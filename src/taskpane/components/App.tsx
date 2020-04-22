@@ -44,19 +44,13 @@ export default class App extends React.Component<AppProps, AppState> {
   click = async () => {
     try {
       await Excel.run(async context => {
-        /**
-         * Insert your Excel code here
-         */
-        const range = context.workbook.getSelectedRange();
+        var sheets = context.workbook.worksheets;
+        var sheet = sheets.add("Sheet2");
+        sheet.load("name, position");
 
-        // Read the range address
-        range.load("address");
-
-        // Update the fill color
-        range.format.fill.color = "yellow";
-
-        await context.sync();
-        console.log(`The range address was ${range.address}.`);
+        return context.sync().then(function() {
+          console.log(`Added worksheet named "${sheet.name}" in position ${sheet.position}`);
+        });
       });
     } catch (error) {
       console.error(error);
@@ -76,16 +70,14 @@ export default class App extends React.Component<AppProps, AppState> {
       <div className="ms-welcome">
         <Header logo="assets/logo-filled.png" title={this.props.title} message="Welcome" />
         <HeroList message="Discover what Office Add-ins can do for you today!" items={this.state.listItems}>
-          <p className="ms-font-l">
-            Modify the source files, then click <b>Run</b>.
-          </p>
+          <p className="ms-font-l">Create a new worksheet</p>
           <Button
             className="ms-welcome__action"
             buttonType={ButtonType.hero}
             iconProps={{ iconName: "ChevronRight" }}
             onClick={this.click}
           >
-            Run
+            Create
           </Button>
         </HeroList>
       </div>
