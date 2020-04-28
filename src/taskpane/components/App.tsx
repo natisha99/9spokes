@@ -3,7 +3,9 @@ import { Button, ButtonType } from "office-ui-fabric-react";
 import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
 import Progress from "./Progress";
-import { populateTable } from "../sheets/house";
+import { Populate_house } from "../sheets/population";
+import { populate_LinkedIn } from "../sheets/population";
+
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
 
@@ -73,8 +75,8 @@ export default class App extends React.Component<AppProps, AppState> {
     
   click = async () => {
     try {
-      populateTable();
-      
+      Populate_house();
+      populate_LinkedIn();
     } catch (error) {
       console.error(error);
     }
