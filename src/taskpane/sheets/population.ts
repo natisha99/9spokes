@@ -1,8 +1,14 @@
+/**
+ * this is a file which allows the population of th eexcel spreadsheet through individual objects
+ * a useful link is:
+ * https://docs.microsoft.com/en-us/javascript/api/excel/excel.range?view=excel-js-preview#values
+ * 
+ * I have not finished adding docstrings nor enhancing it but everything should be working
+ */
 import { getData } from "./api";
 
-//https://docs.microsoft.com/en-us/javascript/api/excel/excel.range?view=excel-js-preview#values
-
 export function populateHouse() {
+
   let House = {
     //Stores excel index for data
     name: ["B1", "E1", "H1", "K1", "N1"],
@@ -89,6 +95,7 @@ export function populateHouse() {
   //#endregion
 }
 
+
 export function populateLinkedIn() {
   let Linkedin = {
     //Stores excel index for data
@@ -160,6 +167,7 @@ export function populateLinkedIn() {
   //#endregion
 }
 
+
 export function populateFinance() {
   let Finance = {
     //Stores excel index for data
@@ -219,7 +227,7 @@ export function populateFinance() {
     }
   };
 
-  //#region [rgba(20,50,20,0.5)]
+  //#region [rgba(20,50,20,0.5)] sample driver code
   let name_sample = "company";
   let summary_sample = [
     ["100B", "+20%"],
