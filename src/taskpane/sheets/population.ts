@@ -129,18 +129,16 @@ export function Populate_finance() {
         sheet.getRange(stocks).values = dump[1];
         return context.sync()
           .then(function () {
-          console.log("Done");
-        })
+            console.log("Done");
+          })
       })
-  },
-}
+    },
+  }
 
-//sample driver code
-let summary_sample = [["not flix"], ["100B"], ["+20%"], ["200M"], ["+20%"], ["5%"], ["+20%"], ["50"], ["+20%"], ["300B"], ["+20%"], ["10"], ["+20%"]]
-let stocks_sample = [["10/10/20"], [1], ["11/10/20"], [1], ["12/10/20"], [2], ["13/10/20"], [3]]
-let sample = [summary_sample, stocks_sample,]
-//stores companies house data
-Finance.store(sample);
-
-
+  //sample driver code
+  let summary_sample = [["not flix"], ["100B"], ["+20%"], ["200M"], ["+20%"], ["5%"], ["+20%"], ["50"], ["+20%"], ["300B"], ["+20%"], ["10"], ["+20%"]]
+  let stocks_sample = [["10/10/20"], [1], ["11/10/20"], [1], ["12/10/20"], [2], ["13/10/20"], [3]]
+  let sample = [summary_sample, stocks_sample,]
+  //stores companies house data
+  Finance.store(sample);
 }
