@@ -5,7 +5,9 @@ import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
 import Title from "./Title";
 import Progress from "./Progress";
-import { populateTable } from "../sheets/house";
+import { Populate_house } from "../sheets/population";
+import { populate_LinkedIn } from "../sheets/population";
+import { Populate_finance } from "../sheets/population";
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
 
@@ -73,14 +75,6 @@ export default class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  // click = async () => {
-  //   try {
-  //     populateTable();
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
   //side pannel main data, images etc
   render() {
     const { title, isOfficeInitialized } = this.props;
@@ -117,7 +111,7 @@ export default class App extends React.Component<AppProps, AppState> {
                 iconProps={{ iconName: "ChevronRight" }}
                 onClick={() => {
                   try {
-                    populateTable();
+                    Populate_house();
                   } catch (error) {
                     console.error(error);
                   }
@@ -138,6 +132,13 @@ export default class App extends React.Component<AppProps, AppState> {
                 className="apiButton"
                 buttonType={ButtonType.hero}
                 iconProps={{ iconName: "ChevronRight" }}
+                onClick={() => {
+                  try {
+                    Populate_finance();
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }}
               >
                 Yahoo Finance
               </Button>
@@ -146,6 +147,13 @@ export default class App extends React.Component<AppProps, AppState> {
                 className="apiButton"
                 buttonType={ButtonType.hero}
                 iconProps={{ iconName: "ChevronRight" }}
+                onClick={() => {
+                  try {
+                    populate_LinkedIn();
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }}
               >
                 LinkedIn
               </Button>
