@@ -73,14 +73,13 @@ export default class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  click = async () => {
-    try {
-      populateTable();
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // click = async () => {
+  //   try {
+  //     populateTable();
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   //side pannel main data, images etc
   render() {
@@ -116,7 +115,13 @@ export default class App extends React.Component<AppProps, AppState> {
                 className="apiButton"
                 buttonType={ButtonType.hero}
                 iconProps={{ iconName: "ChevronRight" }}
-                onClick={this.click}
+                onClick={() => {
+                  try {
+                    populateTable();
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }}
               >
                 Companies House
               </Button>
