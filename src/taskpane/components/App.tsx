@@ -75,6 +75,16 @@ export default class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  // click = async () => {
+  //   try {
+  //     Populate_house();
+  //     populate_LinkedIn();
+  //     Populate_finance();
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
   //side pannel main data, images etc
   render() {
     const { title, isOfficeInitialized } = this.props;
@@ -178,7 +188,6 @@ export default class App extends React.Component<AppProps, AppState> {
                 className="apiButton"
                 buttonType={ButtonType.hero}
                 iconProps={{ iconName: "ChevronRight" }}
-
               >
                 Facebook
               </Button>
