@@ -141,6 +141,4 @@ export function Populate_finance() {
   let sample = [summary_sample, stocks_sample,]
   //stores companies house data
   Finance.store(sample);
-
-
 }
