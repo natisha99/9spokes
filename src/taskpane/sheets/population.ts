@@ -20,7 +20,6 @@ export function populateHouse() {
 
     store: function (dump: any[]) {
       /**
-      * This is a function.
       *
       * @param {array} dump - A data dump in the form of a 3d array
       * dump = [
@@ -113,7 +112,6 @@ export function populateLinkedIn() {
 
     store: function (dump: any[]) {
       /**
-      * This is a function.
       *
       * @param {array} dump - A data dump in the form of a 3d array
       * dump = [
@@ -183,7 +181,6 @@ export function populateFinance() {
 
     store: function (dump: any[]) {
       /**
-      * This is a function.
       *
       * @param {array} dump - A data dump in the form of a 3d array
       * dump = [
@@ -246,5 +243,220 @@ export function populateFinance() {
   let sample = [name_sample, summary_sample, stocks_sample];
   //stores finance data
   Finance.store(sample);
+  //#endregion
+}
+
+export function populateTrends() {
+  let Trends = {
+    //Stores excel index for data
+    summary: ["C2:C7", "D2:D7", "E2:E7", "F2:F7", "G2:G7"],
+    data: ["C13:C", "D13:D", "F13:F", "F13:F", "G13:G"],
+    date: "B13:B",
+    item: 0,
+
+    store: function (dump: any[]) {
+      /**
+      *
+      * @param {array} dump - A data dump in the form of a 3d array
+      * dump = [
+      *         [summary],
+      *         [data]
+      *         date or none
+      *        ] 
+      * 
+      * @example
+      * Trends.store([
+      *                   [["1"], ["2"], ["3"], ["4"], ["5"]]
+      *                   [[100], [90], [2], [3], [12], [30]]
+      *                   0
+      *               ]);
+      */
+      let summary = this.summary[0];
+      let data = this.data[this.item] + String(dump[1].length + 12);
+      let date;
+      if (dump[2] != 0) {
+        date = this.date + String(dump[2].length + 12);
+      }
+      this.item++;
+      //add into cells
+      Excel.run(function (context) {
+        var sheet = context.workbook.worksheets.getItem("Trends");
+        sheet.getRange(summary).values = dump[0];
+        sheet.getRange(data).values = dump[1];
+        if (dump[2] != 0) {
+          sheet.getRange(date).values = dump[2];
+        }
+        return context.sync().then(function () {
+          console.log("Imported Trends");
+        });
+      });
+    }
+  };
+
+  //#region [rgba(10,50,50,0.5)] sample driver code
+  let summary_sample = [["1"], ["2"], ["3"], ["4"], ["5"], ["6"]];
+  let data_sample = [[100], [90], [2], [3], [12], [30]];
+  let sample = [summary_sample, data_sample, "0"];
+  //stores Google Trends data
+  Trends.store(sample);
+  //#endregion
+
+}
+
+export function populateXero() {
+  let Xero = {
+    //Stores excel index for data
+    summary: [],
+    data: [],
+    item: 0,
+
+    store: function (dump: any[]) {
+      /**
+      *
+      * @param {array} dump - A data dump in the form of a 3d array
+      * 
+      * @example
+      * Trends.store([
+      * 
+      * 
+      *               ]);
+      */
+      let summary = this.summary[0];
+      let data = this.data[this.item] + String(dump[1].length + "START VALUE -1");
+      this.item++;
+      //add into cells
+      Excel.run(function (context) {
+        var sheet = context.workbook.worksheets.getItem("Xero");
+        sheet.getRange(summary).values = dump[0];
+        sheet.getRange(data).values = dump[1];
+        return context.sync().then(function () {
+          console.log("Imported Xero");
+        });
+      });
+    }
+  };
+
+  //#region [rgba(50,20,50,0.5)] sample driver code
+  let summary_sample = [["1"], ["2"], ["3"], ["4"], ["5"], ["6"]];
+  let data_sample = [[100], [90], [2], [3], [12], [30]];
+  let sample = [summary_sample, data_sample, "0"];
+  //stores Xero data
+  Xero.store(sample);
+  //#endregion
+
+  //#region [rgba(255,0,0,0.2)] sample test code for linking up to app.tsx
+  Excel.run(function (context) {
+    var sheet = context.workbook.worksheets.getItem("Xero");
+    sheet.getRange("A1:A1").values = [["WORKS"]];
+    return context.sync().then(function () {
+      console.log("Imported Trends");
+    });
+  });
+  //#endregion
+}
+
+
+export function populateFacebook() {
+  let Facebook = {
+    //Stores excel index for data
+    summary: [],
+    data: [],
+    item: 0,
+
+    store: function (dump: any[]) {
+      /**
+      *
+      * @param {array} dump - A data dump in the form of a 3d array
+      * 
+      * @example
+      * Facebook.store([
+      * 
+      * 
+      *               ]);
+      */
+      let summary = this.summary[0];
+      let data = this.data[this.item] + String(dump[1].length + "START VALUE -1");
+      this.item++;
+      //add into cells
+      Excel.run(function (context) {
+        var sheet = context.workbook.worksheets.getItem("Facebook");
+        sheet.getRange(summary).values = dump[0];
+        sheet.getRange(data).values = dump[1];
+        return context.sync().then(function () {
+          console.log("Imported Facebook");
+        });
+      });
+    }
+  };
+
+  //#region [rgba(50,50,20,0.5)] sample driver code
+  let summary_sample = [["1"], ["2"], ["3"], ["4"], ["5"], ["6"]];
+  let data_sample = [[100], [90], [2], [3], [12], [30]];
+  let sample = [summary_sample, data_sample, "0"];
+  //stores Facebook data
+  Facebook.store(sample);
+  //#endregion
+
+  //#region [rgba(255,0,0,0.2)] sample test code for linking up to app.tsx
+  Excel.run(function (context) {
+    var sheet = context.workbook.worksheets.getItem("Facebook");
+    sheet.getRange("A1:A1").values = [["WORKS"]];
+    return context.sync().then(function () {
+      console.log("Imported Trends");
+    });
+  });
+  //#endregion
+}
+
+
+export function populateTwitter() {
+  let Twitter = {
+    //Stores excel index for data
+    summary: [],
+    data: [],
+    item: 0,
+
+    store: function (dump: any[]) {
+      /**
+      *
+      * @param {array} dump - A data dump in the form of a 3d array
+      * 
+      * @example
+      * Twitter.store([
+      * 
+      * 
+      *               ]);
+      */
+      let summary = this.summary[0];
+      let data = this.data[this.item] + String(dump[1].length + "START VALUE -1");
+      this.item++;
+      //add into cells
+      Excel.run(function (context) {
+        var sheet = context.workbook.worksheets.getItem("Twitter");
+        sheet.getRange(summary).values = dump[0];
+        sheet.getRange(data).values = dump[1];
+        return context.sync().then(function () {
+          console.log("Imported Twitter");
+        });
+      });
+    }
+  };
+
+  //#region [rgba(40,60,80,0.5)] sample driver code
+  let summary_sample = [["1"], ["2"], ["3"], ["4"], ["5"], ["6"]];
+  let data_sample = [[100], [90], [2], [3], [12], [30]];
+  let sample = [summary_sample, data_sample, "0"];
+  //stores Twitter data
+  Twitter.store(sample);
+  //#endregion
+
+  //#region [rgba(255,0,0,0.2)] sample test code for linking up to app.tsx
+  Excel.run(function (context) {
+    var sheet = context.workbook.worksheets.getItem("Twitter");
+    sheet.getRange("A1:A1").values = [["WORKS"]];
+    return context.sync().then(function () {
+      console.log("Imported Trends");
+    });
+  });
   //#endregion
 }
