@@ -5,7 +5,7 @@ import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
 import Title from "./Title";
 import Progress from "./Progress";
-import { populateHouse, populateLinkedIn, populateFinance } from "../sheets/population";
+import { populateHouse, populateLinkedIn, populateFinance, populateTrends, populateFacebook, populateTwitter, populateXero } from "../sheets/population";
 
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
@@ -51,11 +51,11 @@ export default class App extends React.Component<AppProps, AppState> {
    */
   loadTemplate = async () => {
     try {
-      Excel.run(async function(context) {
+      Excel.run(async function (context) {
         var templateFile = await (await fetch("/prototype.xlsm")).blob();
         var reader = new FileReader();
-        reader.onload = function(_event) {
-          Excel.run(function(context) {
+        reader.onload = function (_event) {
+          Excel.run(function (context) {
             // strip off the metadata before the base64-encoded string
             var startIndex = reader.result.toString().indexOf("base64,");
             var workbookContents = reader.result.toString().substr(startIndex + 7);
@@ -121,7 +121,18 @@ export default class App extends React.Component<AppProps, AppState> {
                 Companies House
               </Button>
               <br />
-              <Button className="apiButton" buttonType={ButtonType.hero} iconProps={{ iconName: "ChevronRight" }}>
+              <Button
+                className="apiButton"
+                buttonType={ButtonType.hero}
+                iconProps={{ iconName: "ChevronRight" }}
+                onClick={() => {
+                  try {
+                    populateTrends();
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }}
+              >
                 Google Trends
               </Button>
               <br />
@@ -155,16 +166,49 @@ export default class App extends React.Component<AppProps, AppState> {
                 LinkedIn
               </Button>
               <br />
-              <Button className="apiButton" buttonType={ButtonType.hero} iconProps={{ iconName: "ChevronRight" }}>
+              <Button
+                className="apiButton"
+                buttonType={ButtonType.hero}
+                iconProps={{ iconName: "ChevronRight" }}
+                onClick={() => {
+                  try {
+                    populateXero();
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }}
+              >
                 Xero
               </Button>
               <br />
-              <Button className="apiButton" buttonType={ButtonType.hero} iconProps={{ iconName: "ChevronRight" }}>
-                Twitter
+              <Button
+                className="apiButton"
+                buttonType={ButtonType.hero}
+                iconProps={{ iconName: "ChevronRight" }}
+                onClick={() => {
+                  try {
+                    populateFacebook();
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }}
+              >
+                Facebook
               </Button>
               <br />
-              <Button className="apiButton" buttonType={ButtonType.hero} iconProps={{ iconName: "ChevronRight" }}>
-                Facebook
+              <Button
+                className="apiButton"
+                buttonType={ButtonType.hero}
+                iconProps={{ iconName: "ChevronRight" }}
+                onClick={() => {
+                  try {
+                    populateTwitter();
+                  } catch (error) {
+                    console.error(error);
+                  }
+                }}
+              >
+                Twitter
               </Button>
             </Title>
           </PivotItem>
