@@ -1,14 +1,13 @@
 /**
- * this is a file which allows the population of th eexcel spreadsheet through individual objects
+ * this is a file which allows the population of the excel spreadsheet through individual objects
  * a useful link is:
  * https://docs.microsoft.com/en-us/javascript/api/excel/excel.range?view=excel-js-preview#values
- * 
+ *
  * I have not finished adding docstrings nor enhancing it but everything should be working
  */
-import { getData } from "./api";
+import { getHouseData } from "./api";
 
-export function populateHouse() {
-
+export async function populateHouse() {
   let House = {
     //Stores excel index for data
     name: ["B1", "E1", "H1", "K1", "N1"],
@@ -18,28 +17,28 @@ export function populateHouse() {
     share: ["B34:C", "E34:F", "H34:I", "K34:L", "N34:O"],
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
-      *
-      * @param {array} dump - A data dump in the form of a 3d array
-      * dump = [
-      *         [[Name]]
-      *         [[summary]],
-      *         [[NZBN]],
-      *         [[directors]],
-      *         [[shares]]
-      *        ] 
-      * 
-      * @example
-      * House.store([ [["Company"]]
-      *               [["12345"], ["54321"], ["2025"], ["Active"], ["manufacturing"], ["yes"], ["11235813"]]
-      *               [["gst"], ["www.website.com"], ["911"], ["gmail"], ["name"], ["mars"], ["class"], ["ABN"]]
-      *               [["Bob"], ["Jenny"], ["Fred"]]
-      *               [["Bob"],["10000"], ["Jenny"], ["5000"]]
-      *            ]);
-      * 
-      *     
-      */
+       *
+       * @param {array} dump - A data dump in the form of a 3d array
+       * dump = [
+       *         [[Name]]
+       *         [[summary]],
+       *         [[NZBN]],
+       *         [[directors]],
+       *         [[shares]]
+       *        ]
+       *
+       * @example
+       * House.store([ [["Company"]]
+       *               [["12345"], ["54321"], ["2025"], ["Active"], ["manufacturing"], ["yes"], ["11235813"]]
+       *               [["gst"], ["www.website.com"], ["911"], ["gmail"], ["name"], ["mars"], ["class"], ["ABN"]]
+       *               [["Bob"], ["Jenny"], ["Fred"]]
+       *               [["Bob"],["10000"], ["Jenny"], ["5000"]]
+       *            ]);
+       *
+       *
+       */
       let name = this.name[this.item];
       let summary = this.summary[this.item];
       let NZBN = this.NZBN[this.item];
@@ -48,52 +47,51 @@ export function populateHouse() {
       this.item++;
 
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("House");
-        sheet.getRange(name).values = dump[0]
+        sheet.getRange(name).values = dump[0];
         sheet.getRange(summary).values = dump[1];
         sheet.getRange(NZBN).values = dump[2];
         sheet.getRange(directors).values = dump[3];
         sheet.getRange(share).values = dump[4];
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported House");
         });
       });
-    },
+    }
   };
-  let data = getData("companies-register");
+
+  const data = await getHouseData("3538758");
 
   //#region [rgba(70,20,20,0.5)] sample code region (color is for a vs code extension)
-  let summary_sample = [
-    [data.company_number],
-    [data.nzbn],
-    [data.incorporated],
-    [data.current_status],
-    [data.entity_type],
-    [data.constitution_filed],
-    [data.annual_return_filing_month]
+  const summary_sample = [
+    [data.INFO.SUMMARY.company_number],
+    [data.INFO.SUMMARY.nzbn],
+    [data.INFO.SUMMARY.incorporation_date],
+    [data.INFO.SUMMARY.company_status],
+    [data.INFO.SUMMARY.entity_type],
+    [data.INFO.SUMMARY.constitution_filed],
+    [data.INFO.SUMMARY.ar_filing_month]
   ];
-  let name_sample = [["Company"]]
-  let NZBN_sample = [["gst"], ["www.website.com"], ["911"], ["gmail"], ["name"], ["mars"], ["class"], ["ABN"]];
+  const name_sample = data.NAME;
+  const NZBN_sample = [["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"]];
   let directors_sample = [];
-  data.directors.forEach(director => {
-    directors_sample.push([director[0]]);
+  data.INFO.DIRECTORS.forEach(director => {
+    directors_sample.push([director.full_legal_name]);
   });
   let share_sample = [];
-  data.shareholdings.shareholders.forEach(shareholder => {
-    share_sample.push(
-      data.shareholdings.extensive_shareholdings == "Yes"
-        ? [shareholder[1], (100 / data.shareholdings.total_nuber_of_shares) * (shareholder[0] as number)]
-        : [shareholder[0], "N/A"]
-    );
+  data.INFO.SHAREHOLDINGS.allocation.forEach(shareholder => {
+    share_sample.push([
+      shareholder[1].toString(),
+      (100 / parseInt(data.INFO.SHAREHOLDINGS.total_number_of_shares)) * parseInt(shareholder[0])
+    ]);
   });
 
-  let sample = [name_sample, summary_sample, NZBN_sample, directors_sample, share_sample];
+  const sample = [name_sample, summary_sample, NZBN_sample, directors_sample, share_sample];
   //stores companies house data
   House.store(sample);
   //#endregion
 }
-
 
 export function populateLinkedIn() {
   let Linkedin = {
@@ -110,24 +108,24 @@ export function populateLinkedIn() {
     ],
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
-      *
-      * @param {array} dump - A data dump in the form of a 3d array
-      * dump = [
-      *         Name,
-      *         [summary],
-      *         about
-      *        ] 
-      * 
-      * @example
-      * Linkedin.store([
-      *                   "Alan",
-      *                   [["professor"], ["Auckland"], ["www.auckland.ac.nz"], ["lots"], ["linkedin.com/whatever"]]
-      *                   [["gst"], ["www.website.com"], ["911"], ["gmail"], ["name"], ["mars"], ["class"], ["ABN"]]
-      *                   "about info"
-      *               ]);
-      */
+       *
+       * @param {array} dump - A data dump in the form of a 3d array
+       * dump = [
+       *         Name,
+       *         [summary],
+       *         about
+       *        ]
+       *
+       * @example
+       * Linkedin.store([
+       *                   "Alan",
+       *                   [["professor"], ["Auckland"], ["www.auckland.ac.nz"], ["lots"], ["linkedin.com/whatever"]]
+       *                   [["gst"], ["www.website.com"], ["911"], ["gmail"], ["name"], ["mars"], ["class"], ["ABN"]]
+       *                   "about info"
+       *               ]);
+       */
       let person: boolean = dump[0];
       let name;
       let summary;
@@ -143,12 +141,12 @@ export function populateLinkedIn() {
       }
       this.item++;
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("Linkedin");
         sheet.getRange(name).values = dump[1];
         sheet.getRange(summary).values = dump[2];
         sheet.getRange(description).values = dump[3];
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported LinkedIn");
         });
       });
@@ -165,7 +163,6 @@ export function populateLinkedIn() {
   //#endregion
 }
 
-
 export function populateFinance() {
   let Finance = {
     //Stores excel index for data
@@ -179,45 +176,45 @@ export function populateFinance() {
     stocks: ["B13:C", "F13:G", "J13:K", "N13:O", "R13:S"],
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
-      *
-      * @param {array} dump - A data dump in the form of a 3d array
-      * dump = [
-      *         Name,
-      *         [summary],
-      *         [stocks]
-      *        ] 
-      * 
-      * @example
-      * Linkedin.store([
-      *                   "Company",
-      *                   [["100B", "+20%"],
-      *                    ["200M", "+20%"],
-      *                    ["5%", "+20%"],
-      *                    ["50", "+20%"],
-      *                    ["300B", "+20%"],
-      *                    ["10", "+20%"]
-      *                   ]
-      *                   [["10/10/20", 1],
-      *                    ["11/10/20", 1],
-      *                    ["12/10/20", 2],
-      *                    ["13/10/20", 3]                  
-      *                   ]
-      *               ]);
-      */
+       *
+       * @param {array} dump - A data dump in the form of a 3d array
+       * dump = [
+       *         Name,
+       *         [summary],
+       *         [stocks]
+       *        ]
+       *
+       * @example
+       * Linkedin.store([
+       *                   "Company",
+       *                   [["100B", "+20%"],
+       *                    ["200M", "+20%"],
+       *                    ["5%", "+20%"],
+       *                    ["50", "+20%"],
+       *                    ["300B", "+20%"],
+       *                    ["10", "+20%"]
+       *                   ]
+       *                   [["10/10/20", 1],
+       *                    ["11/10/20", 1],
+       *                    ["12/10/20", 2],
+       *                    ["13/10/20", 3]
+       *                   ]
+       *               ]);
+       */
       let name = this.summary[this.item][0];
       let summary = this.summary[this.item][1];
       let stocks = this.stocks[this.item] + String(dump[2].length + 12);
       this.item++;
 
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("Finance");
         sheet.getRange(name).values = dump[0];
         sheet.getRange(summary).values = dump[1];
         sheet.getRange(stocks).values = dump[2];
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported Finance");
         });
       });
@@ -254,23 +251,23 @@ export function populateTrends() {
     date: "B13:B",
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
-      *
-      * @param {array} dump - A data dump in the form of a 3d array
-      * dump = [
-      *         [summary],
-      *         [data]
-      *         date or none
-      *        ] 
-      * 
-      * @example
-      * Trends.store([
-      *                   [["1"], ["2"], ["3"], ["4"], ["5"]]
-      *                   [[100], [90], [2], [3], [12], [30]]
-      *                   0
-      *               ]);
-      */
+       *
+       * @param {array} dump - A data dump in the form of a 3d array
+       * dump = [
+       *         [summary],
+       *         [data]
+       *         date or none
+       *        ]
+       *
+       * @example
+       * Trends.store([
+       *                   [["1"], ["2"], ["3"], ["4"], ["5"]]
+       *                   [[100], [90], [2], [3], [12], [30]]
+       *                   0
+       *               ]);
+       */
       let summary = this.summary[0];
       let data = this.data[this.item] + String(dump[1].length + 12);
       let date;
@@ -279,14 +276,14 @@ export function populateTrends() {
       }
       this.item++;
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("Trends");
         sheet.getRange(summary).values = dump[0];
         sheet.getRange(data).values = dump[1];
         if (dump[2] != 0) {
           sheet.getRange(date).values = dump[2];
         }
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported Trends");
         });
       });
@@ -300,7 +297,6 @@ export function populateTrends() {
   //stores Google Trends data
   Trends.store(sample);
   //#endregion
-
 }
 
 export function populateXero() {
@@ -310,26 +306,26 @@ export function populateXero() {
     data: [],
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
-      *
-      * @param {array} dump - A data dump in the form of a 3d array
-      * 
-      * @example
-      * Trends.store([
-      * 
-      * 
-      *               ]);
-      */
+       *
+       * @param {array} dump - A data dump in the form of a 3d array
+       *
+       * @example
+       * Trends.store([
+       *
+       *
+       *               ]);
+       */
       let summary = this.summary[0];
       let data = this.data[this.item] + String(dump[1].length + "START VALUE -1");
       this.item++;
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("Xero");
         sheet.getRange(summary).values = dump[0];
         sheet.getRange(data).values = dump[1];
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported Xero");
         });
       });
@@ -345,16 +341,15 @@ export function populateXero() {
   //#endregion
 
   //#region [rgba(255,0,0,0.2)] sample test code for linking up to app.tsx
-  Excel.run(function (context) {
+  Excel.run(function(context) {
     var sheet = context.workbook.worksheets.getItem("Xero");
     sheet.getRange("A1:A1").values = [["WORKS"]];
-    return context.sync().then(function () {
+    return context.sync().then(function() {
       console.log("Imported Trends");
     });
   });
   //#endregion
 }
-
 
 export function populateFacebook() {
   let Facebook = {
@@ -363,26 +358,26 @@ export function populateFacebook() {
     data: [],
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
-      *
-      * @param {array} dump - A data dump in the form of a 3d array
-      * 
-      * @example
-      * Facebook.store([
-      * 
-      * 
-      *               ]);
-      */
+       *
+       * @param {array} dump - A data dump in the form of a 3d array
+       *
+       * @example
+       * Facebook.store([
+       *
+       *
+       *               ]);
+       */
       let summary = this.summary[0];
       let data = this.data[this.item] + String(dump[1].length + "START VALUE -1");
       this.item++;
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("Facebook");
         sheet.getRange(summary).values = dump[0];
         sheet.getRange(data).values = dump[1];
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported Facebook");
         });
       });
@@ -398,16 +393,15 @@ export function populateFacebook() {
   //#endregion
 
   //#region [rgba(255,0,0,0.2)] sample test code for linking up to app.tsx
-  Excel.run(function (context) {
+  Excel.run(function(context) {
     var sheet = context.workbook.worksheets.getItem("Facebook");
     sheet.getRange("A1:A1").values = [["WORKS"]];
-    return context.sync().then(function () {
+    return context.sync().then(function() {
       console.log("Imported Trends");
     });
   });
   //#endregion
 }
-
 
 export function populateTwitter() {
   let Twitter = {
@@ -416,26 +410,26 @@ export function populateTwitter() {
     data: [],
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
-      *
-      * @param {array} dump - A data dump in the form of a 3d array
-      * 
-      * @example
-      * Twitter.store([
-      * 
-      * 
-      *               ]);
-      */
+       *
+       * @param {array} dump - A data dump in the form of a 3d array
+       *
+       * @example
+       * Twitter.store([
+       *
+       *
+       *               ]);
+       */
       let summary = this.summary[0];
       let data = this.data[this.item] + String(dump[1].length + "START VALUE -1");
       this.item++;
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("Twitter");
         sheet.getRange(summary).values = dump[0];
         sheet.getRange(data).values = dump[1];
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported Twitter");
         });
       });
@@ -451,10 +445,10 @@ export function populateTwitter() {
   //#endregion
 
   //#region [rgba(255,0,0,0.2)] sample test code for linking up to app.tsx
-  Excel.run(function (context) {
+  Excel.run(function(context) {
     var sheet = context.workbook.worksheets.getItem("Twitter");
     sheet.getRange("A1:A1").values = [["WORKS"]];
-    return context.sync().then(function () {
+    return context.sync().then(function() {
       console.log("Imported Trends");
     });
   });

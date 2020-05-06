@@ -5,7 +5,15 @@ import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
 import Title from "./Title";
 import Progress from "./Progress";
-import { populateHouse, populateLinkedIn, populateFinance, populateTrends, populateFacebook, populateTwitter, populateXero } from "../sheets/population";
+import {
+  populateHouse,
+  populateLinkedIn,
+  populateFinance,
+  populateTrends,
+  populateFacebook,
+  populateTwitter,
+  populateXero
+} from "../sheets/population";
 
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
@@ -51,11 +59,11 @@ export default class App extends React.Component<AppProps, AppState> {
    */
   loadTemplate = async () => {
     try {
-      Excel.run(async function (context) {
+      Excel.run(async function(context) {
         var templateFile = await (await fetch("/prototype.xlsm")).blob();
         var reader = new FileReader();
-        reader.onload = function (_event) {
-          Excel.run(function (context) {
+        reader.onload = function(_event) {
+          Excel.run(function(context) {
             // strip off the metadata before the base64-encoded string
             var startIndex = reader.result.toString().indexOf("base64,");
             var workbookContents = reader.result.toString().substr(startIndex + 7);

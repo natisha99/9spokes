@@ -1,35 +1,12 @@
-export function getData(apiName: "companies-register" | "google-trends" | "yahoo-finance") {
+export async function getHouseData(companyNumber: string) {
+  const output = await fetch(`https://vladra.com/?companyNumber=${companyNumber}`).then(response => response.json());
+  return output as House;
+}
+
+export async function getData(
+  apiName: "companies-register" | "google-trends" | "yahoo-finance" | "twitter" | "linkedin" | "facebook"
+) {
   if (apiName == "companies-register") {
-    return {
-      name: "mock-biz",
-      nzbn: "54321",
-      company_number: "12345",
-      entity_type: "Spicy",
-      incorporated: "2025",
-      current_status: "Stressed",
-      constitution_filed: "maybe",
-      annual_return_filing_month: "69",
-      ultimate_holding_company: "idk",
-      company_addresses: {
-        registered_office: "k road",
-        address_for_service: "the corner"
-      },
-      directors: [
-        ["name0", "address0"],
-        ["name1", "address1"],
-        ["name2", "address2"]
-      ],
-      shareholdings: {
-        total_nuber_of_shares: 123456,
-        extensive_shareholdings: "Yes",
-        // Note: if extensive_shareholdings == No, then format = ["name", "address"]
-        shareholders: [
-          [123, "name0", "address0"],
-          [123, "name1", "address1"],
-          [123, "name2", "address2"]
-        ]
-      }
-    };
   }
 
   if (apiName == "google-trends") {
@@ -114,6 +91,26 @@ export function getData(apiName: "companies-register" | "google-trends" | "yahoo
       exchangeDataDelayedBy: 0,
       symbol: "FB"
     };
+  }
+
+  if (apiName == "twitter") {
+    return {};
+  }
+
+  if (apiName == "linkedin") {
+    return {
+      firstName: "Frodo",
+      headline: "Jewelery Repossession in Middle Earth",
+      id: "1R2RtA",
+      lastName: "Baggins",
+      siteStandardProfileRequest: {
+        url: "https://www.linkedin.com/profile/view?id=…"
+      }
+    };
+  }
+
+  if (apiName == "facebook") {
+    return {};
   }
 
   return undefined;
