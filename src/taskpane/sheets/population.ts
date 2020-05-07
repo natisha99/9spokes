@@ -80,12 +80,18 @@ export async function populateHouse() {
     directors_sample.push([director.full_legal_name]);
   });
   let share_sample = [];
+  let share_sample_known = 0;
   data.INFO.SHAREHOLDINGS.allocation.forEach(shareholder => {
     share_sample.push([
       shareholder[1].toString(),
       Number(shareholder[0])/Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
     ]);
-  });
+	share_sample_known = share_sample_known+Number(shareholder[0]);
+  });  
+  share_sample.push([
+    "Unknown",
+    (Number(data.INFO.SHAREHOLDINGS.total_number_of_shares) - share_sample_known) / Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
+  ]);
 
   const sample = [name_sample, summary_sample, NZBN_sample, directors_sample, share_sample];
   //stores companies house data
