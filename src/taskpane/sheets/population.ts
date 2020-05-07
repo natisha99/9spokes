@@ -83,7 +83,7 @@ export async function populateHouse() {
   data.INFO.SHAREHOLDINGS.allocation.forEach(shareholder => {
     share_sample.push([
       shareholder[1].toString(),
-      (100 / parseInt(data.INFO.SHAREHOLDINGS.total_number_of_shares)) * parseInt(shareholder[0])
+      Number(shareholder[0])/Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
     ]);
   });
 
