@@ -5,10 +5,12 @@ class House {
     NZBN: {};
     PPSR: {};
     SUMMARY: {
+      url: string;
       nzbn: string;
       entity_type: string;
       company_number: string;
       company_status: string;
+      date_retrieved: string;
       ar_filing_month: string;
       company_addresses: {
         registered_office: string;
