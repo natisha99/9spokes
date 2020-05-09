@@ -3,6 +3,8 @@ import { Button, ButtonType } from "office-ui-fabric-react";
 import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
 import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
+import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
+import { Stack, IStackTokens } from 'office-ui-fabric-react/lib/Stack';
 import Title from "./Title";
 import Progress from "./Progress";
 import {
@@ -59,11 +61,11 @@ export default class App extends React.Component<AppProps, AppState> {
    */
   loadTemplate = async () => {
     try {
-      Excel.run(async function(context) {
+      Excel.run(async function (context) {
         var templateFile = await (await fetch("/prototype.xlsm")).blob();
         var reader = new FileReader();
-        reader.onload = function(_event) {
-          Excel.run(function(context) {
+        reader.onload = function (_event) {
+          Excel.run(function (context) {
             // strip off the metadata before the base64-encoded string
             var startIndex = reader.result.toString().indexOf("base64,");
             var workbookContents = reader.result.toString().substr(startIndex + 7);
@@ -87,6 +89,7 @@ export default class App extends React.Component<AppProps, AppState> {
   //side pannel main data, images etc
   render() {
     const { title, isOfficeInitialized } = this.props;
+    const stackTokens: Partial<IStackTokens> = { childrenGap: 20 };
 
     if (!isOfficeInitialized) {
       return (
@@ -110,6 +113,13 @@ export default class App extends React.Component<AppProps, AppState> {
               >
                 Create workbook from template
               </Button>
+            </Title>
+          </PivotItem>
+          <PivotItem headerText="Set-up">
+            <Title message="Search by company name">
+              <Stack tokens={stackTokens}>
+                <SearchBox placeholder="Company Name" onSearch={newValue => console.log('value is ' + newValue)} />
+              </Stack>
             </Title>
           </PivotItem>
           <PivotItem headerText="Import">
