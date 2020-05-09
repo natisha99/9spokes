@@ -11,7 +11,6 @@ import {
   populateFinance,
   populateTrends,
   populateFacebook,
-  populateTwitter,
   populateXero
 } from "../sheets/population";
 
@@ -202,21 +201,6 @@ export default class App extends React.Component<AppProps, AppState> {
                 }}
               >
                 Facebook
-              </Button>
-              <br />
-              <Button
-                className="apiButton"
-                buttonType={ButtonType.hero}
-                iconProps={{ iconName: "ChevronRight" }}
-                onClick={() => {
-                  try {
-                    populateTwitter();
-                  } catch (error) {
-                    console.error(error);
-                  }
-                }}
-              >
-                Twitter
               </Button>
             </Title>
           </PivotItem>

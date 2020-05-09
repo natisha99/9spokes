@@ -5,16 +5,17 @@
  *
  * I have not finished adding docstrings nor enhancing it but everything should be working
  */
-import { getHouseData } from "./api";
+import { getHouseData, getFinanceData } from "./api";
 
 export async function populateHouse() {
   let House = {
     //Stores excel index for data
-    name: ["B1", "E1", "H1", "K1", "N1"],
-    summary: ["C3:C11", "F3:F11", "I3:I11", "L3:L11", "O3:O11"],
-    NZBN: ["C14:C21", "F14:F21", "I14:I21", "L14:L21", "O14:O21"],
-    directors: ["B24:B", "E24:E", "H24:H", "K24:K", "N24:N"],
-    share: ["B36:C", "E36:F", "H36:I", "K36:L", "N36:O"],
+    name: ["B1", "E1"],
+    summary: ["C3:C11", "F3:F11"],
+    NZBN: ["C14:C21", "F14:F21"],
+    directors: ["B24:B", "E24:E"],
+    share: ["B36:C", "E36:F"],
+
     item: 0,
 
     store: function(dump: any[]) {
@@ -72,8 +73,8 @@ export async function populateHouse() {
     [data.INFO.SUMMARY.entity_type],
     [data.INFO.SUMMARY.constitution_filed],
     [data.INFO.SUMMARY.ar_filing_month],
-	[data.INFO.SUMMARY.date_retrieved],
-	[data.INFO.SUMMARY.url]
+	  [data.INFO.SUMMARY.date_retrieved],
+	  [data.INFO.SUMMARY.url]
   ];
   const name_sample = data.NAME;
   const NZBN_sample = [["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"]];
@@ -86,13 +87,14 @@ export async function populateHouse() {
   data.INFO.SHAREHOLDINGS.allocation.forEach(shareholder => {
     share_sample.push([
       shareholder[1].toString(),
-      Number(shareholder[0])/Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
+      Number(shareholder[0]) / Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
     ]);
-	share_sample_known = share_sample_known+Number(shareholder[0]);
-  });  
+    share_sample_known = share_sample_known + Number(shareholder[0]);
+  });
   share_sample.push([
     "Unknown",
-    (Number(data.INFO.SHAREHOLDINGS.total_number_of_shares) - share_sample_known) / Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
+    (Number(data.INFO.SHAREHOLDINGS.total_number_of_shares) - share_sample_known) /
+      Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
   ]);
 
   const sample = [name_sample, summary_sample, NZBN_sample, directors_sample, share_sample];
@@ -171,7 +173,7 @@ export function populateLinkedIn() {
   //#endregion
 }
 
-export function populateFinance() {
+export async function populateFinance() {
   let Finance = {
     //Stores excel index for data
     summary: [
@@ -228,9 +230,11 @@ export function populateFinance() {
       });
     }
   };
+  const data = await getFinanceData("AIR.NZ", "1d", "1y");
+  console.log(data);
 
   //#region [rgba(20,50,20,0.5)] sample driver code
-  let name_sample = "company";
+  let name_sample = "TODO";
   let summary_sample = [
     ["100B", "+20%"],
     ["200M", "+20%"],
@@ -403,58 +407,6 @@ export function populateFacebook() {
   //#region [rgba(255,0,0,0.2)] sample test code for linking up to app.tsx
   Excel.run(function(context) {
     var sheet = context.workbook.worksheets.getItem("Facebook");
-    sheet.getRange("A1:A1").values = [["WORKS"]];
-    return context.sync().then(function() {
-      console.log("Imported Trends");
-    });
-  });
-  //#endregion
-}
-
-export function populateTwitter() {
-  let Twitter = {
-    //Stores excel index for data
-    summary: [],
-    data: [],
-    item: 0,
-
-    store: function(dump: any[]) {
-      /**
-       *
-       * @param {array} dump - A data dump in the form of a 3d array
-       *
-       * @example
-       * Twitter.store([
-       *
-       *
-       *               ]);
-       */
-      let summary = this.summary[0];
-      let data = this.data[this.item] + String(dump[1].length + "START VALUE -1");
-      this.item++;
-      //add into cells
-      Excel.run(function(context) {
-        var sheet = context.workbook.worksheets.getItem("Twitter");
-        sheet.getRange(summary).values = dump[0];
-        sheet.getRange(data).values = dump[1];
-        return context.sync().then(function() {
-          console.log("Imported Twitter");
-        });
-      });
-    }
-  };
-
-  //#region [rgba(40,60,80,0.5)] sample driver code
-  let summary_sample = [["1"], ["2"], ["3"], ["4"], ["5"], ["6"]];
-  let data_sample = [[100], [90], [2], [3], [12], [30]];
-  let sample = [summary_sample, data_sample, "0"];
-  //stores Twitter data
-  Twitter.store(sample);
-  //#endregion
-
-  //#region [rgba(255,0,0,0.2)] sample test code for linking up to app.tsx
-  Excel.run(function(context) {
-    var sheet = context.workbook.worksheets.getItem("Twitter");
     sheet.getRange("A1:A1").values = [["WORKS"]];
     return context.sync().then(function() {
       console.log("Imported Trends");
