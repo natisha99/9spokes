@@ -15,6 +15,7 @@ export async function populateHouse() {
     NZBN: ["C14:C21", "F14:F21"],
     directors: ["B24:B", "E24:E"],
     share: ["B36:C", "E36:F"],
+
     item: 0,
 
     store: function(dump: any[]) {
@@ -72,8 +73,8 @@ export async function populateHouse() {
     [data.INFO.SUMMARY.entity_type],
     [data.INFO.SUMMARY.constitution_filed],
     [data.INFO.SUMMARY.ar_filing_month],
-    [data.DATE],
-    ["TODO"]
+	  [data.INFO.SUMMARY.date_retrieved],
+	  [data.INFO.SUMMARY.url]
   ];
   const name_sample = data.NAME;
   const NZBN_sample = [["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"]];
