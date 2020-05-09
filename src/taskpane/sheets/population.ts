@@ -229,25 +229,27 @@ export async function populateFinance() {
       });
     }
   };
-  const data = await getFinanceData("AIR.NZ", "1d", "1y");
-  console.log(data);
+  const data = (await getFinanceData("AIR.NZ", "1d", "1y")).chart.result[0];
 
   //#region [rgba(20,50,20,0.5)] sample driver code
-  let name_sample = "TODO";
+  let name_sample = data.meta.symbol;
   let summary_sample = [
-    ["100B", "+20%"],
-    ["200M", "+20%"],
-    ["5%", "+20%"],
-    ["50", "+20%"],
-    ["300B", "+20%"],
-    ["10", "+20%"]
+    ["100B", "+TODO%"],
+    ["200M", "+TODO%"],
+    ["5%", "+TODO%"],
+    ["50", "+TODO%"],
+    ["300B", "+TODO%"],
+    ["10", "+TODO%"]
   ];
-  let stocks_sample = [
-    ["10/10/20", 1],
-    ["11/10/20", 1],
-    ["12/10/20", 2],
-    ["13/10/20", 3]
-  ];
+  let stocks_sample = [];
+  data.timestamp.forEach((day, index) => {
+    const date = new Date(day * 1000);
+    stocks_sample.push([
+      `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+      data.indicators.adjclose[0].adjclose[index]
+    ]);
+  });
+
   let sample = [name_sample, summary_sample, stocks_sample];
   //stores finance data
   Finance.store(sample);
