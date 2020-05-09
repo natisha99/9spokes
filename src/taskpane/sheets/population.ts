@@ -11,10 +11,10 @@ export async function populateHouse() {
   let House = {
     //Stores excel index for data
     name: ["B1", "E1", "H1", "K1", "N1"],
-    summary: ["C3:C9", "F3:F9", "I3:I9", "L3:L9", "O3:O9"],
-    NZBN: ["C12:C19", "F12:F19", "I12:I19", "L12:L19", "O12:O19"],
-    directors: ["B22:B", "E22:E", "H22:H", "K22:K", "N22:N"],
-    share: ["B34:C", "E34:F", "H34:I", "K34:L", "N34:O"],
+    summary: ["C3:C11", "F3:F11", "I3:I11", "L3:L11", "O3:O11"],
+    NZBN: ["C14:C21", "F14:F21", "I14:I21", "L14:L21", "O14:O21"],
+    directors: ["B24:B", "E24:E", "H24:H", "K24:K", "N24:N"],
+    share: ["B36:C", "E36:F", "H36:I", "K36:L", "N36:O"],
     item: 0,
 
     store: function(dump: any[]) {
@@ -42,8 +42,8 @@ export async function populateHouse() {
       let name = this.name[this.item];
       let summary = this.summary[this.item];
       let NZBN = this.NZBN[this.item];
-      let directors = this.directors[this.item] + String(dump[3].length + 21);
-      let share = this.share[this.item] + String(dump[4].length + 33);
+      let directors = this.directors[this.item] + String(dump[3].length + 23);
+      let share = this.share[this.item] + String(dump[4].length + 35);
       this.item++;
 
       //add into cells
@@ -71,7 +71,9 @@ export async function populateHouse() {
     [data.INFO.SUMMARY.company_status],
     [data.INFO.SUMMARY.entity_type],
     [data.INFO.SUMMARY.constitution_filed],
-    [data.INFO.SUMMARY.ar_filing_month]
+    [data.INFO.SUMMARY.ar_filing_month],
+	[data.INFO.SUMMARY.date_retrieved],
+	[data.INFO.SUMMARY.url]
   ];
   const name_sample = data.NAME;
   const NZBN_sample = [["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"]];
