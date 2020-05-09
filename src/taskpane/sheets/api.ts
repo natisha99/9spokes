@@ -17,7 +17,7 @@ export async function getHouseData(companyNumber: string) {
  */
 export async function getFinanceData(ticker: string, interval: string, range: string) {
   const output = await fetch(
-    `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=${interval}&range=${range}`
+    `https://projectapi.co.nz/api/yahoofinances/?interval=${interval}&range=${range}&ticker_symbol=${ticker}`
   ).then(response => response.json());
   return output as Finance;
 }
