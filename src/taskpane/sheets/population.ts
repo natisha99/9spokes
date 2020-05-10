@@ -306,13 +306,18 @@ export async function populateTrends() {
     }
   };
   let config = (await loadConfig()).trends[0];
-  const data = getTrendsData(config.keyword, config.weeks);
+  const data = await getTrendsData(config.keyword, config.weeks);
   console.log(data);
 
   //#region [rgba(10,50,50,0.5)] sample driver code
-  let summary_sample = [["1"], ["2"], ["3"], ["4"], ["5"], ["6"]];
-  let data_sample = [[100], [90], [2], [3], [12], [30]];
-  let sample = [summary_sample, data_sample, "0"];
+  let summary_sample = [[config.keyword], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"]];
+  let data_sample = [];
+  let date_sample = [];
+  data.series.forEach(item => {
+    data_sample.push([item[1]]);
+    date_sample.push([item[0]]);
+  });
+  let sample = [summary_sample, data_sample, date_sample];
   //stores Google Trends data
   Trends.store(sample);
   //#endregion
@@ -364,7 +369,7 @@ export function populateXero() {
     var sheet = context.workbook.worksheets.getItem("Xero");
     sheet.getRange("A1:A1").values = [["WORKS"]];
     return context.sync().then(function() {
-      console.log("Imported Trends");
+      console.log("Imported Xero");
     });
   });
   //#endregion
