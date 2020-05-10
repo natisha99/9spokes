@@ -32,36 +32,5 @@ export async function getTrendsData(keyword: string, weeks: number) {
   const output = await fetch(
     `https://projectapi.co.nz/api/googletrends/?weeks=${weeks}&keyword=${keyword}`
   ).then(response => response.json());
-  return output as Finance;
-}
-
-export async function getData(apiName: "google-trends" | "linkedin" | "facebook") {
-  if (apiName == "google-trends") {
-    return {
-      graph: [
-        ["2015-04-26", 2],
-        ["2015-04-27", 3],
-        ["2015-04-28", 12],
-        ["2015-04-29", 5]
-      ]
-    };
-  }
-
-  if (apiName == "linkedin") {
-    return {
-      firstName: "Frodo",
-      headline: "Jewelery Repossession in Middle Earth",
-      id: "1R2RtA",
-      lastName: "Baggins",
-      siteStandardProfileRequest: {
-        url: "https://www.linkedin.com/profile/view?id=…"
-      }
-    };
-  }
-
-  if (apiName == "facebook") {
-    return {};
-  }
-
-  return undefined;
+  return output as Trends;
 }
