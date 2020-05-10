@@ -5,7 +5,8 @@
  *
  * I have not finished adding docstrings nor enhancing it but everything should be working
  */
-import { getHouseData, getFinanceData } from "./api";
+import { getHouseData, getFinanceData, getTrendsData } from "./api";
+import { loadConfig } from "./config";
 
 export async function populateHouse() {
   let House = {
@@ -61,8 +62,8 @@ export async function populateHouse() {
       });
     }
   };
-
-  const data = await getHouseData("3538758");
+  let config = (await loadConfig()).house[0];
+  const data = await getHouseData(config.companyNumber);
 
   //#region [rgba(70,20,20,0.5)] sample code region (color is for a vs code extension)
   const summary_sample = [
@@ -73,8 +74,8 @@ export async function populateHouse() {
     [data.INFO.SUMMARY.entity_type],
     [data.INFO.SUMMARY.constitution_filed],
     [data.INFO.SUMMARY.ar_filing_month],
-	  [data.INFO.SUMMARY.date_retrieved],
-	  [data.INFO.SUMMARY.url]
+    [data.INFO.SUMMARY.date_retrieved],
+    [data.INFO.SUMMARY.url]
   ];
   const name_sample = data.NAME;
   const NZBN_sample = [["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"]];
@@ -230,7 +231,8 @@ export async function populateFinance() {
       });
     }
   };
-  const data = (await getFinanceData("AIR.NZ", "1d", "1y")).chart.result[0];
+  let config = (await loadConfig()).finance[0];
+  const data = (await getFinanceData(config.ticker, config.interval, config.range)).chart.result[0];
 
   //#region [rgba(20,50,20,0.5)] sample driver code
   let name_sample = data.meta.symbol;
@@ -257,7 +259,7 @@ export async function populateFinance() {
   //#endregion
 }
 
-export function populateTrends() {
+export async function populateTrends() {
   let Trends = {
     //Stores excel index for data
     summary: ["C2:C7", "D2:D7", "E2:E7", "F2:F7", "G2:G7"],
@@ -303,6 +305,9 @@ export function populateTrends() {
       });
     }
   };
+  let config = (await loadConfig()).trends[0];
+  const data = getTrendsData(config.keyword, config.weeks);
+  console.log(data);
 
   //#region [rgba(10,50,50,0.5)] sample driver code
   let summary_sample = [["1"], ["2"], ["3"], ["4"], ["5"], ["6"]];
