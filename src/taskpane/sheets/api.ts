@@ -22,6 +22,19 @@ export async function getFinanceData(ticker: string, interval: string, range: st
   return output as Finance;
 }
 
+/**
+ * Fetch Google trends data.
+ * @param keyword search word
+ * @param weeks history period
+ * @returns {Trends}
+ */
+export async function getTrendsData(keyword: string, weeks: number) {
+  const output = await fetch(
+    `https://projectapi.co.nz/api/googletrends/?weeks=${weeks}&keyword=${keyword}`
+  ).then(response => response.json());
+  return output as Finance;
+}
+
 export async function getData(apiName: "google-trends" | "linkedin" | "facebook") {
   if (apiName == "google-trends") {
     return {
