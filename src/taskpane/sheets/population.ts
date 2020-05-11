@@ -78,7 +78,16 @@ export async function populateHouse() {
     [data.INFO.SUMMARY.url]
   ];
   const name_sample = data.NAME;
-  const NZBN_sample = [["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"]];
+  const NZBN_sample = [
+    ["TODO"], 
+    ["TODO"], 
+	["TODO"], 
+	["TODO"], 
+	["TODO"], 
+	["TODO"], 
+	[data.INFO.NZBN.industry], 
+	["TODO"]
+  ];
   let directors_sample = [];
   data.INFO.DIRECTORS.forEach(director => {
     directors_sample.push([director.full_legal_name]);
@@ -87,7 +96,7 @@ export async function populateHouse() {
   let share_sample_known = 0;
   data.INFO.SHAREHOLDINGS.allocation.forEach(shareholder => {
     share_sample.push([
-      shareholder[1].toString(),
+      shareholder[1][0][0].toString(),
       Number(shareholder[0]) / Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
     ]);
     share_sample_known = share_sample_known + Number(shareholder[0]);

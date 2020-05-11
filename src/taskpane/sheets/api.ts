@@ -16,7 +16,7 @@ export async function searchCompany(searchString: string) {
  * @returns {House}
  */
 export async function getHouseData(companyNumber: string) {
-  const output = await fetch(`https://vladra.com/?companyNumber=${companyNumber}`).then(response => response.json());
+  const output = await fetch(`https://projectapi.co.nz/api/nzcompaniesoffice/?company_number=${companyNumber}`).then(response => response.json());
   return output as House;
 }
 
