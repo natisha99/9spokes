@@ -1,76 +1,70 @@
 # Office 365 9 Spokes Integration
 
-add info here
+## Description
 
-## Debugging
+This is an Addin for Microsoft Excel which uses APIs to find public data sources such as
 
-This app supports debugging using any of the following techniques:
+- Companies Office
+- Yahoo Finance
+- Google Trends
+- LinkedIn
 
-* [Use a browser's developer tools](https://docs.microsoft.com/office/dev/add-ins/testing/debug-add-ins-in-office-online)
-* [Attach a debugger from the task pane](https://docs.microsoft.com/office/dev/add-ins/testing/attach-debugger-from-task-pane)
-* [Use F12 developer tools on Windows 10](https://docs.microsoft.com/office/dev/add-ins/testing/debug-add-ins-using-f12-developer-tools-on-windows-10)
+and displays the data in a dashboard that the user can easily modify, use, and access
 
-## Additional resources
+## Running the Program
 
-* [Office add-in documentation](https://docs.microsoft.com/office/dev/add-ins/overview/office-add-ins)
-* More Office Add-in samples at [OfficeDev on Github](https://github.com/officedev)
+run the following script in your terminal from the root directory
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+```bash
+npm stop
+npm start
+```
 
-## Possible APIs
+## Installing
+
+run the following script in your terminal from the root directory
+
+```bash
+npm install
+```
+
+## Current APIs
 
 ### we dont have to impliment all of them but this is the best and most useful APIs I've found
 
 ### [Companies office](https://api.business.govt.nz/api/)
 
-* directors
-* share holding allocations
+- directors
+- share holding allocations
 
-### [Google trends](https://www.npmjs.com/package/google-trends-api)
+### [Google Trends](https://www.npmjs.com/package/google-trends-api)
 
-* search frequency of terms
-  * by geolocation
-  * by time zone
-  * by langauge
+- search frequency of terms
+  - by geolocation
+  - by time zone
+  - by langauge
 
-### [Yahoo finance](https://rapidapi.com/apidojo/api/yahoo-finance1)
+### [Yahoo Finance](https://rapidapi.com/apidojo/api/yahoo-finance1)
 
-* market summary
-* market quotes
-* charts
+- market summary
+- market quotes
+- charts
 
-### [Twitter](https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/api-reference/get-trends-available)
+### [LinkedIn](https://docs.microsoft.com/en-au/linkedin/shared/references/v2/profile)
 
-[more tiwtter](https://rapidapi.com/onurmatik/api/twitter-trending-topics-archive)
+- information about you and your competitors
 
-* trends by locations
-* locations by trends (can do earth)
+## Debugging
 
-### [Facebook](https://developers.facebook.com/docs/graph-api/using-graph-api)
+This app supports debugging using any of the following techniques:
 
-* basic page info on businesses
-* photos metadata
+- [Use a browser's developer tools](https://docs.microsoft.com/office/dev/add-ins/testing/debug-add-ins-in-office-online)
+- [Attach a debugger from the task pane](https://docs.microsoft.com/office/dev/add-ins/testing/attach-debugger-from-task-pane)
+- [Use F12 developer tools on Windows 10](https://docs.microsoft.com/office/dev/add-ins/testing/debug-add-ins-using-f12-developer-tools-on-windows-10)
 
-### [Linkedin](https://docs.microsoft.com/en-au/linkedin/shared/references/v2/profile)
+## Additional Resources
 
-* LOTS about you and your competitors
-* plus its microsoft
+- [Office add-in documentation](https://docs.microsoft.com/office/dev/add-ins/overview/office-add-ins)
+- More Office Add-in samples at [OfficeDev on Github](https://github.com/officedev)
 
-### [yelp](https://www.programmableweb.com/api/yelp-fusion)
-
-* business reviews
-* ratings
-
-### [xero](https://www.programmableweb.com/api/xero)
-
-* bank transactins
-* invoices
-* reports
-
-### [Freshbooks](https://www.programmableweb.com/api/freshbooks)
-
-* invoices
-* expenses
-* estimates
-* reports
-* accounting
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
