@@ -1,4 +1,16 @@
 /**
+ * Fetch companies matching the search query.
+ * @param searchString
+ * @return list of companies, eg [name, number][]
+ */
+export async function searchCompany(searchString: string) {
+  const output = await fetch(
+    `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${searchString.replace(" ", "+")}`
+  ).then(response => response.json());
+  return output as [string, number][];
+}
+
+/**
  * Fetch companies house NZ data.
  * @param companyNumber
  * @returns {House}
