@@ -12,8 +12,10 @@ import {
   populateLinkedIn,
   populateFinance,
   populateTrends,
-  populateFacebook,
-  populateXero
+  /*
+    populateFacebook,
+    populateXero
+  */
 } from "../sheets/population";
 
 //import { SourceMapDevToolPlugin } from "webpack";
@@ -183,6 +185,7 @@ export default class App extends React.Component<AppProps, AppState> {
                 LinkedIn
               </Button>
               <br />
+              {/*
               <Button
                 className="apiButton"
                 buttonType={ButtonType.hero}
@@ -212,6 +215,7 @@ export default class App extends React.Component<AppProps, AppState> {
               >
                 Facebook
               </Button>
+              */}
             </Title>
           </PivotItem>
           <PivotItem headerText="Help">
