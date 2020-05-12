@@ -3,23 +3,21 @@ import { Button, ButtonType } from "office-ui-fabric-react";
 import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
 import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
-import { SearchBox, ISearchBoxStyles } from 'office-ui-fabric-react/lib/SearchBox';
-import { Stack, IStackTokens } from 'office-ui-fabric-react/lib/Stack';
+import { SearchBox, ISearchBoxStyles } from "office-ui-fabric-react/lib/SearchBox";
+import { Stack, IStackTokens } from "office-ui-fabric-react/lib/Stack";
 import Title from "./Title";
 import Progress from "./Progress";
 import {
   populateHouse,
   populateLinkedIn,
   populateFinance,
-  populateTrends,
+  populateTrends
   /*
     populateFacebook,
     populateXero
   */
 } from "../sheets/population";
-import {
-  searchCompany,
-} from "../sheets/api";
+import { searchCompany } from "../sheets/api";
 
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
@@ -50,12 +48,12 @@ export default class App extends React.Component<AppProps, AppState> {
   _showSearchResults = async (bool, val) => {
     this.setState({
       showSearchResults: bool,
-      companyName: val,
+      companyName: val
     });
 
-    this.setState({ companyList: await searchCompany(val) })
+    this.setState({ companyList: await searchCompany(val) });
     // this.search(val);
-  }
+  };
 
   // search = query => {
   //   const url = `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${query.replace(" ", "+")}`;
@@ -92,11 +90,11 @@ export default class App extends React.Component<AppProps, AppState> {
    */
   loadTemplate = async () => {
     try {
-      Excel.run(async function (context) {
+      Excel.run(async function(context) {
         var templateFile = await (await fetch("/prototype.xlsm")).blob();
         var reader = new FileReader();
-        reader.onload = function (_event) {
-          Excel.run(function (context) {
+        reader.onload = function(_event) {
+          Excel.run(function(context) {
             // strip off the metadata before the base64-encoded string
             var startIndex = reader.result.toString().indexOf("base64,");
             var workbookContents = reader.result.toString().substr(startIndex + 7);
@@ -154,9 +152,9 @@ export default class App extends React.Component<AppProps, AppState> {
                   styles={searchBoxStyles}
                   placeholder="Company Name"
                   onSearch={this._showSearchResults.bind(null, true)}
-                // onEscape={this._showSearchResults.bind(null, false)}
-                // onClear={this._showSearchResults.bind(null, false)}
-                // onChange={this._showSearchResults.bind(null, false)}
+                  // onEscape={this._showSearchResults.bind(null, false)}
+                  // onClear={this._showSearchResults.bind(null, false)}
+                  // onChange={this._showSearchResults.bind(null, false)}
                 />
                 <br />
                 {this.state.showSearchResults && "Search results for: " + this.state.companyName}
