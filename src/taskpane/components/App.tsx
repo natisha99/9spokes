@@ -157,7 +157,8 @@ export default class App extends React.Component<AppProps, AppState> {
                   onChange={this._showSearchResults.bind(null, false)}
                 />
                 <br />
-                {this.state.showSearchResults && "Search results for: " + this.state.companyName && this.state.companyList}
+                {this.state.showSearchResults && "Search results for: " + this.state.companyName}
+                {this.state.companyList}
               </Stack>
             </Title>
           </PivotItem>
