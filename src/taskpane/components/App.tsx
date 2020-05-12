@@ -120,7 +120,7 @@ export default class App extends React.Component<AppProps, AppState> {
   //side pannel main data, images etc
   render() {
     const { title, isOfficeInitialized } = this.props;
-    const stackTokens: Partial<IStackTokens> = { childrenGap: 20 };
+    const stackTokens: Partial<IStackTokens> = { childrenGap: 20, maxWidth: 250 };
     const searchBoxStyles: Partial<ISearchBoxStyles> = { root: { width: 250 } };
 
     if (!isOfficeInitialized) {
@@ -160,6 +160,7 @@ export default class App extends React.Component<AppProps, AppState> {
                 />
                 <br />
                 {this.state.showSearchResults && "Search results for: " + this.state.companyName}
+                <br />
                 <br />
                 {this.state.companyList}
               </Stack>
