@@ -3,20 +3,21 @@ import { Button, ButtonType } from "office-ui-fabric-react";
 import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
 import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
-import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
-import { Stack, IStackTokens } from 'office-ui-fabric-react/lib/Stack';
+import { SearchBox, ISearchBoxStyles } from "office-ui-fabric-react/lib/SearchBox";
+import { Stack, IStackTokens } from "office-ui-fabric-react/lib/Stack";
 import Title from "./Title";
 import Progress from "./Progress";
 import {
   populateHouse,
   populateLinkedIn,
   populateFinance,
-  populateTrends,
+  populateTrends
   /*
     populateFacebook,
     populateXero
   */
 } from "../sheets/population";
+import { searchCompany } from "../sheets/api";
 
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
@@ -28,15 +29,42 @@ export interface AppProps {
 
 export interface AppState {
   listItems: HeroListItem[];
+  showSearchResults: boolean;
+  companyName: string;
+  companyList: any;
 }
 
 export default class App extends React.Component<AppProps, AppState> {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      listItems: []
+      listItems: [],
+      showSearchResults: false,
+      companyName: "",
+      companyList: null
     };
   }
+
+  _showSearchResults = async (bool, val) => {
+    this.setState({
+      showSearchResults: bool,
+      companyName: val
+    });
+
+    this.setState({ companyList: await searchCompany(val) });
+    // this.search(val);
+  };
+
+  // search = query => {
+  //   const url = `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${query.replace(" ", "+")}`;
+
+  //   fetch(url)
+  //     .then(results => results.json())
+  //     .then(data => {
+  //       this.setState({ companyList: data.results });
+
+  //     });
+  // };
 
   componentDidMount() {
     this.setState({
@@ -62,11 +90,11 @@ export default class App extends React.Component<AppProps, AppState> {
    */
   loadTemplate = async () => {
     try {
-      Excel.run(async function (context) {
+      Excel.run(async function(context) {
         var templateFile = await (await fetch("/prototype.xlsm")).blob();
         var reader = new FileReader();
-        reader.onload = function (_event) {
-          Excel.run(function (context) {
+        reader.onload = function(_event) {
+          Excel.run(function(context) {
             // strip off the metadata before the base64-encoded string
             var startIndex = reader.result.toString().indexOf("base64,");
             var workbookContents = reader.result.toString().substr(startIndex + 7);
@@ -90,7 +118,8 @@ export default class App extends React.Component<AppProps, AppState> {
   //side pannel main data, images etc
   render() {
     const { title, isOfficeInitialized } = this.props;
-    const stackTokens: Partial<IStackTokens> = { childrenGap: 20 };
+    const stackTokens: Partial<IStackTokens> = { childrenGap: 20, maxWidth: 250 };
+    const searchBoxStyles: Partial<ISearchBoxStyles> = { root: { width: 250 } };
 
     if (!isOfficeInitialized) {
       return (
@@ -119,7 +148,19 @@ export default class App extends React.Component<AppProps, AppState> {
           <PivotItem headerText="Set-up">
             <Title message="Search by company name">
               <Stack tokens={stackTokens}>
-                <SearchBox placeholder="Company Name" onSearch={newValue => console.log('value is ' + newValue)} />
+                <SearchBox
+                  styles={searchBoxStyles}
+                  placeholder="Company Name"
+                  onSearch={this._showSearchResults.bind(null, true)}
+                  // onEscape={this._showSearchResults.bind(null, false)}
+                  // onClear={this._showSearchResults.bind(null, false)}
+                  // onChange={this._showSearchResults.bind(null, false)}
+                />
+                <br />
+                {this.state.showSearchResults && "Search results for: " + this.state.companyName}
+                <br />
+                <br />
+                {this.state.companyList}
               </Stack>
             </Title>
           </PivotItem>

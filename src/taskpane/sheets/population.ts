@@ -19,7 +19,7 @@ export async function populateHouse() {
 
     item: 0,
 
-    store: function(dump: any[]) {
+    store: function (dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -49,14 +49,14 @@ export async function populateHouse() {
       this.item++;
 
       //add into cells
-      Excel.run(function(context) {
+      Excel.run(function (context) {
         var sheet = context.workbook.worksheets.getItem("House");
         sheet.getRange(name).values = dump[0];
         sheet.getRange(summary).values = dump[1];
         sheet.getRange(NZBN).values = dump[2];
         sheet.getRange(directors).values = dump[3];
         sheet.getRange(share).values = dump[4];
-        return context.sync().then(function() {
+        return context.sync().then(function () {
           console.log("Imported House");
         });
       });
@@ -95,7 +95,7 @@ export async function populateHouse() {
   share_sample.push([
     "Unknown",
     (Number(data.INFO.SHAREHOLDINGS.total_number_of_shares) - share_sample_known) /
-      Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
+    Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
   ]);
 
   const sample = [name_sample, summary_sample, NZBN_sample, directors_sample, share_sample];
@@ -119,7 +119,7 @@ export function populateLinkedIn() {
     ],
     item: 0,
 
-    store: function(dump: any[]) {
+    store: function (dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -152,12 +152,12 @@ export function populateLinkedIn() {
       }
       this.item++;
       //add into cells
-      Excel.run(function(context) {
+      Excel.run(function (context) {
         var sheet = context.workbook.worksheets.getItem("Linkedin");
         sheet.getRange(name).values = dump[1];
         sheet.getRange(summary).values = dump[2];
         sheet.getRange(description).values = dump[3];
-        return context.sync().then(function() {
+        return context.sync().then(function () {
           console.log("Imported LinkedIn");
         });
       });
@@ -187,7 +187,7 @@ export async function populateFinance() {
     stocks: ["B13:C", "F13:G", "J13:K", "N13:O", "R13:S"],
     item: 0,
 
-    store: function(dump: any[]) {
+    store: function (dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -220,12 +220,12 @@ export async function populateFinance() {
       this.item++;
 
       //add into cells
-      Excel.run(function(context) {
+      Excel.run(function (context) {
         var sheet = context.workbook.worksheets.getItem("Finance");
         sheet.getRange(name).values = dump[0];
         sheet.getRange(summary).values = dump[1];
         sheet.getRange(stocks).values = dump[2];
-        return context.sync().then(function() {
+        return context.sync().then(function () {
           console.log("Imported Finance");
         });
       });
@@ -267,7 +267,7 @@ export async function populateTrends() {
     date: "B13:B",
     item: 0,
 
-    store: function(dump: any[]) {
+    store: function (dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -292,14 +292,14 @@ export async function populateTrends() {
       }
       this.item++;
       //add into cells
-      Excel.run(function(context) {
+      Excel.run(function (context) {
         var sheet = context.workbook.worksheets.getItem("Trends");
         sheet.getRange(summary).values = dump[0];
         sheet.getRange(data).values = dump[1];
         if (dump[2] != 0) {
           sheet.getRange(date).values = dump[2];
         }
-        return context.sync().then(function() {
+        return context.sync().then(function () {
           console.log("Imported Trends");
         });
       });
@@ -330,7 +330,7 @@ export function populateXero() {
     data: [],
     item: 0,
 
-    store: function(dump: any[]) {
+    store: function (dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -345,11 +345,11 @@ export function populateXero() {
       let data = this.data[this.item] + String(dump[1].length + "START VALUE -1");
       this.item++;
       //add into cells
-      Excel.run(function(context) {
+      Excel.run(function (context) {
         var sheet = context.workbook.worksheets.getItem("Xero");
         sheet.getRange(summary).values = dump[0];
         sheet.getRange(data).values = dump[1];
-        return context.sync().then(function() {
+        return context.sync().then(function () {
           console.log("Imported Xero");
         });
       });
@@ -365,10 +365,10 @@ export function populateXero() {
   //#endregion
 
   //#region [rgba(255,0,0,0.2)] sample test code for linking up to app.tsx
-  Excel.run(function(context) {
+  Excel.run(function (context) {
     var sheet = context.workbook.worksheets.getItem("Xero");
     sheet.getRange("A1:A1").values = [["WORKS"]];
-    return context.sync().then(function() {
+    return context.sync().then(function () {
       console.log("Imported Xero");
     });
   });
@@ -382,7 +382,7 @@ export function populateFacebook() {
     data: [],
     item: 0,
 
-    store: function(dump: any[]) {
+    store: function (dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -397,11 +397,11 @@ export function populateFacebook() {
       let data = this.data[this.item] + String(dump[1].length + "START VALUE -1");
       this.item++;
       //add into cells
-      Excel.run(function(context) {
+      Excel.run(function (context) {
         var sheet = context.workbook.worksheets.getItem("Facebook");
         sheet.getRange(summary).values = dump[0];
         sheet.getRange(data).values = dump[1];
-        return context.sync().then(function() {
+        return context.sync().then(function () {
           console.log("Imported Facebook");
         });
       });
@@ -417,10 +417,10 @@ export function populateFacebook() {
   //#endregion
 
   //#region [rgba(255,0,0,0.2)] sample test code for linking up to app.tsx
-  Excel.run(function(context) {
+  Excel.run(function (context) {
     var sheet = context.workbook.worksheets.getItem("Facebook");
     sheet.getRange("A1:A1").values = [["WORKS"]];
-    return context.sync().then(function() {
+    return context.sync().then(function () {
       console.log("Imported Trends");
     });
   });
