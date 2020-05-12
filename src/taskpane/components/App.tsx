@@ -17,6 +17,9 @@ import {
     populateXero
   */
 } from "../sheets/population";
+import {
+  searchCompany,
+} from "../sheets/api";
 
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
@@ -28,17 +31,44 @@ export interface AppProps {
 
 export interface AppState {
   listItems: HeroListItem[];
+  showSearchResults: boolean;
+  companyName: string;
+  companyList: [string, number][];
 }
 
 export default class App extends React.Component<AppProps, AppState> {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      listItems: []
+      listItems: [],
+      showSearchResults: false,
+      companyName: "",
+      companyList: null
     };
   }
 
+  _showSearchResults = (bool, val) => {
+    this.setState({
+      showSearchResults: bool,
+      companyName: val,
+    });
+
+    this.search(val);
+  }
+
+  search = query => {
+    const url = `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${query.replace(" ", "+")}`;
+
+    fetch(url)
+      .then(results => results.json())
+      .then(data => {
+        this.setState({ companyList: data.results });
+
+      });
+  };
+
   componentDidMount() {
+    this.search("");
     this.setState({
       listItems: [
         {
@@ -119,7 +149,15 @@ export default class App extends React.Component<AppProps, AppState> {
           <PivotItem headerText="Set-up">
             <Title message="Search by company name">
               <Stack tokens={stackTokens}>
-                <SearchBox placeholder="Company Name" onSearch={newValue => console.log('value is ' + newValue)} />
+                <SearchBox
+                  placeholder="Company Name"
+                  onSearch={this._showSearchResults.bind(null, true)}
+                  onEscape={this._showSearchResults.bind(null, false)}
+                  onClear={this._showSearchResults.bind(null, false)}
+                  onChange={this._showSearchResults.bind(null, false)}
+                />
+                <br />
+                {this.state.showSearchResults && "Search results for: " + this.state.companyName && this.state.companyList}
               </Stack>
             </Title>
           </PivotItem>
