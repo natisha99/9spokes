@@ -3,7 +3,7 @@ import { Button, ButtonType } from "office-ui-fabric-react";
 import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
 import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
-import { SearchBox } from 'office-ui-fabric-react/lib/SearchBox';
+import { SearchBox, ISearchBoxStyles } from 'office-ui-fabric-react/lib/SearchBox';
 import { Stack, IStackTokens } from 'office-ui-fabric-react/lib/Stack';
 import Title from "./Title";
 import Progress from "./Progress";
@@ -47,13 +47,13 @@ export default class App extends React.Component<AppProps, AppState> {
     };
   }
 
-  _showSearchResults = (bool, val) => {
+  _showSearchResults = async (bool, val) => {
     this.setState({
       showSearchResults: bool,
       companyName: val,
     });
 
-    this.setState({ companyList: searchCompany(val) })
+    this.setState({ companyList: await searchCompany(val) })
     // this.search(val);
   }
 
@@ -121,6 +121,7 @@ export default class App extends React.Component<AppProps, AppState> {
   render() {
     const { title, isOfficeInitialized } = this.props;
     const stackTokens: Partial<IStackTokens> = { childrenGap: 20 };
+    const searchBoxStyles: Partial<ISearchBoxStyles> = { root: { width: 250 } };
 
     if (!isOfficeInitialized) {
       return (
@@ -150,6 +151,7 @@ export default class App extends React.Component<AppProps, AppState> {
             <Title message="Search by company name">
               <Stack tokens={stackTokens}>
                 <SearchBox
+                  styles={searchBoxStyles}
                   placeholder="Company Name"
                   onSearch={this._showSearchResults.bind(null, true)}
                 // onEscape={this._showSearchResults.bind(null, false)}
@@ -158,6 +160,7 @@ export default class App extends React.Component<AppProps, AppState> {
                 />
                 <br />
                 {this.state.showSearchResults && "Search results for: " + this.state.companyName}
+                <br />
                 {this.state.companyList}
               </Stack>
             </Title>
