@@ -119,16 +119,7 @@ function populateHouse() {
                         [data.INFO.SUMMARY.url]
                     ];
                     name_sample = data.NAME;
-                    NZBN_sample = [
-                        ["TODO"],
-                        ["TODO"],
-                        ["TODO"],
-                        ["TODO"],
-                        ["TODO"],
-                        ["TODO"],
-                        [data.INFO.NZBN.industry],
-                        ["TODO"]
-                    ];
+                    NZBN_sample = [["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], [data.INFO.NZBN.industry], ["TODO"]];
                     directors_sample = [];
                     data.INFO.DIRECTORS.forEach(function (director) {
                         directors_sample.push([director.full_legal_name]);

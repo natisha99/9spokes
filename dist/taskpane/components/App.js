@@ -70,7 +70,6 @@ var App = /** @class */ (function (_super) {
                 companyName: val,
             });
             _this.setState({ companyList: api_1.searchCompany(val) });
-            console.log(_this.state.companyName);
             // this.search(val);
         };
         /**
@@ -168,7 +167,8 @@ var App = /** @class */ (function (_super) {
                         React.createElement(Stack_1.Stack, { tokens: stackTokens },
                             React.createElement(SearchBox_1.SearchBox, { placeholder: "Company Name", onSearch: this._showSearchResults.bind(null, true) }),
                             React.createElement("br", null),
-                            this.state.showSearchResults && "Search results for: " + this.state.companyName))),
+                            this.state.showSearchResults && "Search results for: " + this.state.companyName,
+                            this.state.companyList))),
                 React.createElement(Pivot_1.PivotItem, { headerText: "Import" },
                     React.createElement(Title_1.default, { message: "Import data from..." },
                         React.createElement(office_ui_fabric_react_1.Button, { className: "apiButton", buttonType: office_ui_fabric_react_1.ButtonType.hero, iconProps: { iconName: "ChevronRight" }, onClick: function () {
