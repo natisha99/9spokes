@@ -33,7 +33,7 @@ export interface AppState {
   listItems: HeroListItem[];
   showSearchResults: boolean;
   companyName: string;
-  companyList: [string, number][];
+  companyList: any;
 }
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -53,22 +53,22 @@ export default class App extends React.Component<AppProps, AppState> {
       companyName: val,
     });
 
-    this.search(val);
+    this.setState({ companyList: searchCompany(val) })
+    // this.search(val);
   }
 
-  search = query => {
-    const url = `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${query.replace(" ", "+")}`;
+  // search = query => {
+  //   const url = `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${query.replace(" ", "+")}`;
 
-    fetch(url)
-      .then(results => results.json())
-      .then(data => {
-        this.setState({ companyList: data.results });
+  //   fetch(url)
+  //     .then(results => results.json())
+  //     .then(data => {
+  //       this.setState({ companyList: data.results });
 
-      });
-  };
+  //     });
+  // };
 
   componentDidMount() {
-    this.search("");
     this.setState({
       listItems: [
         {
@@ -152,9 +152,9 @@ export default class App extends React.Component<AppProps, AppState> {
                 <SearchBox
                   placeholder="Company Name"
                   onSearch={this._showSearchResults.bind(null, true)}
-                  onEscape={this._showSearchResults.bind(null, false)}
-                  onClear={this._showSearchResults.bind(null, false)}
-                  onChange={this._showSearchResults.bind(null, false)}
+                // onEscape={this._showSearchResults.bind(null, false)}
+                // onClear={this._showSearchResults.bind(null, false)}
+                // onChange={this._showSearchResults.bind(null, false)}
                 />
                 <br />
                 {this.state.showSearchResults && "Search results for: " + this.state.companyName}

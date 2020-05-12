@@ -2,7 +2,9 @@ class House {
   DATE: string;
   NAME: string;
   INFO: {
-    NZBN: {};
+    NZBN: {
+      industry: string;
+    };
     PPSR: {};
     SUMMARY: {
       url: string;

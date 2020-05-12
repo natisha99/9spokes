@@ -78,16 +78,7 @@ export async function populateHouse() {
     [data.INFO.SUMMARY.url]
   ];
   const name_sample = data.NAME;
-  const NZBN_sample = [
-    ["TODO"],
-    ["TODO"],
-    ["TODO"],
-    ["TODO"],
-    ["TODO"],
-    ["TODO"],
-    [data.INFO.NZBN.industry],
-    ["TODO"]
-  ];
+  const NZBN_sample = [["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], [data.INFO.NZBN.industry], ["TODO"]];
   let directors_sample = [];
   data.INFO.DIRECTORS.forEach(director => {
     directors_sample.push([director.full_legal_name]);
