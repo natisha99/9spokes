@@ -42,7 +42,6 @@ export interface AppState {
     showSearchResults: boolean;
     companyName: string;
     companyList: any;
-    companySelected: string
 }
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -53,7 +52,6 @@ export default class App extends React.Component<AppProps, AppState> {
             showSearchResults: false,
             companyName: "",
             companyList: [],
-            companySelected: ""
         };
     }
 
