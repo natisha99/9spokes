@@ -1,5 +1,10 @@
 /**
- * this is a file which allows the population of the excel spreadsheet through individual objects.
+ * @fileoverview this is a file which allows the population of the excel spreadsheet through individual objects.
+ * @package
+ * @class populateHouse()
+ * @class populateLinkedIn()
+ * @class populateFinance()
+ * @class populateTrends()
 */
 import { getHouseData, getFinanceData, getTrendsData } from "./api";
 import { loadConfig } from "./config";
@@ -74,8 +79,6 @@ export async function populateHouse() {
        *               [["Bob"], ["Jenny"], ["Fred"]]
        *               [["Bob"],["10000"], ["Jenny"], ["5000"]]
        *            ]);
-       *
-       *
        */
       let name = this.name[this.item];
       let summary = this.summary[this.item];
@@ -101,7 +104,7 @@ export async function populateHouse() {
   let config = (await loadConfig()).house[0];
   const data = await getHouseData(config.companyNumber);
 
-  //#region [rgba(70,20,20,0.5)] sample code region (color is for a vs code extension)
+  //#region [rgba(70,20,20,0.5)] sample code region
   const summary_sample = [
     [data.INFO.SUMMARY.company_number],
     [data.INFO.SUMMARY.nzbn],
