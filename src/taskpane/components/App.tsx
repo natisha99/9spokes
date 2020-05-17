@@ -1,3 +1,11 @@
+/**
+ * @fileoverview controls the UI of the addin.
+ * @package
+ * @class AppProps
+ * @class AppState
+ * @class App
+*/
+
 import * as React from "react";
 import { Button, ButtonType } from "office-ui-fabric-react";
 import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
@@ -77,16 +85,16 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({
       listItems: [
         {
-          icon: "Ribbon",
-          primaryText: "Achieve more with Office integration"
-        },
-        {
-          icon: "Unlock",
-          primaryText: "Unlock features and functionality"
+          icon: "Home",
+          primaryText: "Click \"create workbook from template\" in the Home tab."
         },
         {
           icon: "Design",
-          primaryText: "Create and visualize like a pro"
+          primaryText: "Search for a company in the Set-up tab then select the correct company from the options."
+        },
+        {
+          icon: "Ribbon",
+          primaryText: "Import the data, this should display the data in the dashboard."
         }
       ]
     });
@@ -97,11 +105,11 @@ export default class App extends React.Component<AppProps, AppState> {
    */
   loadTemplate = async () => {
     try {
-      Excel.run(async function(context) {
+      Excel.run(async function (context) {
         var templateFile = await (await fetch("/prototype.xlsm")).blob();
         var reader = new FileReader();
-        reader.onload = function(_event) {
-          Excel.run(function(context) {
+        reader.onload = function (_event) {
+          Excel.run(function (context) {
             // strip off the metadata before the base64-encoded string
             var startIndex = reader.result.toString().indexOf("base64,");
             var workbookContents = reader.result.toString().substr(startIndex + 7);
@@ -234,9 +242,9 @@ export default class App extends React.Component<AppProps, AppState> {
                   styles={searchBoxStyles}
                   placeholder="Company Name"
                   onSearch={this._showSearchResults.bind(null, true)}
-                  // onEscape={this._showSearchResults.bind(null, false)}
-                  // onClear={this._showSearchResults.bind(null, false)}
-                  // onChange={this._showSearchResults.bind(null, false)}
+                // onEscape={this._showSearchResults.bind(null, false)}
+                // onClear={this._showSearchResults.bind(null, false)}
+                // onChange={this._showSearchResults.bind(null, false)}
                 />
                 <br />
                 {this.state.showSearchResults && "Search results for: " + this.state.companyName}
@@ -254,8 +262,8 @@ export default class App extends React.Component<AppProps, AppState> {
                         <Card.Section
                           fill
                           verticalAlign="end"
-                          // styles={backgroundImageCardSectionStyles}
-                          // tokens={backgroundImageCardSectionTokens}
+                        // styles={backgroundImageCardSectionStyles}
+                        // tokens={backgroundImageCardSectionTokens}
                         ></Card.Section>
                         <Card.Section>
                           <Text variant="small" styles={subduedTextStyles}>
