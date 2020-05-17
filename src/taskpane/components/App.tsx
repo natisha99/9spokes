@@ -8,7 +8,7 @@
 
 import * as React from "react";
 import { Button, ButtonType } from "office-ui-fabric-react";
-import { Pivot, PivotItem } from "office-ui-fabric-react/lib/Pivot";
+import { Pivot, PivotItem, PivotLinkFormat } from "office-ui-fabric-react/lib/Pivot";
 import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
 import { SearchBox, ISearchBoxStyles } from "office-ui-fabric-react/lib/SearchBox";
@@ -44,47 +44,82 @@ export interface AppProps {
 
 export interface AppState {
   listItems: HeroListItem[];
-  showSearchResults: boolean;
-  companyName: string;
-  companyList: any;
-}
+
+  showHouseResults: boolean;
+  showTrendsResults: boolean;
+  showFinanceResults: boolean;
+  showLinkedinResults: boolean;
+  companiesHouseName: string;
+  googleTrendsName: string;
+  yahooFinanceName: string;
+  linkedinName: string;
+  companiesHouseList: any;
+  googleTrendsList: any;
+  yahooFinanceList: any;
+  linkedInList: any;
+
 
 export default class App extends React.Component<AppProps, AppState> {
   constructor(props, context) {
     super(props, context);
     this.state = {
       listItems: [],
-      showSearchResults: false,
-      companyName: "",
-      companyList: []
+      showHouseResults: false,
+      showTrendsResults: false,
+      showFinanceResults: false,
+      showLinkedinResults: false,
+      companiesHouseName: "",
+      googleTrendsName: "",
+      yahooFinanceName: "",
+      linkedinName: "",
+      companiesHouseList: [],
+      googleTrendsList: [],
+      yahooFinanceList: [],
+      linkedInList: []
     };
   }
 
-  _showSearchResults = async (bool, val) => {
+  _showHouseResults = async (bool, val) => {
     this.setState({
-      showSearchResults: bool,
-      companyName: val
+      showHouseResults: bool,
+      companiesHouseName: val
     });
 
-    this.setState({ companyList: await searchCompany(val) });
-    // this.search(val);
+    this.setState({ companiesHouseList: await searchCompany(val) });
   };
 
-  // search = query => {
-  //   const url = `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${query.replace(" ", "+")}`;
+  _showTrendsResults = async (bool, val) => {
+    this.setState({
+      showTrendsResults: bool,
+      googleTrendsName: val
+    });
 
-  //   fetch(url)
-  //     .then(results => results.json())
-  //     .then(data => {
-  //       this.setState({ companyList: data.results });
+    // this.setState({ googleTrendsList: await ___) });
+  };
 
-  //     });
-  // };
+  _showFinanceResults = async (bool, val) => {
+    this.setState({
+      showFinanceResults: bool,
+      yahooFinanceName: val
+    });
+
+    // this.setState({ yahooFinanceList: await ___ });
+  };
+
+  _showLinkedinResults = async (bool, val) => {
+    this.setState({
+      showLinkedinResults: bool,
+      linkedinName: val
+    });
+
+    // this.setState({ linkedInList: await ___ });
+  };
 
   componentDidMount() {
     this.setState({
       listItems: [
         {
+
           icon: "Home",
           primaryText: "Click \"create workbook from template\" in the Home tab."
         },
@@ -105,11 +140,11 @@ export default class App extends React.Component<AppProps, AppState> {
    */
   loadTemplate = async () => {
     try {
-      Excel.run(async function (context) {
+      Excel.run(async function(context) {
         var templateFile = await (await fetch("/prototype.xlsm")).blob();
         var reader = new FileReader();
-        reader.onload = function (_event) {
-          Excel.run(function (context) {
+        reader.onload = function(_event) {
+          Excel.run(function(context) {
             // strip off the metadata before the base64-encoded string
             var startIndex = reader.result.toString().indexOf("base64,");
             var workbookContents = reader.result.toString().substr(startIndex + 7);
@@ -135,82 +170,33 @@ export default class App extends React.Component<AppProps, AppState> {
     const { title, isOfficeInitialized } = this.props;
     const stackTokens: Partial<IStackTokens> = { childrenGap: 20, maxWidth: 250 };
     const searchBoxStyles: Partial<ISearchBoxStyles> = { root: { width: 250 } };
-    // const siteTextStyles: ITextStyles = {
-    //     root: {
-    //         color: '#025F52',
-    //         fontWeight: FontWeights.semibold,
-    //     },
-    // };
     const descriptionTextStyles: ITextStyles = {
       root: {
         color: "#333333",
         fontWeight: FontWeights.semibold
       }
     };
-    // const helpfulTextStyles: ITextStyles = {
-    //     root: {
-    //         color: '#333333',
-    //         fontWeight: FontWeights.regular,
-    //     },
-    // };
-    // const iconStyles: IIconStyles = {
-    //     root: {
-    //         color: '#0078D4',
-    //         fontSize: 16,
-    //         fontWeight: FontWeights.regular,
-    //     },
-    // };
+
     const footerCardSectionStyles: ICardSectionStyles = {
       root: {
         borderTop: "1px solid #F3F2F1"
       }
     };
-    // const backgroundImageCardSectionStyles: ICardSectionStyles = {
-    //     root: {
-    //         backgroundImage: 'url(https://placehold.it/256x144)',
-    //         backgroundPosition: 'center center',
-    //         backgroundSize: 'cover',
-    //         height: 144,
-    //     },
-    // };
-    // const dateTextStyles: ITextStyles = {
-    //     root: {
-    //         color: '#505050',
-    //         fontWeight: 600,
-    //     },
-    // };
+
     const subduedTextStyles: ITextStyles = {
       root: {
         color: "#666666"
       }
     };
-    // const actionButtonStyles: IButtonStyles = {
-    //     root: {
-    //         border: 'none',
-    //         color: '#333333',
-    //         height: 'auto',
-    //         minHeight: 0,
-    //         minWidth: 0,
-    //         padding: 0,
-    //
-    //         selectors: {
-    //             ':hover': {
-    //                 color: '#0078D4',
-    //             },
-    //         },
-    //     },
-    //     textContainer: {
-    //         fontSize: 12,
-    //         fontWeight: FontWeights.semibold,
-    //     },
-    // };
+
 
     const sectionStackTokens: IStackTokens = { childrenGap: 30 };
     const cardTokens: ICardTokens = { childrenMargin: 12 };
     const footerCardSectionTokens: ICardSectionTokens = { padding: "12px 0px 0px" };
-    // const backgroundImageCardSectionTokens: ICardSectionTokens = {padding: 12};
+
+
     const agendaCardSectionTokens: ICardSectionTokens = { childrenGap: 0 };
-    // const attendantsCardSectionTokens: ICardSectionTokens = {childrenGap: 6};
+
     if (!isOfficeInitialized) {
       return (
         <Progress title={title} logo="assets/logo-filled.png" message="Please sideload your addin to see app body." />
@@ -235,61 +221,108 @@ export default class App extends React.Component<AppProps, AppState> {
               </Button>
             </Title>
           </PivotItem>
+          {/* Playing around with frontend */}
           <PivotItem headerText="Set-up">
-            <Title message="Search by company name">
-              <Stack tokens={stackTokens}>
-                <SearchBox
-                  styles={searchBoxStyles}
-                  placeholder="Company Name"
-                  onSearch={this._showSearchResults.bind(null, true)}
-                // onEscape={this._showSearchResults.bind(null, false)}
-                // onClear={this._showSearchResults.bind(null, false)}
-                // onChange={this._showSearchResults.bind(null, false)}
-                />
-                <br />
-                {this.state.showSearchResults && "Search results for: " + this.state.companyName}
-                <br />
-                <br />
-                <Stack tokens={sectionStackTokens}>
-                  {this.state.showSearchResults &&
-                    this.state.companyList.map(element => (
-                      // eslint-disable-next-line react/jsx-key
-                      <Card
-                        aria-label="Clickable vertical card with image bleeding at the top of the card"
-                        onClick={() => alertClicked(element[0])}
-                        tokens={cardTokens}
-                      >
-                        <Card.Section
-                          fill
-                          verticalAlign="end"
-                        // styles={backgroundImageCardSectionStyles}
-                        // tokens={backgroundImageCardSectionTokens}
-                        ></Card.Section>
-                        <Card.Section>
-                          <Text variant="small" styles={subduedTextStyles}>
-                            Companies House NZ
-                          </Text>
-                          <Text styles={descriptionTextStyles}>{element[0]}</Text>
-                        </Card.Section>
-                        <Card.Section tokens={agendaCardSectionTokens}>
-                          <Text variant="small" styles={descriptionTextStyles}>
-                            {element[1]}
-                          </Text>
-                        </Card.Section>
-                        <Card.Item grow={1}>
-                          <span />
-                        </Card.Item>
-                        <Card.Section
-                          horizontal
-                          styles={footerCardSectionStyles}
-                          tokens={footerCardSectionTokens}
-                        ></Card.Section>
-                      </Card>
-                    ))}
-                </Stack>
-              </Stack>
-            </Title>
+            <br />
+            <center>
+              <Pivot
+                aria-label="Links of Large Tabs Pivot Example"
+                linkFormat={PivotLinkFormat.tabs}
+                // linkSize={PivotLinkSize.large}
+              >
+                <PivotItem headerText="Companies House">
+                  <Title message="Search within Companies House">
+                    <Stack tokens={stackTokens}>
+                      <SearchBox
+                        styles={searchBoxStyles}
+                        placeholder="Company Name"
+                        onSearch={this._showHouseResults.bind(null, true)}
+                      />
+                      <br />
+                      {this.state.showHouseResults && "Search results for: " + this.state.companiesHouseName}
+                      <br />
+                      <Stack tokens={sectionStackTokens}>
+                        {this.state.showHouseResults &&
+                          this.state.companiesHouseList.map(element => (
+                            // eslint-disable-next-line react/jsx-key
+                            <Card
+                              aria-label="Clickable vertical card with image bleeding at the top of the card"
+                              onClick={() => alertClicked(element[0])}
+                              tokens={cardTokens}
+                            >
+                              <Card.Section fill verticalAlign="end"></Card.Section>
+                              <Card.Section>
+                                <Text variant="small" styles={subduedTextStyles}>
+                                  Companies House NZ
+                                </Text>
+                                <Text styles={descriptionTextStyles}>{element[0]}</Text>
+                              </Card.Section>
+                              <Card.Section tokens={agendaCardSectionTokens}>
+                                <Text variant="small" styles={descriptionTextStyles}>
+                                  {element[1]}
+                                </Text>
+                              </Card.Section>
+                              <Card.Item grow={1}>
+                                <span />
+                              </Card.Item>
+                              <Card.Section
+                                horizontal
+                                styles={footerCardSectionStyles}
+                                tokens={footerCardSectionTokens}
+                              ></Card.Section>
+                            </Card>
+                          ))}
+                      </Stack>
+                      <br />
+                    </Stack>
+                  </Title>
+                </PivotItem>
+
+                <PivotItem headerText="Google Trends">
+                  <Title message="Search within Google Trends">
+                    <Stack tokens={stackTokens}>
+                      <SearchBox
+                        styles={searchBoxStyles}
+                        placeholder="Company Name"
+                        onSearch={this._showTrendsResults.bind(null, true)}
+                      />
+                      <br />
+                      {this.state.showTrendsResults && "Search results for: " + this.state.googleTrendsName}
+                    </Stack>
+                  </Title>
+                </PivotItem>
+
+                <PivotItem headerText="Yahoo Finance">
+                  <Title message="Search within Yahoo Finance">
+                    <Stack tokens={stackTokens}>
+                      <SearchBox
+                        styles={searchBoxStyles}
+                        placeholder="Company Name"
+                        onSearch={this._showFinanceResults.bind(null, true)}
+                      />
+                      <br />
+                      {this.state.showFinanceResults && "Search results for: " + this.state.yahooFinanceName}
+                    </Stack>
+                  </Title>
+                </PivotItem>
+
+                <PivotItem headerText="LinkedIn">
+                  <Title message="Search within LinkedIn">
+                    <Stack tokens={stackTokens}>
+                      <SearchBox
+                        styles={searchBoxStyles}
+                        placeholder="Company Name"
+                        onSearch={this._showLinkedinResults.bind(null, true)}
+                      />
+                      <br />
+                      {this.state.showLinkedinResults && "Search results for: " + this.state.linkedinName}
+                    </Stack>
+                  </Title>
+                </PivotItem>
+              </Pivot>
+            </center>
           </PivotItem>
+
           <PivotItem headerText="Import">
             <Title message="Import data from...">
               <Button

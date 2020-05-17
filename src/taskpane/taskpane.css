@@ -15,6 +15,10 @@ ul {
   padding: 0;
 }
 
+center {
+  margin: auto;
+}
+
 .ms-welcome__header {
   padding: 20px;
   padding-bottom: 30px;
@@ -43,6 +47,13 @@ ul {
 .apiButton {
   max-width: 100%;
   width: 190px;
+  max-height: 100%;
+  height: 35px;
+}
+
+.apiPivot {
+  max-width: 100%;
+  width: 50px;
   max-height: 100%;
   height: 35px;
 }
