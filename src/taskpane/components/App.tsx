@@ -85,16 +85,16 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({
       listItems: [
         {
-          icon: "Ribbon",
-          primaryText: "Achieve more with Office integration"
-        },
-        {
-          icon: "Unlock",
-          primaryText: "Unlock features and functionality"
+          icon: "Home",
+          primaryText: "Click \"create workbook from template\" in the Home tab."
         },
         {
           icon: "Design",
-          primaryText: "Create and visualize like a pro"
+          primaryText: "Search for a company in the Set-up tab then select the correct company from the options."
+        },
+        {
+          icon: "Ribbon",
+          primaryText: "Import the data, this should display the data in the dashboard."
         }
       ]
     });
