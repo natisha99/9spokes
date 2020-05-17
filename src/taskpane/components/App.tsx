@@ -1,3 +1,11 @@
+/**
+ * @fileoverview controls the UI of the addin.
+ * @package
+ * @class AppProps
+ * @class AppState
+ * @class App
+*/
+
 import * as React from "react";
 import { Button, ButtonType } from "office-ui-fabric-react";
 import { Pivot, PivotItem, PivotLinkFormat } from "office-ui-fabric-react/lib/Pivot";
@@ -36,6 +44,7 @@ export interface AppProps {
 
 export interface AppState {
   listItems: HeroListItem[];
+
   showHouseResults: boolean;
   showTrendsResults: boolean;
   showFinanceResults: boolean;
@@ -48,7 +57,7 @@ export interface AppState {
   googleTrendsList: any;
   yahooFinanceList: any;
   linkedInList: any;
-}
+
 
 export default class App extends React.Component<AppProps, AppState> {
   constructor(props, context) {
@@ -110,16 +119,17 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({
       listItems: [
         {
-          icon: "Ribbon",
-          primaryText: "Achieve more with Office integration"
-        },
-        {
-          icon: "Unlock",
-          primaryText: "Unlock features and functionality"
+
+          icon: "Home",
+          primaryText: "Click \"create workbook from template\" in the Home tab."
         },
         {
           icon: "Design",
-          primaryText: "Create and visualize like a pro"
+          primaryText: "Search for a company in the Set-up tab then select the correct company from the options."
+        },
+        {
+          icon: "Ribbon",
+          primaryText: "Import the data, this should display the data in the dashboard."
         }
       ]
     });
@@ -160,7 +170,6 @@ export default class App extends React.Component<AppProps, AppState> {
     const { title, isOfficeInitialized } = this.props;
     const stackTokens: Partial<IStackTokens> = { childrenGap: 20, maxWidth: 250 };
     const searchBoxStyles: Partial<ISearchBoxStyles> = { root: { width: 250 } };
-
     const descriptionTextStyles: ITextStyles = {
       root: {
         color: "#333333",
@@ -180,11 +189,14 @@ export default class App extends React.Component<AppProps, AppState> {
       }
     };
 
+
     const sectionStackTokens: IStackTokens = { childrenGap: 30 };
     const cardTokens: ICardTokens = { childrenMargin: 12 };
     const footerCardSectionTokens: ICardSectionTokens = { padding: "12px 0px 0px" };
 
+
     const agendaCardSectionTokens: ICardSectionTokens = { childrenGap: 0 };
+
     if (!isOfficeInitialized) {
       return (
         <Progress title={title} logo="assets/logo-filled.png" message="Please sideload your addin to see app body." />
@@ -209,7 +221,6 @@ export default class App extends React.Component<AppProps, AppState> {
               </Button>
             </Title>
           </PivotItem>
-
           {/* Playing around with frontend */}
           <PivotItem headerText="Set-up">
             <br />
