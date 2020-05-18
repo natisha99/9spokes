@@ -4,7 +4,7 @@
  * @class AppProps
  * @class AppState
  * @class App
-*/
+ */
 
 import * as React from "react";
 import { Button, ButtonType } from "office-ui-fabric-react";
@@ -29,13 +29,14 @@ import {
     */
 } from "../sheets/population";
 import { searchCompany } from "../sheets/api";
+import { loadConfig, saveConfig } from "../sheets/config";
 
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
 
-const alertClicked = (data: string): void => {
-  console.log(data + " is Clicked");
-};
+// const alertClicked = (data: string): void => {
+//   console.log(data + " is Clicked");
+// };
 
 export interface AppProps {
   title: string;
@@ -57,7 +58,7 @@ export interface AppState {
   googleTrendsList: any;
   yahooFinanceList: any;
   linkedInList: any;
-
+}
 
 export default class App extends React.Component<AppProps, AppState> {
   constructor(props, context) {
@@ -119,9 +120,8 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({
       listItems: [
         {
-
           icon: "Home",
-          primaryText: "Click \"create workbook from template\" in the Home tab."
+          primaryText: 'Click "create workbook from template" in the Home tab.'
         },
         {
           icon: "Design",
@@ -189,11 +189,9 @@ export default class App extends React.Component<AppProps, AppState> {
       }
     };
 
-
     const sectionStackTokens: IStackTokens = { childrenGap: 30 };
     const cardTokens: ICardTokens = { childrenMargin: 12 };
     const footerCardSectionTokens: ICardSectionTokens = { padding: "12px 0px 0px" };
-
 
     const agendaCardSectionTokens: ICardSectionTokens = { childrenGap: 0 };
 
@@ -247,7 +245,15 @@ export default class App extends React.Component<AppProps, AppState> {
                             // eslint-disable-next-line react/jsx-key
                             <Card
                               aria-label="Clickable vertical card with image bleeding at the top of the card"
-                              onClick={() => alertClicked(element[0])}
+                              onClick={async () => {
+                                try {
+                                  let config = await loadConfig();
+                                  config.house[0].companyNumber = element[1];
+                                  saveConfig(config);
+                                } catch (error) {
+                                  console.error(error);
+                                }
+                              }}
                               tokens={cardTokens}
                             >
                               <Card.Section fill verticalAlign="end"></Card.Section>
@@ -283,7 +289,7 @@ export default class App extends React.Component<AppProps, AppState> {
                     <Stack tokens={stackTokens}>
                       <SearchBox
                         styles={searchBoxStyles}
-                        placeholder="Company Name"
+                        placeholder="Enter a query/keyword"
                         onSearch={this._showTrendsResults.bind(null, true)}
                       />
                       <br />
