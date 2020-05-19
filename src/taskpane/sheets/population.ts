@@ -12,11 +12,11 @@ import { loadConfig } from "./config";
 export async function populateHouse() {
   let House = {
     //Stores excel index for data
-    name: ["B1", "H1", "K1", "N1", "Q1", "T1", "W1"],
-    summary: ["C3:C11", "I3:I11", "L3:L11", "O3:O11", "R3:R11", "U3:U11", "X3:X11"],
-    NZBN: ["C14:C21", "I14:I21", "L14:L21", "O14:O21", "R14:R21", "U14:U21", "X14:X21"],
-    directors: ["B24:B33", "H24:H33", "K24:K33", "N24:N33", "Q24:Q33", "T24:T33", "W24:W33"],
-    share: ["B36:B", "H36:H", "K36:K", "N36:N", "Q36:Q", "T36:T", "W36:W"],
+    name: ["B1", "E1", "H1", "K1", "N1", "Q1", "T1", "W1"],
+    summary: ["C3:C11", "F3:F11", "I3:I11", "L3:L11", "O3:O11", "R3:R11", "U3:U11", "X3:X11"],
+    NZBN: ["C14:C21", "F14:C21", "I14:I21", "L14:L21", "O14:O21", "R14:R21", "U14:U21", "X14:X21"],
+    directors: ["B24:B", "E24:E", "H24:H", "K24:K", "N24:N", "Q24:Q", "T24:T", "W24:W"],
+    share: ["B36:C", "E36:F", "H36:I", "K36:L", "N36:O", "Q36:R", "T36:U", "W36:X"],
 
     item: 0,
 
@@ -43,6 +43,7 @@ export async function populateHouse() {
       let name = this.name[this.item];
       let summary = this.summary[this.item];
       let NZBN = this.NZBN[this.item];
+      console.log(dump[3]);
       let directors = this.directors[this.item] + String(dump[3].length + 23);
       let share = this.share[this.item] + String(dump[4].length + 35);
       this.item++;
