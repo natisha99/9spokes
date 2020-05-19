@@ -1,3 +1,5 @@
+import { Config } from "../models/Config";
+
 export async function loadConfig() {
   let config;
   await Excel.run(function(context) {

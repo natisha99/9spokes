@@ -1,4 +1,4 @@
-class Finance {
+export interface Finance {
   chart: {
     result: [
       {
@@ -60,4 +60,8 @@ class Finance {
     ];
     error: string | null;
   };
+}
+
+export interface FinanceSearch {
+  results: [string];
 }

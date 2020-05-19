@@ -1,4 +1,4 @@
-class House {
+export interface House {
   DATE: string;
   NAME: string;
   INFO: {
@@ -31,4 +31,8 @@ class House {
       extensive_shareholding: string;
     };
   };
+}
+
+export interface HouseSearch {
+  results: [string, number][];
 }

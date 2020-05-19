@@ -1,4 +1,4 @@
-class Config {
+export interface Config {
   house: { companyNumber: string }[];
   linkedin: {}[];
   finance: { ticker: string; interval: string; range: string }[];

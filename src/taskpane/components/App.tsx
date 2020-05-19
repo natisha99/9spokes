@@ -22,13 +22,13 @@ import {
   populateHouse,
   populateLinkedIn,
   populateFinance,
-  populateTrends
+  populateTrends,
   /*
       populateFacebook,
       populateXero
     */
 } from "../sheets/population";
-import { searchCompany } from "../sheets/api";
+import { searchHouse } from "../sheets/api";
 import { loadConfig, saveConfig } from "../sheets/config";
 
 //import { SourceMapDevToolPlugin } from "webpack";
@@ -76,23 +76,23 @@ export default class App extends React.Component<AppProps, AppState> {
       companiesHouseList: [],
       googleTrendsList: [],
       yahooFinanceList: [],
-      linkedInList: []
+      linkedInList: [],
     };
   }
 
   _showHouseResults = async (bool, val) => {
     this.setState({
       showHouseResults: bool,
-      companiesHouseName: val
+      companiesHouseName: val,
     });
 
-    this.setState({ companiesHouseList: await searchCompany(val) });
+    this.setState({ companiesHouseList: (await searchHouse(val)).results });
   };
 
   _showTrendsResults = async (bool, val) => {
     this.setState({
       showTrendsResults: bool,
-      googleTrendsName: val
+      googleTrendsName: val,
     });
 
     // this.setState({ googleTrendsList: await ___) });
@@ -101,7 +101,7 @@ export default class App extends React.Component<AppProps, AppState> {
   _showFinanceResults = async (bool, val) => {
     this.setState({
       showFinanceResults: bool,
-      yahooFinanceName: val
+      yahooFinanceName: val,
     });
 
     // this.setState({ yahooFinanceList: await ___ });
@@ -110,7 +110,7 @@ export default class App extends React.Component<AppProps, AppState> {
   _showLinkedinResults = async (bool, val) => {
     this.setState({
       showLinkedinResults: bool,
-      linkedinName: val
+      linkedinName: val,
     });
 
     // this.setState({ linkedInList: await ___ });
@@ -121,17 +121,17 @@ export default class App extends React.Component<AppProps, AppState> {
       listItems: [
         {
           icon: "Home",
-          primaryText: 'Click "create workbook from template" in the Home tab.'
+          primaryText: 'Click "create workbook from template" in the Home tab.',
         },
         {
           icon: "Design",
-          primaryText: "Search for a company in the Set-up tab then select the correct company from the options."
+          primaryText: "Search for a company in the Set-up tab then select the correct company from the options.",
         },
         {
           icon: "Ribbon",
-          primaryText: "Import the data, this should display the data in the dashboard."
-        }
-      ]
+          primaryText: "Import the data, this should display the data in the dashboard.",
+        },
+      ],
     });
   }
 
@@ -140,17 +140,17 @@ export default class App extends React.Component<AppProps, AppState> {
    */
   loadTemplate = async () => {
     try {
-      Excel.run(async function(context) {
+      Excel.run(async function (context) {
         var templateFile = await (await fetch("/prototype.xlsm")).blob();
         var reader = new FileReader();
-        reader.onload = function(_event) {
-          Excel.run(function(context) {
+        reader.onload = function (_event) {
+          Excel.run(function (context) {
             // strip off the metadata before the base64-encoded string
             var startIndex = reader.result.toString().indexOf("base64,");
             var workbookContents = reader.result.toString().substr(startIndex + 7);
             Excel.createWorkbook(workbookContents);
             return context.sync();
-          }).catch(error => {
+          }).catch((error) => {
             console.error(error);
           });
         };
@@ -173,20 +173,20 @@ export default class App extends React.Component<AppProps, AppState> {
     const descriptionTextStyles: ITextStyles = {
       root: {
         color: "#333333",
-        fontWeight: FontWeights.semibold
-      }
+        fontWeight: FontWeights.semibold,
+      },
     };
 
     const footerCardSectionStyles: ICardSectionStyles = {
       root: {
-        borderTop: "1px solid #F3F2F1"
-      }
+        borderTop: "1px solid #F3F2F1",
+      },
     };
 
     const subduedTextStyles: ITextStyles = {
       root: {
-        color: "#666666"
-      }
+        color: "#666666",
+      },
     };
 
     const sectionStackTokens: IStackTokens = { childrenGap: 30 };
@@ -222,7 +222,7 @@ export default class App extends React.Component<AppProps, AppState> {
           {/* Playing around with frontend */}
           <PivotItem headerText="Set-up">
             <br />
-            <center>
+            <div className="center">
               <Pivot
                 aria-label="Links of Large Tabs Pivot Example"
                 linkFormat={PivotLinkFormat.tabs}
@@ -241,7 +241,7 @@ export default class App extends React.Component<AppProps, AppState> {
                       <br />
                       <Stack tokens={sectionStackTokens}>
                         {this.state.showHouseResults &&
-                          this.state.companiesHouseList.map(element => (
+                          this.state.companiesHouseList.map((element) => (
                             // eslint-disable-next-line react/jsx-key
                             <Card
                               aria-label="Clickable vertical card with image bleeding at the top of the card"
@@ -326,7 +326,7 @@ export default class App extends React.Component<AppProps, AppState> {
                   </Title>
                 </PivotItem>
               </Pivot>
-            </center>
+            </div>
           </PivotItem>
 
           <PivotItem headerText="Import">
