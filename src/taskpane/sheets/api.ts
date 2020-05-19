@@ -1,13 +1,17 @@
+import { House, HouseSearch } from "../models/House";
+import { Finance, FinanceSearch } from "../models/Finance";
+import { Trends } from "../models/Trends";
+
 /**
  * Fetch companies matching the search query.
  * @param searchString
- * @return list of companies, eg [name, number][]
+ * @return {HouseSearch}
  */
-export async function searchCompany(searchString: string) {
+export async function searchHouse(searchString: string) {
   const output = await fetch(
     `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${searchString.replace(" ", "+")}`
   ).then(response => response.json());
-  return output as [string, number][];
+  return { results: output } as HouseSearch;
 }
 
 /**
@@ -16,8 +20,22 @@ export async function searchCompany(searchString: string) {
  * @returns {House}
  */
 export async function getHouseData(companyNumber: string) {
-  const output = await fetch(`https://projectapi.co.nz/api/nzcompaniesoffice/?company_number=${companyNumber}`).then(response => response.json());
+  const output = await fetch(
+    `https://projectapi.co.nz/api/nzcompaniesoffice/?company_number=${companyNumber}`
+  ).then(response => response.json());
   return output as House;
+}
+
+/**
+ * Fetch company tickers matching the search query.
+ * @param searchString eg "Air New Zealand"
+ * @returns {FinanceSearch}
+ */
+export async function searchFinance(searchString: string) {
+  const output = await fetch(
+    `https://projectapi.co.nz/api/yahoofinances/search/?company_name=${searchString.replace(" ", "+")}`
+  ).then(response => response.json());
+  return output as FinanceSearch;
 }
 
 /**
