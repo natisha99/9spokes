@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { Button, ButtonType } from "office-ui-fabric-react";
+import { Button, ButtonType, Overlay, Spinner, SpinnerSize } from "office-ui-fabric-react";
 import { Pivot, PivotItem, PivotLinkFormat } from "office-ui-fabric-react/lib/Pivot";
 import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
@@ -44,8 +44,8 @@ export interface AppProps {
 }
 
 export interface AppState {
+  isLoading: boolean;
   listItems: HeroListItem[];
-
   showHouseResults: boolean;
   showTrendsResults: boolean;
   showFinanceResults: boolean;
@@ -64,6 +64,7 @@ export default class App extends React.Component<AppProps, AppState> {
   constructor(props, context) {
     super(props, context);
     this.state = {
+      isLoading: false,
       listItems: [],
       showHouseResults: false,
       showTrendsResults: false,
@@ -82,11 +83,15 @@ export default class App extends React.Component<AppProps, AppState> {
 
   _showHouseResults = async (bool, val) => {
     this.setState({
+      isLoading: true,
       showHouseResults: bool,
       companiesHouseName: val
     });
 
-    this.setState({ companiesHouseList: (await searchHouse(val)).results });
+    this.setState({
+      companiesHouseList: (await searchHouse(val)).results,
+      isLoading: false
+    });
   };
 
   _showTrendsResults = async (bool, val) => {
@@ -100,11 +105,15 @@ export default class App extends React.Component<AppProps, AppState> {
 
   _showFinanceResults = async (bool, val) => {
     this.setState({
+      isLoading: true,
       showFinanceResults: bool,
       yahooFinanceName: val
     });
 
-    this.setState({ yahooFinanceList: (await searchFinance(val)).results });
+    this.setState({
+      yahooFinanceList: (await searchFinance(val)).results,
+      isLoading: false
+    });
   };
 
   _showLinkedinResults = async (bool, val) => {
@@ -372,9 +381,11 @@ export default class App extends React.Component<AppProps, AppState> {
                 className="apiButton"
                 buttonType={ButtonType.hero}
                 iconProps={{ iconName: "ChevronRight" }}
-                onClick={() => {
+                onClick={async () => {
                   try {
-                    populateHouse();
+                    this.setState({ isLoading: true });
+                    await populateHouse();
+                    this.setState({ isLoading: false });
                   } catch (error) {
                     console.error(error);
                   }
@@ -387,9 +398,11 @@ export default class App extends React.Component<AppProps, AppState> {
                 className="apiButton"
                 buttonType={ButtonType.hero}
                 iconProps={{ iconName: "ChevronRight" }}
-                onClick={() => {
+                onClick={async () => {
                   try {
-                    populateTrends();
+                    this.setState({ isLoading: true });
+                    await populateTrends();
+                    this.setState({ isLoading: false });
                   } catch (error) {
                     console.error(error);
                   }
@@ -402,9 +415,11 @@ export default class App extends React.Component<AppProps, AppState> {
                 className="apiButton"
                 buttonType={ButtonType.hero}
                 iconProps={{ iconName: "ChevronRight" }}
-                onClick={() => {
+                onClick={async () => {
                   try {
-                    populateFinance();
+                    this.setState({ isLoading: true });
+                    await populateFinance();
+                    this.setState({ isLoading: false });
                   } catch (error) {
                     console.error(error);
                   }
@@ -417,9 +432,11 @@ export default class App extends React.Component<AppProps, AppState> {
                 className="apiButton"
                 buttonType={ButtonType.hero}
                 iconProps={{ iconName: "ChevronRight" }}
-                onClick={() => {
+                onClick={async () => {
                   try {
-                    populateLinkedIn();
+                    this.setState({ isLoading: true });
+                    await populateLinkedIn();
+                    this.setState({ isLoading: false });
                   } catch (error) {
                     console.error(error);
                   }
@@ -468,6 +485,13 @@ export default class App extends React.Component<AppProps, AppState> {
             ></HeroList>
           </PivotItem>
         </Pivot>
+        {this.state.isLoading && (
+          <Overlay isDarkThemed={true}>
+            <div className="center vertical">
+              <Spinner size={SpinnerSize.large} />
+            </div>
+          </Overlay>
+        )}
       </div>
     );
   }
