@@ -14,7 +14,7 @@ export async function populateHouse() {
     //Stores excel index for data
     name: ["B1", "E1", "H1", "K1", "N1", "Q1", "T1", "W1"],
     summary: ["C3:C11", "F3:F11", "I3:I11", "L3:L11", "O3:O11", "R3:R11", "U3:U11", "X3:X11"],
-    NZBN: ["C14:C21", "F14:C21", "I14:I21", "L14:L21", "O14:O21", "R14:R21", "U14:U21", "X14:X21"],
+    NZBN: ["C14:C21", "F14:F21", "I14:I21", "L14:L21", "O14:O21", "R14:R21", "U14:U21", "X14:X21"],
     directors: ["B24:B", "E24:E", "H24:H", "K24:K", "N24:N", "Q24:Q", "T24:T", "W24:W"],
     share: ["B36:C", "E36:F", "H36:I", "K36:L", "N36:O", "Q36:R", "T36:U", "W36:X"],
 
@@ -43,7 +43,6 @@ export async function populateHouse() {
       let name = this.name[this.item];
       let summary = this.summary[this.item];
       let NZBN = this.NZBN[this.item];
-      console.log(dump[3]);
       let directors = this.directors[this.item] + String(dump[3].length + 23);
       let share = this.share[this.item] + String(dump[4].length + 35);
       this.item++;
@@ -63,7 +62,7 @@ export async function populateHouse() {
     }
   };
   let config = (await loadConfig()).house;
-  config.forEach(async item => {
+  for (const item of config) {
     const data = await getHouseData(item.companyNumber);
 
     //#region [rgba(70,20,20,0.5)] sample code region
@@ -112,7 +111,7 @@ export async function populateHouse() {
     //stores companies house data
     House.store(sample);
     //#endregion
-  });
+  }
 }
 
 export function populateLinkedIn() {
@@ -259,7 +258,7 @@ export async function populateFinance() {
     }
   };
   let config = (await loadConfig()).finance;
-  config.forEach(async item => {
+  for (const item of config) {
     const data = (await getFinanceData(item.ticker, item.interval, item.range)).chart.result[0];
 
     //#region [rgba(20,50,20,0.5)] sample driver code
@@ -285,7 +284,7 @@ export async function populateFinance() {
     //stores finance data
     Finance.store(sample);
     //#endregion
-  });
+  }
 }
 
 export async function populateTrends() {
@@ -313,7 +312,7 @@ export async function populateTrends() {
        *                   0
        *               ]);
        */
-      let summary = this.summary[0];
+      let summary = this.summary[this.item];
       let data = this.data[this.item] + String(dump[1].length + 12);
       let date;
       if (dump[2] != 0) {
@@ -335,9 +334,8 @@ export async function populateTrends() {
     }
   };
   let config = (await loadConfig()).trends;
-  config.forEach(async item => {
+  for (const item of config) {
     const data = await getTrendsData(item.keyword, item.weeks);
-    console.log(data);
 
     //#region [rgba(10,50,50,0.5)] sample driver code
     let summary = [[item.keyword], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"]];
@@ -351,5 +349,5 @@ export async function populateTrends() {
     //stores Google Trends data
     Trends.store(sample);
     //#endregion
-  });
+  }
 }
