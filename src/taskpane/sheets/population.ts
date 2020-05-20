@@ -12,11 +12,11 @@ import { loadConfig } from "./config";
 export async function populateHouse() {
   let House = {
     //Stores excel index for data
-    name: ["B1", "H1", "K1", "N1", "Q1", "T1", "W1"],
-    summary: ["C3:C11", "I3:I11", "L3:L11", "O3:O11", "R3:R11", "U3:U11", "X3:X11"],
-    NZBN: ["C14:C21", "I14:I21", "L14:L21", "O14:O21", "R14:R21", "U14:U21", "X14:X21"],
-    directors: ["B24:B33", "H24:H33", "K24:K33", "N24:N33", "Q24:Q33", "T24:T33", "W24:W33"],
-    share: ["B36:B", "H36:H", "K36:K", "N36:N", "Q36:Q", "T36:T", "W36:W"],
+    name: ["B1", "E1", "H1", "K1", "N1", "Q1", "T1", "W1"],
+    summary: ["C3:C11", "F3:F11", "I3:I11", "L3:L11", "O3:O11", "R3:R11", "U3:U11", "X3:X11"],
+    NZBN: ["C14:C21", "F14:C21", "I14:I21", "L14:L21", "O14:O21", "R14:R21", "U14:U21", "X14:X21"],
+    directors: ["B24:B", "E24:E", "H24:H", "K24:K", "N24:N", "Q24:Q", "T24:T", "W24:W"],
+    share: ["B36:C", "E36:F", "H36:I", "K36:L", "N36:O", "Q36:R", "T36:U", "W36:X"],
 
     item: 0,
 
@@ -43,6 +43,7 @@ export async function populateHouse() {
       let name = this.name[this.item];
       let summary = this.summary[this.item];
       let NZBN = this.NZBN[this.item];
+      console.log(dump[3]);
       let directors = this.directors[this.item] + String(dump[3].length + 23);
       let share = this.share[this.item] + String(dump[4].length + 35);
       this.item++;
@@ -61,46 +62,57 @@ export async function populateHouse() {
       });
     }
   };
-  let config = (await loadConfig()).house[0];
-  const data = await getHouseData(config.companyNumber);
+  let config = (await loadConfig()).house;
+  config.forEach(async item => {
+    const data = await getHouseData(item.companyNumber);
 
-  //#region [rgba(70,20,20,0.5)] sample code region
-  const summary_sample = [
-    [data.INFO.SUMMARY.company_number],
-    [data.INFO.SUMMARY.nzbn],
-    [data.INFO.SUMMARY.incorporation_date],
-    [data.INFO.SUMMARY.company_status],
-    [data.INFO.SUMMARY.entity_type],
-    [data.INFO.SUMMARY.constitution_filed],
-    [data.INFO.SUMMARY.ar_filing_month],
-    [data.INFO.SUMMARY.date_retrieved],
-    [data.INFO.SUMMARY.url]
-  ];
-  const name_sample = data.NAME;
-  const NZBN_sample = [["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"], [data.INFO.NZBN.industry], ["TODO"]];
-  let directors_sample = [];
-  data.INFO.DIRECTORS.forEach(director => {
-    directors_sample.push([director.full_legal_name]);
-  });
-  let share_sample = [];
-  let share_sample_known = 0;
-  data.INFO.SHAREHOLDINGS.allocation.forEach(shareholder => {
-    share_sample.push([
-      shareholder[1][0][0].toString(),
-      Number(shareholder[0]) / Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
+    //#region [rgba(70,20,20,0.5)] sample code region
+    const summary = [
+      [data.INFO.SUMMARY.company_number],
+      [data.INFO.SUMMARY.nzbn],
+      [data.INFO.SUMMARY.incorporation_date],
+      [data.INFO.SUMMARY.company_status],
+      [data.INFO.SUMMARY.entity_type],
+      [data.INFO.SUMMARY.constitution_filed],
+      [data.INFO.SUMMARY.ar_filing_month],
+      [data.INFO.SUMMARY.date_retrieved],
+      [data.INFO.SUMMARY.url]
+    ];
+    const name = data.NAME;
+    const NZBN_sample = [
+      ["TODO"],
+      ["TODO"],
+      ["TODO"],
+      ["TODO"],
+      ["TODO"],
+      ["TODO"],
+      [data.INFO.NZBN.industry],
+      ["TODO"]
+    ];
+    let directors = [];
+    data.INFO.DIRECTORS.forEach(director => {
+      directors.push([director.full_legal_name]);
+    });
+    let shares = [];
+    let sharesKnown = 0;
+    data.INFO.SHAREHOLDINGS.allocation.forEach(shareholder => {
+      shares.push([
+        shareholder[1][0][0].toString(),
+        Number(shareholder[0]) / Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
+      ]);
+      sharesKnown = sharesKnown + Number(shareholder[0]);
+    });
+    shares.push([
+      "Unknown",
+      (Number(data.INFO.SHAREHOLDINGS.total_number_of_shares) - sharesKnown) /
+        Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
     ]);
-    share_sample_known = share_sample_known + Number(shareholder[0]);
-  });
-  share_sample.push([
-    "Unknown",
-    (Number(data.INFO.SHAREHOLDINGS.total_number_of_shares) - share_sample_known) /
-      Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
-  ]);
 
-  const sample = [name_sample, summary_sample, NZBN_sample, directors_sample, share_sample];
-  //stores companies house data
-  House.store(sample);
-  //#endregion
+    const sample = [name, summary, NZBN_sample, directors, shares];
+    //stores companies house data
+    House.store(sample);
+    //#endregion
+  });
 }
 
 export function populateLinkedIn() {
@@ -180,10 +192,10 @@ export function populateLinkedIn() {
   };
 
   //#region [rgba(20,20,50,0.5)] sample driver code
-  let name_sample = "Alan";
-  let summary_sample = [["lecturer"], ["Auckland"], ["www.auckland.ac.nz"], ["lots"], ["linkedin.com/whatever"]];
-  let about_sample = "about info";
-  let sample = [name_sample, summary_sample, about_sample];
+  let name = "Alan";
+  let summary = [["lecturer"], ["Auckland"], ["www.auckland.ac.nz"], ["lots"], ["linkedin.com/whatever"]];
+  let about = "about info";
+  let sample = [name, summary, about];
   //stores LinkedIn data
   Linkedin.store(sample);
   //#endregion
@@ -246,32 +258,34 @@ export async function populateFinance() {
       });
     }
   };
-  let config = (await loadConfig()).finance[0];
-  const data = (await getFinanceData(config.ticker, config.interval, config.range)).chart.result[0];
+  let config = (await loadConfig()).finance;
+  config.forEach(async item => {
+    const data = (await getFinanceData(item.ticker, item.interval, item.range)).chart.result[0];
 
-  //#region [rgba(20,50,20,0.5)] sample driver code
-  let name_sample = data.meta.symbol;
-  let summary_sample = [
-    ["100B", "+TODO%"],
-    ["200M", "+TODO%"],
-    ["5%", "+TODO%"],
-    ["50", "+TODO%"],
-    ["300B", "+TODO%"],
-    ["10", "+TODO%"]
-  ];
-  let stocks_sample = [];
-  data.timestamp.forEach((day, index) => {
-    const date = new Date(day * 1000);
-    stocks_sample.push([
-      `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
-      data.indicators.adjclose[0].adjclose[index]
-    ]);
+    //#region [rgba(20,50,20,0.5)] sample driver code
+    let name = data.meta.symbol;
+    let summary = [
+      ["100B", "+TODO%"],
+      ["200M", "+TODO%"],
+      ["5%", "+TODO%"],
+      ["50", "+TODO%"],
+      ["300B", "+TODO%"],
+      ["10", "+TODO%"]
+    ];
+    let stocks_sample = [];
+    data.timestamp.forEach((day, index) => {
+      const date = new Date(day * 1000);
+      stocks_sample.push([
+        `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+        data.indicators.adjclose[0].adjclose[index]
+      ]);
+    });
+
+    let sample = [name, summary, stocks_sample];
+    //stores finance data
+    Finance.store(sample);
+    //#endregion
   });
-
-  let sample = [name_sample, summary_sample, stocks_sample];
-  //stores finance data
-  Finance.store(sample);
-  //#endregion
 }
 
 export async function populateTrends() {
@@ -320,20 +334,22 @@ export async function populateTrends() {
       });
     }
   };
-  let config = (await loadConfig()).trends[0];
-  const data = await getTrendsData(config.keyword, config.weeks);
-  console.log(data);
+  let config = (await loadConfig()).trends;
+  config.forEach(async item => {
+    const data = await getTrendsData(item.keyword, item.weeks);
+    console.log(data);
 
-  //#region [rgba(10,50,50,0.5)] sample driver code
-  let summary_sample = [[config.keyword], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"]];
-  let data_sample = [];
-  let date_sample = [];
-  data.series.forEach(item => {
-    data_sample.push([item[1]]);
-    date_sample.push([item[0]]);
+    //#region [rgba(10,50,50,0.5)] sample driver code
+    let summary = [[item.keyword], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"]];
+    let trends = [];
+    let dates = [];
+    data.series.forEach(item => {
+      trends.push([item[1]]);
+      dates.push([item[0]]);
+    });
+    let sample = [summary, trends, dates];
+    //stores Google Trends data
+    Trends.store(sample);
+    //#endregion
   });
-  let sample = [summary_sample, data_sample, date_sample];
-  //stores Google Trends data
-  Trends.store(sample);
-  //#endregion
 }
