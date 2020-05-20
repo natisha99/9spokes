@@ -7,7 +7,7 @@
  */
 
 import * as React from "react";
-import { Button, ButtonType, Overlay, Spinner, SpinnerSize } from "office-ui-fabric-react";
+import { Button, ButtonType, Overlay, Spinner, SpinnerSize, MessageBar, MessageBarType } from "office-ui-fabric-react";
 import { Pivot, PivotItem, PivotLinkFormat } from "office-ui-fabric-react/lib/Pivot";
 import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
@@ -45,6 +45,8 @@ export interface AppProps {
 
 export interface AppState {
   isLoading: boolean;
+  isSuccess: boolean;
+  isError: boolean;
   listItems: HeroListItem[];
   showHouseResults: boolean;
   showTrendsResults: boolean;
@@ -60,11 +62,21 @@ export interface AppState {
   linkedInList: any;
 }
 
+const LoadingOverlay = () => (
+  <Overlay isDarkThemed={true}>
+    <div className="center vertical">
+      <Spinner size={SpinnerSize.large} />
+    </div>
+  </Overlay>
+);
+
 export default class App extends React.Component<AppProps, AppState> {
   constructor(props, context) {
     super(props, context);
     this.state = {
       isLoading: false,
+      isSuccess: false,
+      isError: false,
       listItems: [],
       showHouseResults: false,
       showTrendsResults: false,
@@ -80,6 +92,28 @@ export default class App extends React.Component<AppProps, AppState> {
       linkedInList: []
     };
   }
+
+  SuccessNotify = () => (
+    <MessageBar
+      messageBarType={MessageBarType.success}
+      isMultiline={false}
+      onDismiss={() => this.setState({ isSuccess: false })}
+      dismissButtonAriaLabel="Close"
+    >
+      Success
+    </MessageBar>
+  );
+
+  ErrorNotify = () => (
+    <MessageBar
+      messageBarType={MessageBarType.error}
+      isMultiline={false}
+      onDismiss={() => this.setState({ isError: false })}
+      dismissButtonAriaLabel="Close"
+    >
+      Error
+    </MessageBar>
+  );
 
   _showHouseResults = async (bool, val) => {
     this.setState({
@@ -214,6 +248,8 @@ export default class App extends React.Component<AppProps, AppState> {
     //This helps to separate the task pane into separate pages so the functionality isn't squashed into one place
     return (
       <div className="ms-welcome">
+        {this.state.isSuccess && <this.SuccessNotify />}
+        {this.state.isError && <this.ErrorNotify />}
         <Pivot>
           <PivotItem headerText="Home">
             <Header logo="assets/logo-filled.png" title={this.props.title} message="Welcome" />
@@ -385,9 +421,10 @@ export default class App extends React.Component<AppProps, AppState> {
                   try {
                     this.setState({ isLoading: true });
                     await populateHouse();
-                    this.setState({ isLoading: false });
+                    this.setState({ isLoading: false, isSuccess: true });
                   } catch (error) {
                     console.error(error);
+                    this.setState({ isLoading: false, isError: true });
                   }
                 }}
               >
@@ -402,9 +439,10 @@ export default class App extends React.Component<AppProps, AppState> {
                   try {
                     this.setState({ isLoading: true });
                     await populateTrends();
-                    this.setState({ isLoading: false });
+                    this.setState({ isLoading: false, isSuccess: true });
                   } catch (error) {
                     console.error(error);
+                    this.setState({ isLoading: false, isError: true });
                   }
                 }}
               >
@@ -419,9 +457,10 @@ export default class App extends React.Component<AppProps, AppState> {
                   try {
                     this.setState({ isLoading: true });
                     await populateFinance();
-                    this.setState({ isLoading: false });
+                    this.setState({ isLoading: false, isSuccess: true });
                   } catch (error) {
                     console.error(error);
+                    this.setState({ isLoading: false, isError: true });
                   }
                 }}
               >
@@ -436,9 +475,10 @@ export default class App extends React.Component<AppProps, AppState> {
                   try {
                     this.setState({ isLoading: true });
                     await populateLinkedIn();
-                    this.setState({ isLoading: false });
+                    this.setState({ isLoading: false, isSuccess: true });
                   } catch (error) {
                     console.error(error);
+                    this.setState({ isLoading: false, isError: true });
                   }
                 }}
               >
@@ -485,13 +525,7 @@ export default class App extends React.Component<AppProps, AppState> {
             ></HeroList>
           </PivotItem>
         </Pivot>
-        {this.state.isLoading && (
-          <Overlay isDarkThemed={true}>
-            <div className="center vertical">
-              <Spinner size={SpinnerSize.large} />
-            </div>
-          </Overlay>
-        )}
+        {this.state.isLoading && <LoadingOverlay />}
       </div>
     );
   }
