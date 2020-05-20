@@ -19,7 +19,7 @@ export async function searchHouse(searchString: string) {
  * @param companyNumber
  * @returns {House}
  */
-export async function getHouseData(companyNumber: string) {
+export async function getHouseData(companyNumber: number) {
   const output = await fetch(
     `https://projectapi.co.nz/api/nzcompaniesoffice/?company_number=${companyNumber}`
   ).then(response => response.json());

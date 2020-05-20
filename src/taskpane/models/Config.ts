@@ -6,7 +6,8 @@ export interface Config {
 }
 
 export interface HouseConfig {
-  companyNumber: string;
+  companyName: string;
+  companyNumber: number;
 }
 
 export interface LinkedinConfig {}
