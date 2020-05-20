@@ -242,8 +242,8 @@ export default class App extends React.Component<AppProps, AppState> {
                       <Stack tokens={sectionStackTokens}>
                         {this.state.showHouseResults &&
                           this.state.companiesHouseList.map(element => (
-                            // eslint-disable-next-line react/jsx-key
                             <Card
+                              key={element[1]}
                               aria-label="Clickable vertical card with image bleeding at the top of the card"
                               onClick={async () => {
                                 try {
@@ -312,8 +312,8 @@ export default class App extends React.Component<AppProps, AppState> {
                       <Stack tokens={sectionStackTokens}>
                         {this.state.showFinanceResults &&
                           this.state.yahooFinanceList.map(element => (
-                            // eslint-disable-next-line react/jsx-key
                             <Card
+                              key={element}
                               aria-label="Clickable vertical card with image bleeding at the top of the card"
                               onClick={async () => {
                                 try {
