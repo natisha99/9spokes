@@ -3,8 +3,7 @@
  * See LICENSE in the project root for license information.
  */
 
-html,
-body {
+html, body {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -14,10 +13,6 @@ body {
 ul {
   margin: 0;
   padding: 0;
-}
-
-center {
-  margin: auto;
 }
 
 .ms-welcome__header {
@@ -49,17 +44,22 @@ center {
   max-width: 100%;
   width: 190px;
   max-height: 100%;
-  height: 35px;
+  height: 40px;
 }
 
-.apiPivot {
+.configButton {
   max-width: 100%;
-  width: 50px;
+  width: 210px;
   max-height: 100%;
-  height: 35px;
+  height: 40px;
 }
 
-.ms-welcome__main > h2 {
+.removeButton {
+  width: auto;
+  height: 30px;
+}
+
+.ms-welcome__main>h2 {
   width: 100%;
   text-align: center;
 }
@@ -75,7 +75,7 @@ center {
   display: flex;
 }
 
-.ms-welcome__features.ms-List .ms-ListItem > .ms-Icon {
+.ms-welcome__features.ms-List .ms-ListItem>.ms-Icon {
   margin-right: 10px;
 }
 
@@ -87,8 +87,7 @@ center {
   color: #0078d7;
 }
 
-.ms-Button.ms-Button--hero:hover .ms-Button-label,
-.ms-Button.ms-Button--hero:focus .ms-Button-label {
+.ms-Button.ms-Button--hero:hover .ms-Button-label, .ms-Button.ms-Button--hero:focus .ms-Button-label {
   color: #005a9e;
   cursor: pointer;
 }
