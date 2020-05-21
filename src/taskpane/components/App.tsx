@@ -7,7 +7,17 @@
  */
 
 import * as React from "react";
-import { Button, ButtonType, Overlay, Spinner, SpinnerSize, MessageBar, MessageBarType } from "office-ui-fabric-react";
+import {
+  Button,
+  ButtonType,
+  SelectedPeopleList,
+  Overlay,
+  Spinner,
+  SpinnerSize,
+  MessageBar,
+  MessageBarType
+} from "office-ui-fabric-react";
+import { DefaultButton } from "office-ui-fabric-react";
 import { Pivot, PivotItem, PivotLinkFormat } from "office-ui-fabric-react/lib/Pivot";
 import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
@@ -29,7 +39,15 @@ import {
     */
 } from "../sheets/population";
 import { searchHouse, searchFinance } from "../sheets/api";
-import { loadConfig, saveConfig } from "../sheets/config";
+import {
+  loadConfig,
+  saveConfig,
+  addHouseConfig,
+  addFinanceConfig,
+  removeHouseConfig,
+  removeFinanceConfig
+} from "../sheets/config";
+import { HouseConfig } from "../models/Config";
 
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
@@ -37,7 +55,6 @@ import { loadConfig, saveConfig } from "../sheets/config";
 // const alertClicked = (data: string): void => {
 //   console.log(data + " is Clicked");
 // };
-
 export interface AppProps {
   title: string;
   isOfficeInitialized: boolean;
@@ -48,6 +65,10 @@ export interface AppState {
   isSuccess: boolean;
   isError: boolean;
   listItems: HeroListItem[];
+  showHouseSearch: boolean;
+  showFinanceSearch: boolean;
+  showHouseRows: boolean;
+  showFinanceRows: boolean;
   showHouseResults: boolean;
   showTrendsResults: boolean;
   showFinanceResults: boolean;
@@ -60,6 +81,9 @@ export interface AppState {
   googleTrendsList: any;
   yahooFinanceList: any;
   linkedInList: any;
+  cNum: number;
+  houseRows: any;
+  yahooRows: any;
 }
 
 const LoadingOverlay = () => (
@@ -78,6 +102,10 @@ export default class App extends React.Component<AppProps, AppState> {
       isSuccess: false,
       isError: false,
       listItems: [],
+      showHouseSearch: false,
+      showFinanceSearch: false,
+      showHouseRows: false,
+      showFinanceRows: false,
       showHouseResults: false,
       showTrendsResults: false,
       showFinanceResults: false,
@@ -89,7 +117,10 @@ export default class App extends React.Component<AppProps, AppState> {
       companiesHouseList: [],
       googleTrendsList: [],
       yahooFinanceList: [],
-      linkedInList: []
+      linkedInList: [],
+      cNum: null,
+      houseRows: [],
+      yahooRows: []
     };
   }
 
@@ -114,6 +145,50 @@ export default class App extends React.Component<AppProps, AppState> {
       Error
     </MessageBar>
   );
+
+  _showHouseSearch = async bool => {
+    this.setState({
+      showHouseRows: false,
+      showHouseSearch: bool
+    });
+  };
+
+  _showFinanceSearch = async bool => {
+    this.setState({
+      showFinanceRows: false,
+      showFinanceSearch: bool
+    });
+  };
+
+  _showHouseRows = async bool => {
+    this.setState({
+      showHouseSearch: false,
+      showHouseRows: bool,
+      houseRows: []
+    });
+
+    let temp = [];
+    let config = await loadConfig();
+    config.house.forEach((item, i) => {
+      temp.push([i, item.companyName, item.companyNumber]);
+    });
+    this.setState({ houseRows: temp });
+  };
+
+  _showFinanceRows = async bool => {
+    this.setState({
+      showFinanceSearch: false,
+      showFinanceRows: bool,
+      yahooRows: []
+    });
+
+    let temp = [];
+    let config = await loadConfig();
+    config.finance.forEach((item, i) => {
+      temp.push([i, item.ticker]);
+    });
+    this.setState({ yahooRows: temp });
+  };
 
   _showHouseResults = async (bool, val) => {
     this.setState({
@@ -233,6 +308,10 @@ export default class App extends React.Component<AppProps, AppState> {
     };
 
     const sectionStackTokens: IStackTokens = { childrenGap: 30 };
+    const horizontalGapStackTokens: IStackTokens = {
+      childrenGap: 10,
+      padding: 10
+    };
     const cardTokens: ICardTokens = { childrenMargin: 12 };
     const footerCardSectionTokens: ICardSectionTokens = { padding: "12px 0px 0px" };
 
@@ -244,8 +323,6 @@ export default class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    //Creates a menu bar on the top (Home, import, help), I've just added those for now, can change later.
-    //This helps to separate the task pane into separate pages so the functionality isn't squashed into one place
     return (
       <div className="ms-welcome">
         {this.state.isSuccess && <this.SuccessNotify />}
@@ -264,71 +341,137 @@ export default class App extends React.Component<AppProps, AppState> {
               </Button>
             </Title>
           </PivotItem>
-          {/* Playing around with frontend */}
+
           <PivotItem headerText="Set-up">
             <br />
             <div className="center">
-              <Pivot
-                aria-label="Links of Large Tabs Pivot Example"
-                linkFormat={PivotLinkFormat.tabs}
-                // linkSize={PivotLinkSize.large}
-              >
+              <Pivot linkFormat={PivotLinkFormat.tabs}>
+                {/* Companies House */}
                 <PivotItem headerText="Companies House">
-                  <Title message="Search within Companies House">
-                    <Stack tokens={stackTokens}>
-                      <SearchBox
-                        styles={searchBoxStyles}
-                        placeholder="Company Name"
-                        onSearch={this._showHouseResults.bind(null, true)}
+                  <div className={"center"}>
+                    <Stack horizontal tokens={horizontalGapStackTokens}>
+                      <DefaultButton
+                        className="configButton"
+                        text="Show current set-up"
+                        iconProps={{ iconName: "ChevronRight" }}
+                        onClick={this._showHouseRows.bind(null, true)}
                       />
-                      <br />
-                      {this.state.showHouseResults && "Search results for: " + this.state.companiesHouseName}
-                      <br />
-                      <Stack tokens={sectionStackTokens}>
-                        {this.state.showHouseResults &&
-                          this.state.companiesHouseList.map(element => (
-                            <Card
-                              key={element[1]}
-                              aria-label="Clickable vertical card with image bleeding at the top of the card"
-                              onClick={async () => {
-                                try {
-                                  let config = await loadConfig();
-                                  config.house[0].companyNumber = element[1];
-                                  saveConfig(config);
-                                } catch (error) {
-                                  console.error(error);
-                                }
-                              }}
-                              tokens={cardTokens}
-                            >
-                              <Card.Section fill verticalAlign="end"></Card.Section>
-                              <Card.Section>
-                                <Text variant="small" styles={subduedTextStyles}>
-                                  Companies House NZ
-                                </Text>
-                                <Text styles={descriptionTextStyles}>{element[0]}</Text>
-                              </Card.Section>
-                              <Card.Section tokens={agendaCardSectionTokens}>
-                                <Text variant="small" styles={descriptionTextStyles}>
-                                  {element[1]}
-                                </Text>
-                              </Card.Section>
-                              <Card.Item grow={1}>
-                                <span />
-                              </Card.Item>
-                              <Card.Section
-                                horizontal
-                                styles={footerCardSectionStyles}
-                                tokens={footerCardSectionTokens}
-                              ></Card.Section>
-                            </Card>
-                          ))}
-                      </Stack>
-                      <br />
+                      <DefaultButton
+                        className="configButton"
+                        text="Add another company"
+                        iconProps={{ iconName: "ChevronRight" }}
+                        onClick={this._showHouseSearch.bind(null, true)}
+                      />
                     </Stack>
-                  </Title>
+                  </div>
+                  <div className={"center"}>
+                    <Stack tokens={stackTokens}>
+                      {this.state.showHouseRows &&
+                        this.state.houseRows.map(element => (
+                          <Card key={element} tokens={cardTokens}>
+                            <Card.Section fill verticalAlign="end"></Card.Section>
+                            <Card.Section>
+                              <Text variant="small" styles={subduedTextStyles}>
+                                Companies House NZ
+                              </Text>
+                              <Text variant="mediumPlus" styles={descriptionTextStyles}>
+                                {element[1]}
+                              </Text>
+                            </Card.Section>
+                            <Card.Section tokens={agendaCardSectionTokens}>
+                              <Text variant="small" styles={descriptionTextStyles}>
+                                {element[2]}
+                              </Text>
+                            </Card.Section>
+                            <Card.Section tokens={agendaCardSectionTokens}>
+                              <DefaultButton
+                                className="removeButton"
+                                onClick={async () => {
+                                  try {
+                                    removeHouseConfig(element[0]);
+                                    let temp = [];
+                                    let config = await loadConfig();
+                                    config.house.forEach((item, i) => {
+                                      temp.push([i, item.companyName, item.companyNumber]);
+                                    });
+                                    this.setState({ houseRows: temp });
+                                  } catch (error) {
+                                    console.error(error);
+                                  }
+                                }}
+                                text="Remove"
+                              />
+                            </Card.Section>
+                            <Card.Item grow={1}>
+                              <span />
+                            </Card.Item>
+                            <Card.Section
+                              horizontal
+                              styles={footerCardSectionStyles}
+                              tokens={footerCardSectionTokens}
+                            ></Card.Section>
+                          </Card>
+                        ))}
+                    </Stack>
+                  </div>
+                  {this.state.showHouseSearch && (
+                    <Title message="Search within Companies House">
+                      <Stack tokens={stackTokens}>
+                        <SearchBox
+                          styles={searchBoxStyles}
+                          placeholder="Company Name"
+                          onSearch={this._showHouseResults.bind(null, true)}
+                        />
+                        <br />
+                        {this.state.showHouseResults && "Search results for: " + this.state.companiesHouseName}
+                        <br />
+                        <Stack tokens={sectionStackTokens}>
+                          {this.state.showHouseResults &&
+                            this.state.companiesHouseList.map(element => (
+                              <Card
+                                key={element[1]}
+                                onClick={async () => {
+                                  try {
+                                    addHouseConfig({ companyName: element[0], companyNumber: element[1] });
+                                    this.setState({ companiesHouseList: [], showHouseResults: false });
+                                  } catch (error) {
+                                    console.error(error);
+                                  }
+                                }}
+                                tokens={cardTokens}
+                              >
+                                <Card.Section fill verticalAlign="end"></Card.Section>
+                                <Card.Section>
+                                  <Text variant="small" styles={subduedTextStyles}>
+                                    Companies House NZ
+                                  </Text>
+                                  <Text variant="mediumPlus" styles={descriptionTextStyles}>
+                                    {element[0]}
+                                  </Text>
+                                </Card.Section>
+                                <Card.Section tokens={agendaCardSectionTokens}>
+                                  <Text variant="small" styles={descriptionTextStyles}>
+                                    {element[1]}
+                                  </Text>
+                                </Card.Section>
+                                <Card.Item grow={1}>
+                                  <span />
+                                </Card.Item>
+                                <Card.Section
+                                  horizontal
+                                  styles={footerCardSectionStyles}
+                                  tokens={footerCardSectionTokens}
+                                ></Card.Section>
+                              </Card>
+                            ))}
+                        </Stack>
+                        <br />
+                      </Stack>
+                    </Title>
+                  )}
                 </PivotItem>
 
+                {/* Google Trends */}
                 <PivotItem headerText="Google Trends">
                   <Title message="Search within Google Trends">
                     <Stack tokens={stackTokens}>
@@ -343,57 +486,123 @@ export default class App extends React.Component<AppProps, AppState> {
                   </Title>
                 </PivotItem>
 
+                {/* Yahoo Finance */}
                 <PivotItem headerText="Yahoo Finance">
-                  <Title message="Search within Yahoo Finance">
-                    <Stack tokens={stackTokens}>
-                      <SearchBox
-                        styles={searchBoxStyles}
-                        placeholder="Company Name"
-                        onSearch={this._showFinanceResults.bind(null, true)}
+                  <div className={"center"}>
+                    <Stack horizontal tokens={horizontalGapStackTokens}>
+                      <DefaultButton
+                        className="configButton"
+                        text="Show current set-up"
+                        iconProps={{ iconName: "ChevronRight" }}
+                        onClick={this._showFinanceRows.bind(null, true)}
                       />
-                      <br />
-                      {this.state.showFinanceResults && "Search results for: " + this.state.yahooFinanceName}
-                      <br />
-                      <Stack tokens={sectionStackTokens}>
-                        {this.state.showFinanceResults &&
-                          this.state.yahooFinanceList.map(element => (
-                            <Card
-                              key={element}
-                              aria-label="Clickable vertical card with image bleeding at the top of the card"
-                              onClick={async () => {
-                                try {
-                                  let config = await loadConfig();
-                                  config.finance[0].ticker = element;
-                                  saveConfig(config);
-                                } catch (error) {
-                                  console.error(error);
-                                }
-                              }}
-                              tokens={cardTokens}
-                            >
-                              <Card.Section fill verticalAlign="end"></Card.Section>
-                              <Card.Section>
-                                <Text variant="small" styles={subduedTextStyles}>
-                                  Yahoo Finance
-                                </Text>
-                                <Text styles={descriptionTextStyles}>{element}</Text>
-                              </Card.Section>
-                              <Card.Item grow={1}>
-                                <span />
-                              </Card.Item>
-                              <Card.Section
-                                horizontal
-                                styles={footerCardSectionStyles}
-                                tokens={footerCardSectionTokens}
-                              ></Card.Section>
-                            </Card>
-                          ))}
-                      </Stack>
-                      <br />
+                      <DefaultButton
+                        className="configButton"
+                        text="Add another company"
+                        iconProps={{ iconName: "ChevronRight" }}
+                        onClick={this._showFinanceSearch.bind(null, true)}
+                      />
                     </Stack>
-                  </Title>
+                  </div>
+                  <div className={"center"}>
+                    <Stack tokens={sectionStackTokens}>
+                      {this.state.showFinanceRows &&
+                        this.state.yahooRows.map(element => (
+                          <Card key={element} tokens={cardTokens}>
+                            <Card.Section fill verticalAlign="end"></Card.Section>
+                            <Card.Section>
+                              <Text variant="small" styles={subduedTextStyles}>
+                                Yahoo Finance
+                              </Text>
+                              <Text variant="mediumPlus" styles={descriptionTextStyles}>
+                                {element[1]}
+                              </Text>
+                            </Card.Section>
+                            <Card.Section tokens={agendaCardSectionTokens}>
+                              <DefaultButton
+                                className="removeButton"
+                                onClick={async () => {
+                                  try {
+                                    removeFinanceConfig(element[0]);
+                                    let temp = [];
+                                    let config = await loadConfig();
+                                    config.finance.forEach((item, i) => {
+                                      temp.push([i, item.ticker]);
+                                    });
+                                    this.setState({ yahooRows: temp });
+                                  } catch (error) {
+                                    console.error(error);
+                                  }
+                                }}
+                                text="Remove"
+                              />
+                            </Card.Section>
+                            <Card.Item grow={1}>
+                              <span />
+                            </Card.Item>
+                            <Card.Section
+                              horizontal
+                              styles={footerCardSectionStyles}
+                              tokens={footerCardSectionTokens}
+                            ></Card.Section>
+                          </Card>
+                        ))}
+                    </Stack>
+                  </div>
+                  {this.state.showFinanceSearch && (
+                    <Title message="Search within Yahoo Finance">
+                      <Stack tokens={stackTokens}>
+                        <SearchBox
+                          styles={searchBoxStyles}
+                          placeholder="Company Name"
+                          onSearch={this._showFinanceResults.bind(null, true)}
+                        />
+                        <br />
+                        {this.state.showFinanceResults && "Search results for: " + this.state.yahooFinanceName}
+                        <br />
+                        <Stack tokens={sectionStackTokens}>
+                          {this.state.showFinanceResults &&
+                            this.state.yahooFinanceList.map(element => (
+                              <Card
+                                key={element}
+                                aria-label="Clickable vertical card with image bleeding at the top of the card"
+                                onClick={async () => {
+                                  try {
+                                    addFinanceConfig({ ticker: element, interval: "1d", range: "1y" });
+                                    this.setState({ yahooFinanceList: [], showFinanceResults: false });
+                                  } catch (error) {
+                                    console.error(error);
+                                  }
+                                }}
+                                tokens={cardTokens}
+                              >
+                                <Card.Section fill verticalAlign="end"></Card.Section>
+                                <Card.Section>
+                                  <Text variant="small" styles={subduedTextStyles}>
+                                    Yahoo Finance
+                                  </Text>
+                                  <Text variant="mediumPlus" styles={descriptionTextStyles}>
+                                    {element}
+                                  </Text>
+                                </Card.Section>
+                                <Card.Item grow={1}>
+                                  <span />
+                                </Card.Item>
+                                <Card.Section
+                                  horizontal
+                                  styles={footerCardSectionStyles}
+                                  tokens={footerCardSectionTokens}
+                                ></Card.Section>
+                              </Card>
+                            ))}
+                        </Stack>
+                        <br />
+                      </Stack>
+                    </Title>
+                  )}
                 </PivotItem>
 
+                {/* LinkedIn */}
                 <PivotItem headerText="LinkedIn">
                   <Title message="Search within LinkedIn">
                     <Stack tokens={stackTokens}>
@@ -413,9 +622,9 @@ export default class App extends React.Component<AppProps, AppState> {
 
           <PivotItem headerText="Import">
             <Title message="Import data from...">
-              <Button
+              <DefaultButton
                 className="apiButton"
-                buttonType={ButtonType.hero}
+                text="Companies House"
                 iconProps={{ iconName: "ChevronRight" }}
                 onClick={async () => {
                   try {
@@ -427,13 +636,11 @@ export default class App extends React.Component<AppProps, AppState> {
                     this.setState({ isLoading: false, isError: true });
                   }
                 }}
-              >
-                Companies House
-              </Button>
+              />
               <br />
-              <Button
+              <DefaultButton
                 className="apiButton"
-                buttonType={ButtonType.hero}
+                text="Google Trends"
                 iconProps={{ iconName: "ChevronRight" }}
                 onClick={async () => {
                   try {
@@ -445,13 +652,11 @@ export default class App extends React.Component<AppProps, AppState> {
                     this.setState({ isLoading: false, isError: true });
                   }
                 }}
-              >
-                Google Trends
-              </Button>
+              />
               <br />
-              <Button
+              <DefaultButton
                 className="apiButton"
-                buttonType={ButtonType.hero}
+                text="Yahoo Finance"
                 iconProps={{ iconName: "ChevronRight" }}
                 onClick={async () => {
                   try {
@@ -463,13 +668,11 @@ export default class App extends React.Component<AppProps, AppState> {
                     this.setState({ isLoading: false, isError: true });
                   }
                 }}
-              >
-                Yahoo Finance
-              </Button>
+              />
               <br />
-              <Button
+              <DefaultButton
                 className="apiButton"
-                buttonType={ButtonType.hero}
+                text="LinkedIn"
                 iconProps={{ iconName: "ChevronRight" }}
                 onClick={async () => {
                   try {
@@ -481,48 +684,11 @@ export default class App extends React.Component<AppProps, AppState> {
                     this.setState({ isLoading: false, isError: true });
                   }
                 }}
-              >
-                LinkedIn
-              </Button>
-              <br />
-              {/*
-              <Button
-                className="apiButton"
-                buttonType={ButtonType.hero}
-                iconProps={{ iconName: "ChevronRight" }}
-                onClick={() => {
-                  try {
-                    populateXero();
-                  } catch (error) {
-                    console.error(error);
-                  }
-                }}
-              >
-                Xero
-              </Button>
-              <br />
-              <Button
-                className="apiButton"
-                buttonType={ButtonType.hero}
-                iconProps={{ iconName: "ChevronRight" }}
-                onClick={() => {
-                  try {
-                    populateFacebook();
-                  } catch (error) {
-                    console.error(error);
-                  }
-                }}
-              >
-                Facebook
-              </Button>
-              */}
+              />
             </Title>
           </PivotItem>
           <PivotItem headerText="Help">
-            <HeroList
-              message="Discover what Office Add-ins can do for you today!"
-              items={this.state.listItems}
-            ></HeroList>
+            <HeroList message="Follow the steps below to get started!" items={this.state.listItems}></HeroList>
           </PivotItem>
         </Pivot>
         {this.state.isLoading && <LoadingOverlay />}

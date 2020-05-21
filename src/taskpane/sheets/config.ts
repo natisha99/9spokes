@@ -155,7 +155,7 @@ export function removeLinkedinConfig(index: number) {
  * @param index
  */
 export function removeFinanceConfig(index: number) {
-  addConfig(index, "Finance");
+  removeConfig(index, "Finance");
 }
 
 /**
@@ -163,5 +163,5 @@ export function removeFinanceConfig(index: number) {
  * @param index
  */
 export function removeTrendsConfig(index: number) {
-  addConfig(index, "Trends");
+  removeConfig(index, "Trends");
 }
