@@ -10,12 +10,12 @@ import * as React from "react";
 import {
   Button,
   ButtonType,
-  SelectedPeopleList,
   Overlay,
   Spinner,
   SpinnerSize,
   MessageBar,
-  MessageBarType
+  MessageBarType,
+  Dialog
 } from "office-ui-fabric-react";
 import { DefaultButton } from "office-ui-fabric-react";
 import { Pivot, PivotItem, PivotLinkFormat } from "office-ui-fabric-react/lib/Pivot";
@@ -38,16 +38,8 @@ import {
       populateXero
     */
 } from "../sheets/population";
-import { searchHouse, searchFinance } from "../sheets/api";
-import {
-  loadConfig,
-  saveConfig,
-  addHouseConfig,
-  addFinanceConfig,
-  removeHouseConfig,
-  removeFinanceConfig
-} from "../sheets/config";
-import { HouseConfig } from "../models/Config";
+import { searchFinance, searchHouse } from "../sheets/api";
+import { loadConfig, addHouseConfig, addFinanceConfig, removeHouseConfig, removeFinanceConfig } from "../sheets/config";
 
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
@@ -86,14 +78,6 @@ export interface AppState {
   yahooRows: any;
 }
 
-const LoadingOverlay = () => (
-  <Overlay isDarkThemed={true}>
-    <div className="center vertical">
-      <Spinner size={SpinnerSize.large} />
-    </div>
-  </Overlay>
-);
-
 export default class App extends React.Component<AppProps, AppState> {
   constructor(props, context) {
     super(props, context);
@@ -124,6 +108,14 @@ export default class App extends React.Component<AppProps, AppState> {
     };
   }
 
+  LoadingOverlay = () => (
+    <Overlay isDarkThemed={true} hidden={!this.state.isLoading}>
+      <div className="center vertical">
+        <Spinner size={SpinnerSize.large} />
+      </div>
+    </Overlay>
+  );
+
   SuccessNotify = () => (
     <MessageBar
       messageBarType={MessageBarType.success}
@@ -145,13 +137,6 @@ export default class App extends React.Component<AppProps, AppState> {
       Error
     </MessageBar>
   );
-
-  _showHouseSearch = async bool => {
-    this.setState({
-      showHouseRows: false,
-      showHouseSearch: bool
-    });
-  };
 
   _showFinanceSearch = async bool => {
     this.setState({
@@ -193,12 +178,14 @@ export default class App extends React.Component<AppProps, AppState> {
   _showHouseResults = async (bool, val) => {
     this.setState({
       isLoading: true,
+      showHouseSearch: false,
       showHouseResults: bool,
       companiesHouseName: val
     });
 
     this.setState({
       companiesHouseList: (await searchHouse(val)).results,
+      showHouseSearch: true,
       isLoading: false
     });
   };
@@ -215,12 +202,14 @@ export default class App extends React.Component<AppProps, AppState> {
   _showFinanceResults = async (bool, val) => {
     this.setState({
       isLoading: true,
+      showFinanceSearch: false,
       showFinanceResults: bool,
       yahooFinanceName: val
     });
 
     this.setState({
       yahooFinanceList: (await searchFinance(val)).results,
+      showFinanceSearch: true,
       isLoading: false
     });
   };
@@ -360,7 +349,7 @@ export default class App extends React.Component<AppProps, AppState> {
                         className="configButton"
                         text="Add another company"
                         iconProps={{ iconName: "ChevronRight" }}
-                        onClick={this._showHouseSearch.bind(null, true)}
+                        onClick={() => this.setState({ showHouseSearch: true })}
                       />
                     </Stack>
                   </div>
@@ -414,7 +403,24 @@ export default class App extends React.Component<AppProps, AppState> {
                         ))}
                     </Stack>
                   </div>
-                  {this.state.showHouseSearch && (
+                  <Dialog
+                    hidden={!this.state.showHouseSearch}
+                    onDismiss={() =>
+                      this.setState({
+                        showHouseSearch: false
+                      })
+                    }
+                    modalProps={{
+                      onDismissed: () => {
+                        if (!this.state.isLoading) {
+                          this.setState({
+                            companiesHouseList: [],
+                            showHouseResults: false
+                          });
+                        }
+                      }
+                    }}
+                  >
                     <Title message="Search within Companies House">
                       <Stack tokens={stackTokens}>
                         <SearchBox
@@ -433,9 +439,16 @@ export default class App extends React.Component<AppProps, AppState> {
                                 onClick={async () => {
                                   try {
                                     addHouseConfig({ companyName: element[0], companyNumber: element[1] });
-                                    this.setState({ companiesHouseList: [], showHouseResults: false });
+                                    this.setState({
+                                      isSuccess: true,
+                                      showHouseSearch: false
+                                    });
                                   } catch (error) {
                                     console.error(error);
+                                    this.setState({
+                                      isSuccess: false,
+                                      showHouseSearch: false
+                                    });
                                   }
                                 }}
                                 tokens={cardTokens}
@@ -468,7 +481,7 @@ export default class App extends React.Component<AppProps, AppState> {
                         <br />
                       </Stack>
                     </Title>
-                  )}
+                  </Dialog>
                 </PivotItem>
 
                 {/* Google Trends */}
@@ -549,7 +562,24 @@ export default class App extends React.Component<AppProps, AppState> {
                         ))}
                     </Stack>
                   </div>
-                  {this.state.showFinanceSearch && (
+                  <Dialog
+                    hidden={!this.state.showFinanceSearch}
+                    onDismiss={() =>
+                      this.setState({
+                        showFinanceSearch: false
+                      })
+                    }
+                    modalProps={{
+                      onDismissed: () => {
+                        if (!this.state.isLoading) {
+                          this.setState({
+                            yahooFinanceList: [],
+                            showFinanceResults: false
+                          });
+                        }
+                      }
+                    }}
+                  >
                     <Title message="Search within Yahoo Finance">
                       <Stack tokens={stackTokens}>
                         <SearchBox
@@ -569,9 +599,16 @@ export default class App extends React.Component<AppProps, AppState> {
                                 onClick={async () => {
                                   try {
                                     addFinanceConfig({ ticker: element, interval: "1d", range: "1y" });
-                                    this.setState({ yahooFinanceList: [], showFinanceResults: false });
+                                    this.setState({
+                                      isSuccess: true,
+                                      showFinanceSearch: false
+                                    });
                                   } catch (error) {
                                     console.error(error);
+                                    this.setState({
+                                      isSuccess: false,
+                                      showFinanceSearch: false
+                                    });
                                   }
                                 }}
                                 tokens={cardTokens}
@@ -599,7 +636,7 @@ export default class App extends React.Component<AppProps, AppState> {
                         <br />
                       </Stack>
                     </Title>
-                  )}
+                  </Dialog>
                 </PivotItem>
 
                 {/* LinkedIn */}
@@ -691,7 +728,7 @@ export default class App extends React.Component<AppProps, AppState> {
             <HeroList message="Follow the steps below to get started!" items={this.state.listItems}></HeroList>
           </PivotItem>
         </Pivot>
-        {this.state.isLoading && <LoadingOverlay />}
+        <this.LoadingOverlay />
       </div>
     );
   }
