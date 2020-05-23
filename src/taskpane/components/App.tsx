@@ -56,6 +56,8 @@ export interface AppState {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
+  emptyHouseSearch: boolean;
+  emptyFinanceSearch: boolean;
   listItems: HeroListItem[];
   showHouseSearch: boolean;
   showFinanceSearch: boolean;
@@ -85,6 +87,8 @@ export default class App extends React.Component<AppProps, AppState> {
       isLoading: false,
       isSuccess: false,
       isError: false,
+      emptyHouseSearch: false,
+      emptyFinanceSearch: false,
       listItems: [],
       showHouseSearch: false,
       showFinanceSearch: false,
@@ -178,16 +182,21 @@ export default class App extends React.Component<AppProps, AppState> {
   _showHouseResults = async (bool, val) => {
     this.setState({
       isLoading: true,
+      emptyHouseSearch: false,
       showHouseSearch: false,
       showHouseResults: bool,
       companiesHouseName: val
     });
-
-    this.setState({
-      companiesHouseList: (await searchHouse(val)).results,
-      showHouseSearch: true,
-      isLoading: false
-    });
+    if (val.trim() == "") {
+      this.setState({ emptyHouseSearch: true, showHouseResults: false, isLoading: false, showHouseSearch: true });
+    } else {
+      this.setState({
+        emptyHouseSearch: false,
+        companiesHouseList: (await searchHouse(val)).results,
+        showHouseSearch: true,
+        isLoading: false
+      });
+    }
   };
 
   _showTrendsResults = async (bool, val) => {
@@ -202,16 +211,22 @@ export default class App extends React.Component<AppProps, AppState> {
   _showFinanceResults = async (bool, val) => {
     this.setState({
       isLoading: true,
+      emptyFinanceSearch: false,
       showFinanceSearch: false,
       showFinanceResults: bool,
       yahooFinanceName: val
     });
 
-    this.setState({
-      yahooFinanceList: (await searchFinance(val)).results,
-      showFinanceSearch: true,
-      isLoading: false
-    });
+    if (val.trim() == "") {
+      this.setState({ emptyFinanceSearch: true, showFinanceResults: false, isLoading: false, showFinanceSearch: true });
+    } else {
+      this.setState({
+        emptyFinanceSearch: false,
+        yahooFinanceList: (await searchFinance(val)).results,
+        showFinanceSearch: true,
+        isLoading: false
+      });
+    }
   };
 
   _showLinkedinResults = async (bool, val) => {
@@ -349,7 +364,7 @@ export default class App extends React.Component<AppProps, AppState> {
                         className="configButton"
                         text="Add another company"
                         iconProps={{ iconName: "ChevronRight" }}
-                        onClick={() => this.setState({ showHouseSearch: true })}
+                        onClick={() => this.setState({ showHouseSearch: true, emptyHouseSearch: false })}
                       />
                     </Stack>
                   </div>
@@ -428,7 +443,7 @@ export default class App extends React.Component<AppProps, AppState> {
                           placeholder="Company Name"
                           onSearch={this._showHouseResults.bind(null, true)}
                         />
-                        <br />
+                        <Text className={"emptySearch"}>{this.state.emptyHouseSearch && "Invalid search"}</Text>
                         {this.state.showHouseResults && "Search results for: " + this.state.companiesHouseName}
                         <br />
                         <Stack tokens={sectionStackTokens}>
@@ -513,7 +528,7 @@ export default class App extends React.Component<AppProps, AppState> {
                         className="configButton"
                         text="Add another company"
                         iconProps={{ iconName: "ChevronRight" }}
-                        onClick={this._showFinanceSearch.bind(null, true)}
+                        onClick={() => this.setState({ showFinanceSearch: true, emptyFinanceSearch: false })}
                       />
                     </Stack>
                   </div>
@@ -587,7 +602,7 @@ export default class App extends React.Component<AppProps, AppState> {
                           placeholder="Company Name"
                           onSearch={this._showFinanceResults.bind(null, true)}
                         />
-                        <br />
+                        <Text className={"emptySearch"}>{this.state.emptyFinanceSearch && "Invalid search"}</Text>
                         {this.state.showFinanceResults && "Search results for: " + this.state.yahooFinanceName}
                         <br />
                         <Stack tokens={sectionStackTokens}>
