@@ -243,15 +243,15 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   /**
-   * Creates a new workbook using the template file prototype.xlsm
+   * Creates a new workbook using the template file prototype.xlsx
    */
   loadTemplate = async () => {
     try {
-      Excel.run(async function(context) {
-        var templateFile = await (await fetch("/prototype.xlsm")).blob();
+      Excel.run(async function (context) {
+        var templateFile = await (await fetch("/prototype.xlsx")).blob();
         var reader = new FileReader();
-        reader.onload = function(_event) {
-          Excel.run(function(context) {
+        reader.onload = function (_event) {
+          Excel.run(function (context) {
             // strip off the metadata before the base64-encoded string
             var startIndex = reader.result.toString().indexOf("base64,");
             var workbookContents = reader.result.toString().substr(startIndex + 7);
