@@ -19,7 +19,7 @@ export async function searchHouse(searchString: string) {
  * @param companyNumber
  * @returns {House}
  */
-export async function getHouseData(companyNumber: number) {
+export async function getHouseNZData(companyNumber: number) {
   const output = await fetch(
     `https://projectapi.co.nz/api/nzcompaniesoffice/?company_number=${companyNumber}`
   ).then(response => response.json());
@@ -64,3 +64,12 @@ export async function getTrendsData(keyword: string, weeks: number) {
   ).then(response => response.json());
   return output as Trends;
 }
+
+export async function getHouseUKData(companyNumber: number) {
+  //add UK companies hosue API
+  const output = await fetch(
+    `https://projectapi.co.nz/api/UKcompaniesoffice/?company_number=${companyNumber}`
+  ).then(response => response.json());
+  return output as House;
+}
+
