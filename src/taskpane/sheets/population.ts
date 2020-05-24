@@ -310,7 +310,14 @@ export function populateLinkedIn() {
       });
     }
   };
-
+  //#region [rgba(20,50,20,0.5)] sample driver code
+  let sample = [
+    "9Spokes",
+    [["Tech"], ["small"], ["162 bc"], ["Mars"], ["linkedin.com/whatever"]],
+    "about info"
+  ]
+  Linkedin.store(sample);
+  //#endregion
 }
 
 export async function populateFinance() {
