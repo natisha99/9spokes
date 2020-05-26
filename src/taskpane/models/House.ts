@@ -3,7 +3,14 @@ export interface House {
   NAME: string;
   INFO: {
     NZBN: {
+      gst_number: string;
+      website: string;
+      phone_number: string;
+      email_address: string;
+      trading_name: string;
+      trading_area: string;
       industry: string;
+      abn: string;
     };
     PPSR: {};
     SUMMARY: {
