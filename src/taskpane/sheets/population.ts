@@ -20,7 +20,7 @@ export async function populateHouse() {
 
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -48,14 +48,14 @@ export async function populateHouse() {
       this.item++;
 
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("House_NZ");
         sheet.getRange(name).values = dump[0];
         sheet.getRange(summary).values = dump[1];
         sheet.getRange(NZBN).values = dump[2];
         sheet.getRange(directors).values = dump[3];
         sheet.getRange(share).values = dump[4];
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported House");
         });
       });
@@ -79,14 +79,14 @@ export async function populateHouse() {
     ];
     const name = data.NAME;
     const NZBN_sample = [
-      ["TODO"],
-      ["TODO"],
-      ["TODO"],
-      ["TODO"],
-      ["TODO"],
-      ["TODO"],
+      [data.INFO.NZBN.gst_number],
+      [data.INFO.NZBN.website],
+      [data.INFO.NZBN.phone_number],
+      [data.INFO.NZBN.email_address],
+      [data.INFO.NZBN.trading_name],
+      [data.INFO.NZBN.trading_area],
       [data.INFO.NZBN.industry],
-      ["TODO"]
+      [data.INFO.NZBN.abn]
     ];
     let directors = [];
     data.INFO.DIRECTORS.forEach(director => {
@@ -104,7 +104,7 @@ export async function populateHouse() {
     shares.push([
       "Unknown",
       (Number(data.INFO.SHAREHOLDINGS.total_number_of_shares) - sharesKnown) /
-      Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
+        Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
     ]);
 
     const sample = [name, summary, NZBN_sample, directors, shares];
@@ -127,28 +127,12 @@ export async function populateUK() {
       ["T1", "U3:U7", "U10:U11"],
       ["W1", "X3:X7", "X10:X11"]
     ],
-    directors: [
-      "B24:B",
-      "E24:E",
-      "H24:H",
-      "K24:K",
-      "N24:N",
-      "Q24:Q",
-      "T24:T",
-      "W24:W"],
-    share: [
-      "B36:C",
-      "E36:F",
-      "H36:I",
-      "K36:L",
-      "N36:O",
-      "Q36:R",
-      "T36:U",
-      "W36:X"],
+    directors: ["B24:B", "E24:E", "H24:H", "K24:K", "N24:N", "Q24:Q", "T24:T", "W24:W"],
+    share: ["B36:C", "E36:F", "H36:I", "K36:L", "N36:O", "Q36:R", "T36:U", "W36:X"],
 
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -172,14 +156,14 @@ export async function populateUK() {
       this.item++;
 
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("House_UK");
         sheet.getRange(summary[0]).values = dump[0][0];
         sheet.getRange(summary[1]).values = dump[0][1];
         sheet.getRange(summary[2]).values = dump[0][2];
         sheet.getRange(directors).values = dump[2];
         sheet.getRange(share).values = dump[3];
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported House UK");
         });
       });
@@ -187,7 +171,6 @@ export async function populateUK() {
   };
   let config = (await loadConfig()).house;
   for (const item of config) {
-
     /*
     LINK TO COMPANIES HOUSE UK
 
@@ -202,12 +185,9 @@ export async function populateUK() {
         [data.INFO.SUMMARY.company_status],
         [data.INFO.SUMMARY.entity_type],
         [data.INFO.SUMMARY.constitution_filed],
-        [data.INFO.SUMMARY.ar_filing_month],
+        [data.INFO.SUMMARY.ar_filing_month]
       ],
-      [
-        [data.DATE],
-        [data.DATE]
-      ]
+      [[data.DATE], [data.DATE]]
     ];
     let directors = [];
     data.INFO.DIRECTORS.forEach(director => {
@@ -225,7 +205,7 @@ export async function populateUK() {
     shares.push([
       "Unknown",
       (Number(data.INFO.SHAREHOLDINGS.total_number_of_shares) - sharesKnown) /
-      Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
+        Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
     ]);
 
     const sample = [summary, directors, shares];
@@ -274,7 +254,7 @@ export function populateLinkedIn() {
     ],
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -299,23 +279,19 @@ export function populateLinkedIn() {
       description = this.company[this.item][2];
       this.item++;
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("Linkedin");
         sheet.getRange(name).values = dump[0];
         sheet.getRange(summary).values = dump[1];
         sheet.getRange(description).values = dump[2];
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported LinkedIn");
         });
       });
     }
   };
   //#region [rgba(20,50,20,0.5)] sample driver code
-  let sample = [
-    "9Spokes",
-    [["Tech"], ["small"], ["162 bc"], ["Mars"], ["linkedin.com/whatever"]],
-    "about info"
-  ]
+  let sample = ["9Spokes", [["Tech"], ["small"], ["162 bc"], ["Mars"], ["linkedin.com/whatever"]], "about info"];
   Linkedin.store(sample);
   //#endregion
 }
@@ -323,22 +299,11 @@ export function populateLinkedIn() {
 export async function populateFinance() {
   let Finance = {
     //Stores excel index for data
-    name: [
-      ["B1"],
-      ["F1"],
-      ["J1"],
-      ["N1"],
-      ["R1"]
-    ],
-    stocks: [
-      "B5:C",
-      "F5:G",
-      "J5:K",
-      "N5:O",
-      "R5:S"],
+    name: [["B1"], ["F1"], ["J1"], ["N1"], ["R1"]],
+    stocks: ["B5:C", "F5:G", "J5:K", "N5:O", "R5:S"],
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -362,11 +327,11 @@ export async function populateFinance() {
       this.item++;
 
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("Finance");
         sheet.getRange(name).values = dump[0];
         sheet.getRange(stocks).values = dump[1];
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported Finance");
         });
       });
@@ -402,7 +367,7 @@ export async function populateTrends() {
     date: "B13:B",
     item: 0,
 
-    store: function (dump: any[]) {
+    store: function(dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -427,14 +392,14 @@ export async function populateTrends() {
       }
       this.item++;
       //add into cells
-      Excel.run(function (context) {
+      Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("Trends");
         sheet.getRange(summary).values = dump[0];
         sheet.getRange(data).values = dump[1];
         if (dump[2] != 0) {
           sheet.getRange(date).values = dump[2];
         }
-        return context.sync().then(function () {
+        return context.sync().then(function() {
           console.log("Imported Trends");
         });
       });
