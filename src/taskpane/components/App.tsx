@@ -38,8 +38,8 @@ import {
       populateXero
     */
 } from "../sheets/population";
-import { searchFinance, searchHouse } from "../sheets/api";
-import { loadConfig, addHouseConfig, addFinanceConfig, removeHouseConfig, removeFinanceConfig } from "../sheets/config";
+import { searchFinance, searchHouse, searchLinkedin } from "../sheets/api";
+import { loadConfig, addHouseConfig, addFinanceConfig, addLinkedinConfig, removeHouseConfig, removeFinanceConfig, removeLinkedinConfig } from "../sheets/config";
 
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
@@ -58,11 +58,14 @@ export interface AppState {
   isError: boolean;
   emptyHouseSearch: boolean;
   emptyFinanceSearch: boolean;
+  emptyLinkedinSearch: boolean;
   listItems: HeroListItem[];
   showHouseSearch: boolean;
   showFinanceSearch: boolean;
+  showLinkedinSearch: boolean;
   showHouseRows: boolean;
   showFinanceRows: boolean;
+  showLinkedinRows: boolean;
   showHouseResults: boolean;
   showTrendsResults: boolean;
   showFinanceResults: boolean;
@@ -78,6 +81,7 @@ export interface AppState {
   cNum: number;
   houseRows: any;
   yahooRows: any;
+  linkedInRows: any;
 }
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -89,11 +93,14 @@ export default class App extends React.Component<AppProps, AppState> {
       isError: false,
       emptyHouseSearch: false,
       emptyFinanceSearch: false,
+      emptyLinkedinSearch: false,
       listItems: [],
       showHouseSearch: false,
       showFinanceSearch: false,
+      showLinkedinSearch: false,
       showHouseRows: false,
       showFinanceRows: false,
+      showLinkedinRows: false,
       showHouseResults: false,
       showTrendsResults: false,
       showFinanceResults: false,
@@ -108,7 +115,8 @@ export default class App extends React.Component<AppProps, AppState> {
       linkedInList: [],
       cNum: null,
       houseRows: [],
-      yahooRows: []
+      yahooRows: [],
+      linkedInRows: []
     };
   }
 
@@ -149,6 +157,13 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  _showLinkedinSearch = async bool => {
+    this.setState({
+      showLinkedinRows: false,
+      showLinkedinSearch: bool
+    });
+  };
+
   _showHouseRows = async bool => {
     this.setState({
       showHouseSearch: false,
@@ -177,6 +192,21 @@ export default class App extends React.Component<AppProps, AppState> {
       temp.push([i, item.ticker]);
     });
     this.setState({ yahooRows: temp });
+  };
+
+  _showLinkedinRows = async bool => {
+    this.setState({
+      showLinkedinSearch: false,
+      showLinkedinRows: bool,
+      linkedInRows: []
+    });
+
+    let temp = [];
+    let config = await loadConfig();
+    config.linkedin.forEach((item, i) => {
+      temp.push([i, item.profileName]);
+    });
+    this.setState({ linkedInRows: temp });
   };
 
   _showHouseResults = async (bool, val) => {
@@ -231,11 +261,23 @@ export default class App extends React.Component<AppProps, AppState> {
 
   _showLinkedinResults = async (bool, val) => {
     this.setState({
+      isLoading: true,
+      emptyLinkedinSearch: false,
+      showLinkedinSearch: false,
       showLinkedinResults: bool,
       linkedinName: val
     });
 
-    // this.setState({ linkedInList: await ___ });
+    if (val.trim() == "") {
+      this.setState({ emptyLinkedinSearch: true, showLinkedinResults: false, isLoading: false, showLinkedinSearch: true });
+    } else {
+      this.setState({ 
+        emptyLinkedinSearch: false,
+        linkedInList: (await searchLinkedin(val)).results,
+        showLinkedinSearch: true,
+        isLoading: false
+     });
+    }
   };
 
   componentDidMount() {
@@ -656,17 +698,141 @@ export default class App extends React.Component<AppProps, AppState> {
 
                 {/* LinkedIn */}
                 <PivotItem headerText="LinkedIn">
-                  <Title message="Search within LinkedIn">
-                    <Stack tokens={stackTokens}>
-                      <SearchBox
-                        styles={searchBoxStyles}
-                        placeholder="Company Name"
-                        onSearch={this._showLinkedinResults.bind(null, true)}
+                  <div className={"center"}>
+                    <Stack horizontal tokens={horizontalGapStackTokens}>
+                      <DefaultButton
+                        className="configButton"
+                        text="Show current set-up"
+                        iconProps={{ iconName: "ChevronRight" }}
+                        onClick={this._showLinkedinRows.bind(null, true)}
                       />
-                      <br />
-                      {this.state.showLinkedinResults && "Search results for: " + this.state.linkedinName}
+                      <DefaultButton
+                        className="configButton"
+                        text="Add another profile"
+                        iconProps={{ iconName: "ChevronRight" }}
+                        onClick={() => this.setState({ showLinkedinSearch: true, emptyLinkedinSearch: false })}
+                      />
                     </Stack>
-                  </Title>
+                  </div>
+                  <div className={"center"}>
+                    <Stack tokens={sectionStackTokens}>
+                      {this.state.showLinkedinRows &&
+                        this.state.linkedInRows.map(element => (
+                          <Card key={element} tokens={cardTokens}>
+                            <Card.Section fill verticalAlign="end"></Card.Section>
+                            <Card.Section>
+                              <Text variant="small" styles={subduedTextStyles}>
+                                LinkedIn
+                              </Text>
+                              <Text variant="mediumPlus" styles={descriptionTextStyles}>
+                                {element[1]}
+                              </Text>
+                            </Card.Section>
+                            <Card.Section tokens={agendaCardSectionTokens}>
+                              <DefaultButton
+                                className="removeButton"
+                                onClick={async () => {
+                                  try {
+                                    removeLinkedinConfig(element[0]);
+                                    let temp = [];
+                                    let config = await loadConfig();
+                                    config.linkedin.forEach((item, i) => {
+                                      temp.push([i, item.profileName]);
+                                    });
+                                    this.setState({ linkedInRows: temp });
+                                  } catch (error) {
+                                    console.error(error);
+                                  }
+                                }}
+                                text="Remove"
+                              />
+                            </Card.Section>
+                            <Card.Item grow={1}>
+                              <span />
+                            </Card.Item>
+                            <Card.Section
+                              horizontal
+                              styles={footerCardSectionStyles}
+                              tokens={footerCardSectionTokens}
+                            ></Card.Section>
+                          </Card>
+                        ))}
+                    </Stack>
+                  </div>
+                  <Dialog
+                    hidden={!this.state.showLinkedinSearch}
+                    onDismiss={() =>
+                      this.setState({
+                        showLinkedinSearch: false
+                      })
+                    }
+                    modalProps={{
+                      onDismissed: () => {
+                        if (!this.state.isLoading) {
+                          this.setState({
+                            linkedInList: [],
+                            showLinkedinResults: false
+                          });
+                        }
+                      }
+                    }}
+                  >
+                    <Title message="Search within LinkedIn">
+                      <Stack tokens={stackTokens}>
+                        <SearchBox
+                          styles={searchBoxStyles}
+                          placeholder="Company Name"
+                          onSearch={this._showLinkedinResults.bind(null, true)}
+                        />
+                        <Text className={"emptySearch"}>{this.state.emptyLinkedinSearch && "Invalid search"}</Text>
+                        {this.state.showLinkedinResults && "Search results for: " + this.state.linkedinName}
+                        <br />
+                        <Stack tokens={sectionStackTokens}>
+                          {this.state.showLinkedinResults &&
+                            this.state.linkedInList.map(element => (
+                              <Card
+                                key={element}
+                                onClick={async () => {
+                                  try {
+                                    addLinkedinConfig({ profileName: element });
+                                    this.setState({
+                                      isSuccess: true,
+                                      showLinkedinSearch: false
+                                    });
+                                  } catch (error) {
+                                    console.error(error);
+                                    this.setState({
+                                      isSuccess: false,
+                                      showLinkedinSearch: false
+                                    });
+                                  }
+                                }}
+                                tokens={cardTokens}
+                              >
+                                <Card.Section fill verticalAlign="end"></Card.Section>
+                                <Card.Section>
+                                  <Text variant="small" styles={subduedTextStyles}>
+                                    LinkedIn
+                                  </Text>
+                                  <Text variant="mediumPlus" styles={descriptionTextStyles}>
+                                    {element}
+                                  </Text>
+                                </Card.Section>
+                                <Card.Item grow={1}>
+                                  <span />
+                                </Card.Item>
+                                <Card.Section
+                                  horizontal
+                                  styles={footerCardSectionStyles}
+                                  tokens={footerCardSectionTokens}
+                                ></Card.Section>
+                              </Card>
+                            ))}
+                        </Stack>
+                        <br />
+                      </Stack>
+                    </Title>
+                  </Dialog>
                 </PivotItem>
               </Pivot>
             </div>
