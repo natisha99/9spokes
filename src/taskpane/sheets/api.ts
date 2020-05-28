@@ -1,6 +1,7 @@
 import { House, HouseSearch } from "../models/House";
 import { Finance, FinanceSearch } from "../models/Finance";
 import { Trends } from "../models/Trends";
+import { Linkedin, LinkedinSearch } from "../models/Linkedin";
 
 /**
  * Fetch companies matching the search query.
@@ -9,7 +10,7 @@ import { Trends } from "../models/Trends";
  */
 export async function searchHouse(searchString: string) {
   const output = await fetch(
-    `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${searchString.replace(" ", "+")}`
+    `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${searchString.replace(/ /g, "+")}`
   ).then(response => response.json());
   return { results: output } as HouseSearch;
 }
@@ -33,7 +34,7 @@ export async function getHouseNZData(companyNumber: number) {
  */
 export async function searchFinance(searchString: string) {
   const output = await fetch(
-    `https://projectapi.co.nz/api/yahoofinances/search/?company_name=${searchString.replace(" ", "+")}`
+    `https://projectapi.co.nz/api/yahoofinances/search/?company_name=${searchString.replace(/ /g, "+")}`
   ).then(response => response.json());
   return output as FinanceSearch;
 }
@@ -65,6 +66,31 @@ export async function getTrendsData(keyword: string, weeks: number) {
   return output as Trends;
 }
 
+/**
+ * Fetch company profiles matching the search query.
+ * @param searchString
+ * @return {LinkedinSearch}
+ */
+export async function searchLinkedin(searchString: string) {
+  const output = await fetch(
+    `https://projectapi.co.nz/api/linkedin/search/?keyword=${searchString.replace(/ /g, "+")}`
+  ).then(response => response.json());
+  return output as LinkedinSearch;
+}
+
+/**
+ * Fetch company profile data.
+ * @param profileName
+ * @returns {Linkedin}
+ */
+export async function getLinkedinData(profileName: string) {
+  const output = await fetch(`https://projectapi.co.nz/api/linkedin/?keyword=${profileName}`).then(response =>
+    response.json()
+  );
+  console.log(output);
+  return output.results as Linkedin;
+}
+
 export async function getHouseUKData(companyNumber: number) {
   //add UK companies hosue API
   const output = await fetch(
@@ -72,4 +98,3 @@ export async function getHouseUKData(companyNumber: number) {
   ).then(response => response.json());
   return output as House;
 }
-

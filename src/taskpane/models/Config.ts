@@ -10,7 +10,9 @@ export interface HouseConfig {
   companyNumber: number;
 }
 
-export interface LinkedinConfig {}
+export interface LinkedinConfig {
+  profileName: string;
+}
 
 export interface FinanceConfig {
   ticker: string;
