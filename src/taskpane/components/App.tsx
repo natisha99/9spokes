@@ -15,10 +15,11 @@ import {
   SpinnerSize,
   MessageBar,
   MessageBarType,
-  Dialog
+  Dialog,
+  IStyleSet
 } from "office-ui-fabric-react";
 import { DefaultButton } from "office-ui-fabric-react";
-import { Pivot, PivotItem, PivotLinkFormat } from "office-ui-fabric-react/lib/Pivot";
+import { Pivot, PivotItem, PivotLinkFormat, IPivotStyles } from "office-ui-fabric-react/lib/Pivot";
 import Header from "./Header";
 import HeroList, { HeroListItem } from "./HeroList";
 import { SearchBox, ISearchBoxStyles } from "office-ui-fabric-react/lib/SearchBox";
@@ -39,7 +40,7 @@ import {
     */
 } from "../sheets/population";
 import { searchFinance, searchHouse, searchLinkedin } from "../sheets/api";
-import { loadConfig, addHouseConfig, addFinanceConfig, addLinkedinConfig, removeHouseConfig, removeFinanceConfig, removeLinkedinConfig } from "../sheets/config";
+import { loadConfig, addHouseConfig, addFinanceConfig, addLinkedinConfig, removeHouseConfig, removeFinanceConfig, removeLinkedinConfig, removeTrendsConfig, addTrendsConfig } from "../sheets/config";
 
 //import { SourceMapDevToolPlugin } from "webpack";
 /* global Button, console, Excel, Header, HeroList, HeroListItem, Progress */
@@ -59,13 +60,16 @@ export interface AppState {
   emptyHouseSearch: boolean;
   emptyFinanceSearch: boolean;
   emptyLinkedinSearch: boolean;
+  emptyTrendsSearch: boolean;
   listItems: HeroListItem[];
   showHouseSearch: boolean;
   showFinanceSearch: boolean;
   showLinkedinSearch: boolean;
+  showTrendsSearch: boolean;
   showHouseRows: boolean;
   showFinanceRows: boolean;
   showLinkedinRows: boolean;
+  showTrendsRows: boolean;
   showHouseResults: boolean;
   showTrendsResults: boolean;
   showFinanceResults: boolean;
@@ -75,13 +79,13 @@ export interface AppState {
   yahooFinanceName: string;
   linkedinName: string;
   companiesHouseList: any;
-  googleTrendsList: any;
   yahooFinanceList: any;
   linkedInList: any;
   cNum: number;
   houseRows: any;
   yahooRows: any;
   linkedInRows: any;
+  trendsRows: any;
 }
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -94,13 +98,16 @@ export default class App extends React.Component<AppProps, AppState> {
       emptyHouseSearch: false,
       emptyFinanceSearch: false,
       emptyLinkedinSearch: false,
+      emptyTrendsSearch: false,
       listItems: [],
       showHouseSearch: false,
       showFinanceSearch: false,
       showLinkedinSearch: false,
+      showTrendsSearch: false,
       showHouseRows: false,
       showFinanceRows: false,
       showLinkedinRows: false,
+      showTrendsRows: false,
       showHouseResults: false,
       showTrendsResults: false,
       showFinanceResults: false,
@@ -110,13 +117,13 @@ export default class App extends React.Component<AppProps, AppState> {
       yahooFinanceName: "",
       linkedinName: "",
       companiesHouseList: [],
-      googleTrendsList: [],
       yahooFinanceList: [],
       linkedInList: [],
       cNum: null,
       houseRows: [],
       yahooRows: [],
-      linkedInRows: []
+      linkedInRows: [],
+      trendsRows: []
     };
   }
 
@@ -161,6 +168,13 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({
       showLinkedinRows: false,
       showLinkedinSearch: bool
+    });
+  };
+
+  _showTrendsSearch = async bool => {
+    this.setState({
+      showTrendsRows: false,
+      showTrendsSearch: bool
     });
   };
 
@@ -209,6 +223,21 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({ linkedInRows: temp });
   };
 
+  _showTrendsRows = async bool => {
+    this.setState({
+      showTrendsSearch: false,
+      showTrendsRows: bool,
+      trendsRows: []
+    });
+
+    let temp = [];
+    let config = await loadConfig();
+    config.trends.forEach((item, i) => {
+      temp.push([i, item.keyword]);
+    });
+    this.setState({ trendsRows: temp });
+  };
+
   _showHouseResults = async (bool, val) => {
     this.setState({
       isLoading: true,
@@ -231,11 +260,23 @@ export default class App extends React.Component<AppProps, AppState> {
 
   _showTrendsResults = async (bool, val) => {
     this.setState({
+      isLoading: true,
+      emptyTrendsSearch: false,
+      showTrendsSearch: false,
       showTrendsResults: bool,
       googleTrendsName: val
     });
-
-    // this.setState({ googleTrendsList: await ___) });
+    if (val.trim() == "") {
+      this.setState({ emptyTrendsSearch: true, showTrendsResults: false, isLoading: false, showTrendsSearch: true });
+    } else {
+      addTrendsConfig({ keyword: val, weeks: 52});
+      this.setState({
+        emptyTrendsSearch: false,
+        isSuccess: true,
+        showTrendsSearch: true,
+        isLoading: false
+      });
+    }
   };
 
   _showFinanceResults = async (bool, val) => {
@@ -333,7 +374,7 @@ export default class App extends React.Component<AppProps, AppState> {
   render() {
     const { title, isOfficeInitialized } = this.props;
     const stackTokens: Partial<IStackTokens> = { childrenGap: 20, maxWidth: 250 };
-    const searchBoxStyles: Partial<ISearchBoxStyles> = { root: { width: 250 } };
+    const searchBoxStyles: Partial<ISearchBoxStyles> = { root: { width: 250 }};
     const descriptionTextStyles: ITextStyles = {
       root: {
         color: "#333333",
@@ -363,6 +404,21 @@ export default class App extends React.Component<AppProps, AppState> {
 
     const agendaCardSectionTokens: ICardSectionTokens = { childrenGap: 0 };
 
+    const pivotStyles: Partial<IStyleSet<IPivotStyles>> = {
+      root:{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      },
+      link: {
+        // margin: "center",
+        width: "85px"
+      },
+      linkIsSelected: {
+        width: "85px"
+      }
+    };
+
     if (!isOfficeInitialized) {
       return (
         <Progress title={title} logo="assets/logo-filled.png" message="Please sideload your addin to see app body." />
@@ -391,7 +447,7 @@ export default class App extends React.Component<AppProps, AppState> {
           <PivotItem headerText="Set-up">
             <br />
             <div className="center">
-              <Pivot linkFormat={PivotLinkFormat.tabs}>
+              <Pivot linkFormat={PivotLinkFormat.tabs} styles={pivotStyles}>
                 {/* Companies House */}
                 <PivotItem headerText="Companies House">
                   <div className={"center"}>
@@ -410,6 +466,7 @@ export default class App extends React.Component<AppProps, AppState> {
                       />
                     </Stack>
                   </div>
+                  <br/>
                   <div className={"center"}>
                     <Stack tokens={stackTokens}>
                       {this.state.showHouseRows &&
@@ -543,17 +600,98 @@ export default class App extends React.Component<AppProps, AppState> {
 
                 {/* Google Trends */}
                 <PivotItem headerText="Google Trends">
-                  <Title message="Search within Google Trends">
-                    <Stack tokens={stackTokens}>
-                      <SearchBox
-                        styles={searchBoxStyles}
-                        placeholder="Enter a query/keyword"
-                        onSearch={this._showTrendsResults.bind(null, true)}
-                      />
-                      <br />
-                      {this.state.showTrendsResults && "Search results for: " + this.state.googleTrendsName}
+                  <div className={"center"}>
+                      <Stack horizontal tokens={horizontalGapStackTokens}>
+                        <DefaultButton
+                          className="configButton"
+                          text="Show current set-up"
+                          iconProps={{ iconName: "ChevronRight" }}
+                          onClick={this._showTrendsRows.bind(null, true)}
+                        />
+                        <DefaultButton
+                          className="configButton"
+                          text="Enter a keyword"
+                          iconProps={{ iconName: "ChevronRight" }}
+                          onClick={() => this.setState({ showTrendsSearch: true, emptyTrendsSearch: false })}
+                        />
+                      </Stack>
+                  </div>
+                  <br/>
+                  <div className={"center"}>
+                    <Stack tokens={sectionStackTokens}>
+                      {this.state.showTrendsRows &&
+                        this.state.trendsRows.map(element => (
+                          <Card key={element} tokens={cardTokens}>
+                            <Card.Section fill verticalAlign="end"></Card.Section>
+                            <Card.Section>
+                              <Text variant="small" styles={subduedTextStyles}>
+                                Google Trends
+                              </Text>
+                              <Text variant="mediumPlus" styles={descriptionTextStyles}>
+                                {element[1]}
+                              </Text>
+                            </Card.Section>
+                            <Card.Section tokens={agendaCardSectionTokens}>
+                              <DefaultButton
+                                className="removeButton"
+                                onClick={async () => {
+                                  try {
+                                    removeTrendsConfig(element[0]);
+                                    let temp = [];
+                                    let config = await loadConfig();
+                                    config.trends.forEach((item, i) => {
+                                      temp.push([i, item.keyword]);
+                                    });
+                                    this.setState({ trendsRows: temp });
+                                  } catch (error) {
+                                    console.error(error);
+                                  }
+                                }}
+                                text="Remove"
+                              />
+                            </Card.Section>
+                            <Card.Item grow={1}>
+                              <span />
+                            </Card.Item>
+                            <Card.Section
+                              horizontal
+                              styles={footerCardSectionStyles}
+                              tokens={footerCardSectionTokens}
+                            ></Card.Section>
+                          </Card>
+                        ))}
                     </Stack>
-                  </Title>
+                  </div>
+                  <Dialog
+                    hidden={!this.state.showTrendsSearch}
+                    onDismiss={() =>
+                      this.setState({
+                        showTrendsSearch: false
+                      })
+                    }
+                    modalProps={{
+                      onDismissed: () => {
+                        if (!this.state.isLoading) {
+                          this.setState({
+                            showTrendsResults: false
+                          });
+                        }
+                      }
+                    }}
+                  >
+                    <Title message="Enter a keyword for Google Trends">
+                      <Stack tokens={stackTokens}>
+                        <SearchBox
+                          styles={searchBoxStyles}
+                          placeholder="Keyword"
+                          onSearch={this._showTrendsResults.bind(null, true)}
+                        />
+                        <Text className={"emptySearch"}>{this.state.emptyTrendsSearch && "Invalid input"}</Text>
+                        {this.state.showTrendsResults && "Successfully added keyword: " + this.state.googleTrendsName}
+                        <br />
+                      </Stack>
+                    </Title>
+                  </Dialog>
                 </PivotItem>
 
                 {/* Yahoo Finance */}
@@ -574,6 +712,7 @@ export default class App extends React.Component<AppProps, AppState> {
                       />
                     </Stack>
                   </div>
+                  <br/>
                   <div className={"center"}>
                     <Stack tokens={sectionStackTokens}>
                       {this.state.showFinanceRows &&
@@ -714,6 +853,7 @@ export default class App extends React.Component<AppProps, AppState> {
                       />
                     </Stack>
                   </div>
+                  <br/>
                   <div className={"center"}>
                     <Stack tokens={sectionStackTokens}>
                       {this.state.showLinkedinRows &&
@@ -781,7 +921,7 @@ export default class App extends React.Component<AppProps, AppState> {
                       <Stack tokens={stackTokens}>
                         <SearchBox
                           styles={searchBoxStyles}
-                          placeholder="Company Name"
+                          placeholder="Company profile name"
                           onSearch={this._showLinkedinResults.bind(null, true)}
                         />
                         <Text className={"emptySearch"}>{this.state.emptyLinkedinSearch && "Invalid search"}</Text>
@@ -837,7 +977,7 @@ export default class App extends React.Component<AppProps, AppState> {
               </Pivot>
             </div>
           </PivotItem>
-
+                                
           <PivotItem headerText="Import">
             <Title message="Import data from...">
               <DefaultButton
