@@ -409,13 +409,15 @@ export default class App extends React.Component<AppProps, AppState> {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        whiteSpace: 'wrap',
       },
       link: {
-        // margin: "center",
-        width: "85px"
+        width: "85px",
+        lineHeight: "18px"
       },
       linkIsSelected: {
-        width: "85px"
+        width: "85px",
+        lineHeight: "18px"
       }
     };
 
