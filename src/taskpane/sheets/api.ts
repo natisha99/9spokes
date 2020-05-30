@@ -87,7 +87,6 @@ export async function getLinkedinData(profileName: string) {
   const output = await fetch(`https://projectapi.co.nz/api/linkedin/?keyword=${profileName}`).then(response =>
     response.json()
   );
-  console.log(output);
   return output.results as Linkedin;
 }
 
