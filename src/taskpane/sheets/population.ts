@@ -13,9 +13,11 @@ export async function populateHouse() {
   let House = {
     //Stores excel index for data
     name: ["B1", "E1", "H1", "K1", "N1", "Q1", "T1", "W1"],
+    name_merged: ["B1:C1", "E1:F1", "H1:I1", "K1:L1", "N1:O1", "Q1:R1", "T1:U1", "W1:X1"],
     summary: ["C3:C11", "F3:F11", "I3:I11", "L3:L11", "O3:O11", "R3:R11", "U3:U11", "X3:X11"],
     NZBN: ["C14:C21", "F14:F21", "I14:I21", "L14:L21", "O14:O21", "R14:R21", "U14:U21", "X14:X21"],
     directors: ["B24:B", "E24:E", "H24:H", "K24:K", "N24:N", "Q24:Q", "T24:T", "W24:W"],
+    directors_merged: ["B24:C33", "E24:F33", "H24:I33", "K24:L33", "N24:O33", "Q24:R33", "T24:U33", "W24:X33"],
     share: ["B36:C", "E36:F", "H36:I", "K36:L", "N36:O", "Q36:R", "T36:U", "W36:X"],
 
     item: 0,
@@ -61,7 +63,23 @@ export async function populateHouse() {
       });
     }
   };
+
+  // Clear old data
+  Excel.run(function(context) {
+    var sheet = context.workbook.worksheets.getItem("House_NZ");
+    sheet.getRanges(House.name_merged.toString()).clear("Contents");
+    sheet.getRanges(House.summary.toString()).clear("Contents");
+    sheet.getRanges(House.NZBN.toString()).clear("Contents");
+    sheet.getRanges(House.directors_merged.toString()).clear("Contents");
+    sheet.getRanges(House.share.reduce((prev, cur) => [...prev, cur + "10000"], []).toString()).clear("Contents");
+    return context.sync().then(function() {
+      console.log("House_NZ Cleared");
+    });
+  });
+
   let config = (await loadConfig()).house;
+
+  // Populate new data
   for (const item of config) {
     const data = await getHouseNZData(item.companyNumber);
 
@@ -221,21 +239,40 @@ export async function populateLinkedIn() {
     company: [
       ["B1", "C3:C8", "B14"],
       ["E1", "F3:F8", "E14"],
-      ["H1", "I3:C8", "H14"],
+      ["H1", "I3:I8", "H14"],
       ["K1", "L3:F8", "K14"],
       ["N1", "O3:O8", "N14"],
 
       ["B36", "C38:C43", "B49"],
       ["E36", "F38:F43", "E49"],
-      ["H36", "I38:C43", "H49"],
+      ["H36", "I38:I43", "H49"],
       ["K36", "L38:F43", "K49"],
       ["N36", "O38:O43", "N49"],
 
       ["B70", "C72:C77", "B83"],
       ["E70", "F72:F77", "E83"],
-      ["H70", "I72:C77", "H83"],
+      ["H70", "I72:I77", "H83"],
       ["K70", "L72:F77", "K83"],
       ["N70", "O72:O77", "N83"]
+    ],
+    company_merged: [
+      ["B1:C1", "C3:C11", "B14:C33"],
+      ["E1:F1", "F3:F11", "E14:F33"],
+      ["H1:I1", "I3:I11", "H14:I33"],
+      ["K1:L1", "L3:F11", "K14:L33"],
+      ["N1:O1", "O3:O11", "N14:O33"],
+
+      ["B36:C36", "C38:C46", "B49:C68"],
+      ["E36:F36", "F38:F46", "E49:F68"],
+      ["H36:I36", "I38:C46", "H49:I68"],
+      ["K36:L36", "L38:F46", "K49:L68"],
+      ["N36:O36", "O38:O46", "N49:O68"],
+
+      ["B70:C70", "C72:C80", "B83:C102"],
+      ["E70:F70", "F72:F80", "E83:F102"],
+      ["H70:I70", "I72:C80", "H83:I102"],
+      ["K70:L70", "L72:F80", "K83:L102"],
+      ["N70:O70", "O72:O80", "N83:O102"]
     ],
     item: 0,
 
@@ -276,8 +313,19 @@ export async function populateLinkedIn() {
       });
     }
   };
+
+  // Clear old data
+  Excel.run(function(context) {
+    var sheet = context.workbook.worksheets.getItem("Linkedin");
+    sheet.getRanges(Linkedin.company_merged.toString()).clear("Contents");
+    return context.sync().then(function() {
+      console.log("Linkedin Cleared");
+    });
+  });
+
   let config = (await loadConfig()).linkedin;
-  console.log(config);
+
+  // Populate new data
   for (const item of config) {
     const data = await getLinkedinData(item.profileName);
     //#region [rgba(20,50,20,0.5)] sample driver code
@@ -294,7 +342,8 @@ export async function populateLinkedIn() {
 export async function populateFinance() {
   let Finance = {
     //Stores excel index for data
-    name: [["B1"], ["F1"], ["J1"], ["N1"], ["R1"]],
+    name: ["B1", "F1", "J1", "N1", "R1"],
+    name_merged: ["B1:D1", "F1:H1", "J1:L1", "N1:P1", "R1:T1"],
     stocks: ["B5:C", "F5:G", "J5:K", "N5:O", "R5:S"],
     item: 0,
 
@@ -318,7 +367,7 @@ export async function populateFinance() {
        *               ]);
        */
       let name = this.name[this.item];
-      let stocks = this.stocks[this.item] + String(dump[1].length + 12);
+      let stocks = this.stocks[this.item] + String(dump[1].length + 4);
       this.item++;
 
       //add into cells
@@ -332,7 +381,20 @@ export async function populateFinance() {
       });
     }
   };
+
+  // Clear old data
+  Excel.run(function(context) {
+    var sheet = context.workbook.worksheets.getItem("Finance");
+    sheet.getRanges(Finance.name_merged.toString()).clear("Contents");
+    sheet.getRanges(Finance.stocks.reduce((prev, cur) => [...prev, cur + "242"], []).toString()).clear("Contents");
+    return context.sync().then(function() {
+      console.log("Finance Cleared");
+    });
+  });
+
   let config = (await loadConfig()).finance;
+
+  // Populate new data
   for (const item of config) {
     const data = (await getFinanceData(item.ticker, item.interval, item.range)).chart.result[0];
 
@@ -358,7 +420,7 @@ export async function populateTrends() {
   let Trends = {
     //Stores excel index for data
     summary: ["C2:C7", "D2:D7", "E2:E7", "F2:F7", "G2:G7"],
-    data: ["C13:C", "D13:D", "F13:F", "F13:F", "G13:G"],
+    data: ["C13:C", "D13:D", "E13:E", "F13:F", "G13:G"],
     date: "B13:B",
     item: 0,
 
@@ -400,7 +462,21 @@ export async function populateTrends() {
       });
     }
   };
+
+  // Clear old data
+  Excel.run(function(context) {
+    var sheet = context.workbook.worksheets.getItem("Trends");
+    sheet.getRanges(Trends.summary.toString()).clear("Contents");
+    sheet.getRanges(Trends.data.reduce((prev, cur) => [...prev, cur + "64"], []).toString()).clear("Contents");
+    sheet.getRanges(Trends.date + "64").clear("Contents");
+    return context.sync().then(function() {
+      console.log("Trends Cleared");
+    });
+  });
+
   let config = (await loadConfig()).trends;
+
+  // Populate new data
   for (const item of config) {
     const data = await getTrendsData(item.keyword, item.weeks);
 
