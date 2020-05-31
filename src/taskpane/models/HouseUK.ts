@@ -149,5 +149,5 @@ interface CompanyName {
 }
 
 export interface HouseSearchUK {
-  results: [string, number][];
+  results: [string, string][];
 }
