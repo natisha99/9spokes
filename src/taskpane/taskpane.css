@@ -46,14 +46,18 @@ ul {
 
 .apiButton {
   max-width: 100%;
-  width: 190px;
+  width: 210px;
   max-height: 100%;
   height: 40px;
 }
 
+.homePageButtons {
+  width: 290px;
+}
+
 .configButton {
   max-width: 100%;
-  width: 165px;
+  width: 240px;
   max-height: 100%;
   height: 45px;
 }
@@ -66,6 +70,11 @@ ul {
 .ms-welcome__main>h2 {
   width: 100%;
   text-align: center;
+}
+
+.setUpHeaders {
+  font-size: 1.5em;
+  font-weight: 300;
 }
 
 .ms-welcome__features {
@@ -100,6 +109,15 @@ ul {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.centerText {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.marginTop {
+  position: relative;
 }
 
 .center.vertical {
