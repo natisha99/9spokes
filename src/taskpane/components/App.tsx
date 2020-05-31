@@ -38,7 +38,7 @@ import {
       populateXero
     */
 } from "../sheets/population";
-import { searchFinance, searchHouse, searchLinkedin } from "../sheets/api";
+import { searchFinance, searchHouseNZ, searchLinkedin } from "../sheets/api";
 import {
   loadConfig,
   addHouseConfig,
@@ -295,7 +295,7 @@ export default class App extends React.Component<AppProps, AppState> {
       this.setState({
         isError: false,
         isSuccess: false,
-        companiesHouseList: (await searchHouse(val)).results,
+        companiesHouseList: (await searchHouseNZ(val)).results,
         showHouseSearch: true,
         showHouseSetUp: true,
         isLoading: false

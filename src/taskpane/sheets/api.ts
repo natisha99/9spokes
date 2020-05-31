@@ -1,30 +1,55 @@
-import { House, HouseSearch } from "../models/House";
+import { HouseNZ, HouseSearchNZ } from "../models/HouseNZ";
+import { HouseSearchUK, HouseUK } from "../models/HouseUK";
 import { Finance, FinanceSearch } from "../models/Finance";
 import { Trends } from "../models/Trends";
 import { Linkedin, LinkedinSearch } from "../models/Linkedin";
 
 /**
- * Fetch companies matching the search query.
+ * Fetch NZ companies matching the search query.
  * @param searchString
- * @return {HouseSearch}
+ * @return {HouseSearchNZ}
  */
-export async function searchHouse(searchString: string) {
+export async function searchHouseNZ(searchString: string) {
   const output = await fetch(
     `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${searchString.replace(/ /g, "+")}`
   ).then(response => response.json());
-  return { results: output } as HouseSearch;
+  return { results: output } as HouseSearchNZ;
 }
 
 /**
  * Fetch companies house NZ data.
  * @param companyNumber
- * @returns {House}
+ * @returns {HouseNZ}
  */
-export async function getHouseNZData(companyNumber: number) {
+export async function getHouseDataNZ(companyNumber: number) {
   const output = await fetch(
     `https://projectapi.co.nz/api/nzcompaniesoffice/?company_number=${companyNumber}`
   ).then(response => response.json());
-  return output as House;
+  return output as HouseNZ;
+}
+
+/**
+ * Fetch UK companies matching the search query.
+ * @param searchString
+ * @return {HouseSearchUK}
+ */
+export async function searchHouseUK(searchString: string) {
+  const output = await fetch(
+    `https://projectapi.co.nz/api/ukcompanieshouse/search/?keyword=${searchString.replace(/ /g, "+")}`
+  ).then(response => response.json());
+  return { results: output } as HouseSearchUK;
+}
+
+/**
+ * Fetch companies house UK data.
+ * @param companyNumber
+ * @returns {HouseUK}
+ */
+export async function getHouseDataUK(companyNumber: number) {
+  const output = await fetch(
+    `https://projectapi.co.nz/api/ukcompanieshouse/?company_number=${companyNumber}`
+  ).then(response => response.json());
+  return output.results as HouseUK;
 }
 
 /**
@@ -88,12 +113,4 @@ export async function getLinkedinData(profileName: string) {
     response.json()
   );
   return output.results as Linkedin;
-}
-
-export async function getHouseUKData(companyNumber: number) {
-  //add UK companies hosue API
-  const output = await fetch(
-    `https://projectapi.co.nz/api/UKcompaniesoffice/?company_number=${companyNumber}`
-  ).then(response => response.json());
-  return output as House;
 }

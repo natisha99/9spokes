@@ -1,4 +1,4 @@
-export interface House {
+export interface HouseNZ {
   DATE: string;
   NAME: string;
   INFO: {
@@ -40,6 +40,6 @@ export interface House {
   };
 }
 
-export interface HouseSearch {
+export interface HouseSearchNZ {
   results: [string, number][];
 }
