@@ -45,7 +45,7 @@ export async function searchHouseUK(searchString: string) {
  * @param companyNumber
  * @returns {HouseUK}
  */
-export async function getHouseDataUK(companyNumber: number) {
+export async function getHouseDataUK(companyNumber: string) {
   const output = await fetch(
     `https://projectapi.co.nz/api/ukcompanieshouse/?company_number=${companyNumber}`
   ).then(response => response.json());
