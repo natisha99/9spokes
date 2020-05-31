@@ -1,4 +1,4 @@
-import { Config, HouseConfig, LinkedinConfig, FinanceConfig, TrendsConfig } from "../models/Config";
+import {Config, HouseConfig, LinkedinConfig, FinanceConfig, TrendsConfig, HouseUKConfig} from "../models/Config";
 
 /**
  * Returns all config data.
@@ -9,12 +9,14 @@ export async function loadConfig() {
   await Excel.run(function(context) {
     const sheet = context.workbook.worksheets.getItem("Config");
     const house = sheet.tables.getItem("House").rows.load();
+    const houseUK = sheet.tables.getItem("House_UK").rows.load(); //TODO: Add House_UK in the Config worksheet.
     const linkedin = sheet.tables.getItem("Linkedin").rows.load();
     const finance = sheet.tables.getItem("Finance").rows.load();
     const trends = sheet.tables.getItem("Trends").rows.load();
     return context.sync().then(function() {
       config = {
         house: house.items.reduce((prev, cur) => [...prev, JSON.parse(cur.values[0][0])], []),
+        houseUK: houseUK.items.reduce((prev, cur) => [...prev, JSON.parse(cur.values[0][0])], []),
         linkedin: linkedin.items.reduce((prev, cur) => [...prev, JSON.parse(cur.values[0][0])], []),
         finance: finance.items.reduce((prev, cur) => [...prev, JSON.parse(cur.values[0][0])], []),
         trends: trends.items.reduce((prev, cur) => [...prev, JSON.parse(cur.values[0][0])], [])
@@ -39,11 +41,13 @@ export function saveConfig(config: Config) {
   Excel.run(function(context) {
     const sheet = context.workbook.worksheets.getItem("Config");
     const house = sheet.tables.getItem("House").rows.load();
+    const houseUK = sheet.tables.getItem("House_UK").rows.load();
     const linkedin = sheet.tables.getItem("Linkedin").rows.load();
     const finance = sheet.tables.getItem("Finance").rows.load();
     const trends = sheet.tables.getItem("Trends").rows.load();
     return context.sync().then(function() {
       config.house.forEach((item, index) => (house.items[index].values = [[JSON.stringify(item)]]));
+      config.houseUK.forEach((item, index) => (houseUK.items[index].values = [[JSON.stringify(item)]]));
       config.linkedin.forEach((item, index) => (linkedin.items[index].values = [[JSON.stringify(item)]]));
       config.finance.forEach((item, index) => (finance.items[index].values = [[JSON.stringify(item)]]));
       config.trends.forEach((item, index) => (trends.items[index].values = [[JSON.stringify(item)]]));
@@ -63,8 +67,8 @@ export function saveConfig(config: Config) {
  * @param tableName
  */
 function addConfig(
-  item: HouseConfig | LinkedinConfig | FinanceConfig | TrendsConfig,
-  tableName: "House" | "Linkedin" | "Finance" | "Trends"
+  item: HouseConfig | LinkedinConfig | FinanceConfig | TrendsConfig | HouseUKConfig,
+  tableName: "House" | "Linkedin" | "Finance" | "Trends" | "House_UK"
 ) {
   Excel.run(function(context) {
     const sheet = context.workbook.worksheets.getItem("Config");
@@ -86,7 +90,7 @@ function addConfig(
  * @param index
  * @param tableName
  */
-function removeConfig(index: number, tableName: "House" | "Linkedin" | "Finance" | "Trends") {
+function removeConfig(index: number, tableName: "House" | "Linkedin" | "Finance" | "Trends" | "House_UK") {
   Excel.run(function(context) {
     const sheet = context.workbook.worksheets.getItem("Config");
     const row = sheet.tables.getItem(tableName).rows.getItemAt(index);
@@ -108,6 +112,14 @@ function removeConfig(index: number, tableName: "House" | "Linkedin" | "Finance"
  */
 export function addHouseConfig(item: HouseConfig) {
   addConfig(item, "House");
+}
+
+/**
+ * Adds a new house config.
+ * @param item
+ */
+export function addHouseUKConfig(item: HouseUKConfig) {
+  addConfig(item, "House_UK");
 }
 
 /**
@@ -140,6 +152,14 @@ export function addTrendsConfig(item: TrendsConfig) {
  */
 export function removeHouseConfig(index: number) {
   removeConfig(index, "House");
+}
+
+/**
+ * Removes a house config by index.
+ * @param index
+ */
+export function removeHouseUKConfig(index: number) {
+  removeConfig(index, "House_UK");
 }
 
 /**

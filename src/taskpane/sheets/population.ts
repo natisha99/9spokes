@@ -6,7 +6,7 @@
  * @class populateFinance()
  * @class populateTrends()
  */
-import { getHouseDataNZ, getFinanceData, getTrendsData, getLinkedinData } from "./api";
+import {getHouseDataNZ, getFinanceData, getTrendsData, getLinkedinData, getHouseDataUK} from "./api";
 import { loadConfig } from "./config";
 
 export async function populateHouse() {
@@ -133,98 +133,119 @@ export async function populateHouse() {
 }
 
 export async function populateUK() {
-  // let House = {
-  //   //Stores excel index for data
-  //   summary: [
-  //     ["B1", "C3:C7", "C10:C11"],
-  //     ["E1", "F3:F7", "F10:F11"],
-  //     ["H1", "I3:I7", "I10:I11"],
-  //     ["K1", "L3:L7", "L10:L11"],
-  //     ["N1", "O3:O7", "O10:O11"],
-  //     ["Q1", "R3:R7", "R10:R11"],
-  //     ["T1", "U3:U7", "U10:U11"],
-  //     ["W1", "X3:X7", "X10:X11"]
-  //   ],
-  //   directors: ["B24:B", "E24:E", "H24:H", "K24:K", "N24:N", "Q24:Q", "T24:T", "W24:W"],
-  //   share: ["B36:C", "E36:F", "H36:I", "K36:L", "N36:O", "Q36:R", "T36:U", "W36:X"],
-  //   item: 0,
-  //   store: function(dump: any[]) {
-  //     /**
-  //      *
-  //      * @param {array} dump - A data dump in the form of a 3d array
-  //      * dump = [
-  //      *         [[summary]],
-  //      *         [[directors]],
-  //      *         [[shares]]
-  //      *        ]
-  //      *
-  //      * @example
-  //      * House.store([ [[["Company"]],
-  //      *               ["12345"], ["London"], ["2025"], ["2025"], ["www.asdsad.com"]],
-  //      *               [["2012"], [True]]]
-  //      *               [["Bob"], ["Jenny"], ["Fred"]]
-  //      *               [["Bob"],["10000"], ["Jenny"], ["5000"]]
-  //      *            ]);
-  //      */
-  //     let summary = this.summary[this.item];
-  //     let directors = this.directors[this.item] + String(dump[3].length + 23);
-  //     let share = this.share[this.item] + String(dump[4].length + 35);
-  //     this.item++;
-  //     //add into cells
-  //     Excel.run(function(context) {
-  //       var sheet = context.workbook.worksheets.getItem("House_UK");
-  //       sheet.getRange(summary[0]).values = dump[0][0];
-  //       sheet.getRange(summary[1]).values = dump[0][1];
-  //       sheet.getRange(summary[2]).values = dump[0][2];
-  //       sheet.getRange(directors).values = dump[2];
-  //       sheet.getRange(share).values = dump[3];
-  //       return context.sync().then(function() {
-  //         console.log("Imported House UK");
-  //       });
-  //     });
-  //   }
-  // };
-  // let config = (await loadConfig()).house;
-  // for (const item of config) {
-  //   /*
-  //   LINK TO COMPANIES HOUSE UK
-  //   */
-  //   const data = await getHouseDataUK(item.companyNumber);
-  //   //#region [rgba(70,20,20,0.5)] sample code region
-  //   const summary = [
-  //     [data.NAME],
-  //     [
-  //       [data.INFO.SUMMARY.company_number],
-  //       [data.INFO.SUMMARY.company_status],
-  //       [data.INFO.SUMMARY.entity_type],
-  //       [data.INFO.SUMMARY.constitution_filed],
-  //       [data.INFO.SUMMARY.ar_filing_month]
-  //     ],
-  //     [[data.DATE], [data.DATE]]
-  //   ];
-  //   let directors = [];
-  //   data.INFO.DIRECTORS.forEach(director => {
-  //     directors.push([director.full_legal_name]);
-  //   });
-  //   let shares = [];
-  //   let sharesKnown = 0;
-  //   data.INFO.SHAREHOLDINGS.allocation.forEach(shareholder => {
-  //     shares.push([
-  //       shareholder[1][0][0].toString(),
-  //       Number(shareholder[0]) / Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
-  //     ]);
-  //     sharesKnown = sharesKnown + Number(shareholder[0]);
-  //   });
-  //   shares.push([
-  //     "Unknown",
-  //     (Number(data.INFO.SHAREHOLDINGS.total_number_of_shares) - sharesKnown) /
-  //       Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
-  //   ]);
-  //   const sample = [summary, directors, shares];
-  //   //stores companies house data
-  //   House.store(sample);
-  //   //#endregion
-  // }
+  let House = {
+    //Stores excel index for data
+    name: ["B1", "E1", "H1", "K1", "N1", "Q1", "T1", "W1"],
+    name_merged: ["B1:C1", "E1:F1", "H1:I1", "K1:L1", "N1:O1", "Q1:R1", "T1:U1", "W1:X1"],
+    summary: ["C3:C7", "F3:F7", "I3:I7", "L3:L7", "O3:O7", "R3:R7", "U3:U7", "X3:X7"],
+    accounts: ["C10:C11", "F10:F11", "I10:I11", "L10:L11", "O10:O11", "R10:R11", "U10:U11", "X10:X11"],
+    directors: ["B14:B", "E14:E", "H14:H", "K14:K", "N14:N", "Q14:Q", "T14:T", "W14:W"],
+    directors_merged: ["B14:C23", "E14:F23", "H14:I23", "K14:L23", "N14:O23", "Q14:R23", "T14:U23", "W14:X23"],
+    // share: ["B36:C", "E36:F", "H36:I", "K36:L", "N36:O", "Q36:R", "T36:U", "W36:X"],
+
+    item: 0,
+
+    store: function(dump: any[]) {
+      /**
+       *
+       * @param {array} dump - A data dump in the form of a 3d array
+       * dump = [
+       *         [[Name]]
+       *         [[summary]],
+       *         [[NZBN]],
+       *         [[directors]],
+       *         [[shares]]
+       *        ]
+       *
+       * @example
+       * House.store([ [["Company"]]
+       *               [["12345"], ["54321"], ["2025"], ["Active"], ["manufacturing"], ["yes"], ["11235813"]]
+       *               [["gst"], ["www.website.com"], ["911"], ["gmail"], ["name"], ["mars"], ["class"], ["ABN"]]
+       *               [["Bob"], ["Jenny"], ["Fred"]]
+       *               [["Bob"],["10000"], ["Jenny"], ["5000"]]
+       *            ]);
+       */
+      let name = this.name[this.item];
+      let summary = this.summary[this.item];
+      let accounts = this.accounts[this.item];
+      let directors = this.directors[this.item] + String(dump[3].length + 13);
+      // let share = this.share[this.item] + String(dump[4].length + 35);
+      this.item++;
+
+      //add into cells
+      Excel.run(function(context) {
+        var sheet = context.workbook.worksheets.getItem("House_UK");
+        sheet.getRange(name).values = dump[0];
+        sheet.getRange(summary).values = dump[1];
+        sheet.getRange(accounts).values = dump[2];
+        sheet.getRange(directors).values = dump[3];
+        // sheet.getRange(share).values = dump[4];
+        return context.sync().then(function() {
+          console.log("Imported House");
+        });
+      });
+    }
+  };
+
+  // Clear old data
+  Excel.run(function(context) {
+    var sheet = context.workbook.worksheets.getItem("House_UK");
+    sheet.getRanges(House.name_merged.toString()).clear("Contents");
+    sheet.getRanges(House.summary.toString()).clear("Contents");
+    sheet.getRanges(House.accounts.toString()).clear("Contents");
+    sheet.getRanges(House.directors_merged.toString()).clear("Contents");
+    // sheet.getRanges(House.share.reduce((prev, cur) => [...prev, cur + "10000"], []).toString()).clear("Contents");
+    return context.sync().then(function() {
+      console.log("House_UK Cleared");
+    });
+  });
+
+  let config = (await loadConfig()).houseUK;
+
+  // Populate new data
+  for (const item of config) {
+    const data = await getHouseDataUK(item.companyNumber);
+
+    //#region [rgba(70,20,20,0.5)] sample code region
+
+    const summary = [
+      [data.company_number],
+      [data.registered_office_address.address_line_1+", "+data.registered_office_address.address_line_2
+      +", "+data.registered_office_address.locality+" "+data.registered_office_address.postal_code],
+      [data.date_of_creation],
+      [data.date_of_creation],
+      [data.links.self]
+    ];
+    const name = data.company_name;
+    const accounts = [
+      [data.accounts.next_due],
+      [data.accounts.overdue],
+    ];
+    let directors = [];
+    data.links.officers.forEach(director => {
+      directors.push([director.name]);
+    });
+    // let shares = [];
+    // let sharesKnown = 0;
+    // data.INFO.SHAREHOLDINGS.allocation.forEach(shareholder => {
+    //   shares.push([
+    //     shareholder[1][0][0].toString(),
+    //     Number(shareholder[0]) / Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
+    //   ]);
+    //   sharesKnown = sharesKnown + Number(shareholder[0]);
+    // });
+    // shares.push([
+    //   "Unknown",
+    //   (Number(data.INFO.SHAREHOLDINGS.total_number_of_shares) - sharesKnown) /
+    //   Number(data.INFO.SHAREHOLDINGS.total_number_of_shares)
+    // ]);
+
+    const sample = [name, summary, accounts, directors];
+    //stores companies house data
+    House.store(sample);
+    //#endregion
+
+  }
 }
 
 export async function populateLinkedIn() {
