@@ -6,6 +6,7 @@
  * @class App
  */
 
+//#region import
 import * as React from "react";
 import {
   Overlay,
@@ -53,12 +54,14 @@ import {
   removeHouseUKConfig,
   addHouseUKConfig
 } from "../sheets/config";
+//#endregion
 
 export interface AppProps {
   title: string;
   isOfficeInitialized: boolean;
 }
 
+//Exporting current states
 export interface AppState {
   isLoading: boolean;
   isSuccess: boolean;
@@ -106,8 +109,10 @@ export interface AppState {
   showLinkedinSetUp: boolean;
 }
 
+//The main code
 export default class App extends React.Component<AppProps, AppState> {
   constructor(props, context) {
+    //the constructor for the task plane
     super(props, context);
     this.state = {
       isLoading: false,
@@ -187,6 +192,7 @@ export default class App extends React.Component<AppProps, AppState> {
     </MessageBar>
   );
 
+  //#region show searchs, results and rows
   _showFinanceSearch = async bool => {
     this.setState({
       showFinanceRows: false,
@@ -473,6 +479,7 @@ export default class App extends React.Component<AppProps, AppState> {
       });
     }
   };
+  //#endregion
 
   componentDidMount() {
     this.setState({
@@ -559,10 +566,16 @@ export default class App extends React.Component<AppProps, AppState> {
       );
     }
 
+    /*HTML taskplane
+      this includes 
+        Home, Set-up, and Help tabs
+        All UI elements and components 
+        Function and object storage calls and references
+    */
     return (
       <div className="ms-welcome">
         <Pivot>
-          {/* Home */}
+          {/* Home Tab*/}
           <PivotItem headerText="Home">
             <Header logo="assets/logo-filled.png" title={this.props.title} message="Welcome" />
             <Title message="Create a new worksheet to get started">
@@ -575,7 +588,7 @@ export default class App extends React.Component<AppProps, AppState> {
             </Title>
           </PivotItem>
 
-          {/* Set-up */}
+          {/* Set-up Tab*/}
           <PivotItem headerText="Set-up">
             <Title message="Manage Your Data">
               <div className={"centerText"}>
@@ -1813,7 +1826,7 @@ export default class App extends React.Component<AppProps, AppState> {
             </Title>
           </PivotItem>
 
-          {/* Help */}
+          {/* Help Tab*/}
           <PivotItem headerText="Help">
             <HeroList message="Follow the steps below to get started!" items={this.state.listItems}></HeroList>
           </PivotItem>
