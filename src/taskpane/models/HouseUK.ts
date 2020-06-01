@@ -42,6 +42,7 @@ export interface HouseUK {
     address_line_2: string;
     postal_code: string;
     address_line_1: string;
+    locality: string;
   };
 
   confirmation_statement: {

@@ -1,5 +1,6 @@
 export interface Config {
   house: HouseConfig[];
+  houseUK: HouseUKConfig[];
   linkedin: LinkedinConfig[];
   finance: FinanceConfig[];
   trends: TrendsConfig[];
@@ -8,6 +9,11 @@ export interface Config {
 export interface HouseConfig {
   companyName: string;
   companyNumber: number;
+}
+
+export interface HouseUKConfig {
+  companyName: string;
+  companyNumber: string;
 }
 
 export interface LinkedinConfig {
