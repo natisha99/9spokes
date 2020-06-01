@@ -12,16 +12,14 @@ import { loadConfig } from "./config";
 export async function populateHouseNZ() {
   let House = {
     //Stores excel index for data
-    name: ["B1", "E1", "H1", "K1", "N1", "Q1", "T1", "W1"],
-    name_merged: ["B1:C1", "E1:F1", "H1:I1", "K1:L1", "N1:O1", "Q1:R1", "T1:U1", "W1:X1"],
-    summary: ["C3:C11", "F3:F11", "I3:I11", "L3:L11", "O3:O11", "R3:R11", "U3:U11", "X3:X11"],
-    NZBN: ["C14:C21", "F14:F21", "I14:I21", "L14:L21", "O14:O21", "R14:R21", "U14:U21", "X14:X21"],
-    directors: ["B24:B", "E24:E", "H24:H", "K24:K", "N24:N", "Q24:Q", "T24:T", "W24:W"],
-    directors_merged: ["B24:C33", "E24:F33", "H24:I33", "K24:L33", "N24:O33", "Q24:R33", "T24:U33", "W24:X33"],
-    share: ["B36:C", "E36:F", "H36:I", "K36:L", "N36:O", "Q36:R", "T36:U", "W36:X"],
-
     item: 0,
-
+    name: ["B2", "E2", "H2", "K2", "N2", "Q2", "T2", "W2"],
+    name_merged: ["B2:C2", "E2:F2", "H2:I2", "K2:L2", "N2:O2", "Q2:R2", "T2:U2", "W2:X2"],
+    summary: ["C4:C12", "F4:F12", "I4:I12", "L4:L12", "O4:O12", "R4:R12", "U4:U12", "X4:X12"],
+    NZBN: ["C15:C22", "F15:F22", "I15:I22", "L15:L22", "O15:O22", "R15:R22", "U15:U22", "X15:X22"],
+    directors: ["B25:B", "E25:E", "H25:H", "K25:K", "N25:N", "Q25:Q", "T25:T", "W25:W"],
+    directors_merged: ["B25:C34", "E25:F34", "H25:I34", "K25:L34", "N25:O34", "Q25:R34", "T25:U34", "W25:X34"],
+    share: ["B37:C", "E37:F", "H37:I", "K37:L", "N37:O", "Q37:R", "T37:U", "W37:X"],
     store: function(dump: any[]) {
       /**
        *
@@ -135,12 +133,13 @@ export async function populateHouseNZ() {
 export async function populateHouseUK() {
   let House = {
     //Stores excel index for data
-    name: ["B1", "E1", "H1", "K1", "N1", "Q1", "T1", "W1"],
-    name_merged: ["B1:C1", "E1:F1", "H1:I1", "K1:L1", "N1:O1", "Q1:R1", "T1:U1", "W1:X1"],
-    summary: ["C3:C7", "F3:F7", "I3:I7", "L3:L7", "O3:O7", "R3:R7", "U3:U7", "X3:X7"],
-    accounts: ["C10:C11", "F10:F11", "I10:I11", "L10:L11", "O10:O11", "R10:R11", "U10:U11", "X10:X11"],
-    directors: ["B14:B", "E14:E", "H14:H", "K14:K", "N14:N", "Q14:Q", "T14:T", "W14:W"],
-    directors_merged: ["B14:C23", "E14:F23", "H14:I23", "K14:L23", "N14:O23", "Q14:R23", "T14:U23", "W14:X23"],
+    rows: ["2", "4", "8", "11", "12", "15", "24", "27"],
+    name: ["B2", "E2", "H2", "K2", "N2", "Q2", "T2", "W2"],
+    name_merged: ["B2:C2", "E2:F2", "H2:I2", "K2:L2", "N2:O2", "Q2:R2", "T2:U2", "W2:X2"],
+    summary: ["C4:C8", "F4:F8", "I4:I8", "L4:L8", "O4:O8", "R4:R8", "U4:U8", "X4:X8"],
+    accounts: ["C11:C12", "F11:F12", "I11:I12", "L11:L12", "O11:O12", "R11:R12", "U11:U12", "X11:X12"],
+    directors: ["B15:B", "E15:E", "H15:H", "K15:K", "N15:N", "Q15:Q", "T15:T", "W15:W"],
+    directors_merged: ["B15:C24", "E15:F24", "H15:I24", "K15:L24", "N15:O24", "Q15:R24", "T15:U24", "W15:X24"],
     // share: ["B36:C", "E36:F", "H36:I", "K36:L", "N36:O", "Q36:R", "T36:U", "W36:X"],
 
     item: 0,
@@ -255,42 +254,42 @@ export async function populateLinkedIn() {
   let Linkedin = {
     //Stores excel index for data
     company: [
-      ["B1", "C3:C8", "B14"],
-      ["E1", "F3:F8", "E14"],
-      ["H1", "I3:I8", "H14"],
-      ["K1", "L3:F8", "K14"],
-      ["N1", "O3:O8", "N14"],
+      ["B2", "C4:C8", "B15"],
+      ["E2", "F4:F8", "E15"],
+      ["H2", "I4:I8", "H15"],
+      ["K2", "L4:F8", "K15"],
+      ["N2", "O4:O8", "N15"],
 
-      ["B36", "C38:C43", "B49"],
-      ["E36", "F38:F43", "E49"],
-      ["H36", "I38:I43", "H49"],
-      ["K36", "L38:F43", "K49"],
-      ["N36", "O38:O43", "N49"],
+      ["B37", "C39:C44", "B50"],
+      ["E37", "F39:F44", "E50"],
+      ["H37", "I39:I44", "H50"],
+      ["K37", "L39:F44", "K50"],
+      ["N37", "O39:O44", "N50"],
 
-      ["B70", "C72:C77", "B83"],
-      ["E70", "F72:F77", "E83"],
-      ["H70", "I72:I77", "H83"],
-      ["K70", "L72:F77", "K83"],
-      ["N70", "O72:O77", "N83"]
+      ["B71", "C73:C78", "B84"],
+      ["E71", "F73:F78", "E84"],
+      ["H71", "I73:I78", "H84"],
+      ["K71", "L73:F78", "K84"],
+      ["N71", "O73:O78", "N84"]
     ],
     company_merged: [
-      ["B1:C1", "C3:C11", "B14:C33"],
-      ["E1:F1", "F3:F11", "E14:F33"],
-      ["H1:I1", "I3:I11", "H14:I33"],
-      ["K1:L1", "L3:F11", "K14:L33"],
-      ["N1:O1", "O3:O11", "N14:O33"],
+      ["B2:C2", "C4:C12", "B15:C34"],
+      ["E2:F2", "F4:F12", "E15:F34"],
+      ["H2:I2", "I4:I12", "H15:I34"],
+      ["K2:L2", "L4:F12", "K15:L34"],
+      ["N2:O2", "O4:O12", "N15:O34"],
 
-      ["B36:C36", "C38:C46", "B49:C68"],
-      ["E36:F36", "F38:F46", "E49:F68"],
-      ["H36:I36", "I38:C46", "H49:I68"],
-      ["K36:L36", "L38:F46", "K49:L68"],
-      ["N36:O36", "O38:O46", "N49:O68"],
+      ["B37:C37", "C39:C47", "B50:C69"],
+      ["E37:F37", "F39:F47", "E50:F69"],
+      ["H37:I37", "I39:C47", "H50:I69"],
+      ["K37:L37", "L39:F47", "K50:L69"],
+      ["N37:O37", "O39:O47", "N50:O69"],
 
-      ["B70:C70", "C72:C80", "B83:C102"],
-      ["E70:F70", "F72:F80", "E83:F102"],
-      ["H70:I70", "I72:C80", "H83:I102"],
-      ["K70:L70", "L72:F80", "K83:L102"],
-      ["N70:O70", "O72:O80", "N83:O102"]
+      ["B71:C71", "C73:C81", "B84:C103"],
+      ["E71:F71", "F73:F81", "E84:F103"],
+      ["H71:I71", "I73:C81", "H84:I103"],
+      ["K71:L71", "L73:F81", "K84:L103"],
+      ["N71:O71", "O73:O81", "N84:O103"]
     ],
     item: 0,
 
@@ -360,8 +359,9 @@ export async function populateLinkedIn() {
 export async function populateFinance() {
   let Finance = {
     //Stores excel index for data
-    name: ["B1", "F1", "J1", "N1", "R1"],
-    name_merged: ["B1:D1", "F1:H1", "J1:L1", "N1:P1", "R1:T1"],
+    name: ["B2", "F2", "J2", "N2", "R2"],
+    name_merged: ["B2:D2", "F2:H2", "J2:L2", "N2:P2", "R2:T2"],
+    time_range: ["B3:C", "F3:G", "J3:K", "N3:O", "R3:S"],
     stocks: ["B5:C", "F5:G", "J5:K", "N5:O", "R5:S"],
     item: 0,
 
@@ -438,8 +438,8 @@ export async function populateTrends() {
   let Trends = {
     //Stores excel index for data
     summary: ["C2:C7", "D2:D7", "E2:E7", "F2:F7", "G2:G7"],
-    data: ["C13:C", "D13:D", "E13:E", "F13:F", "G13:G"],
-    date: "B13:B",
+    data: ["C3:C", "D3:D", "E3:E", "F3:F", "G3:G"],
+    date: "B3:B",
     item: 0,
 
     store: function(dump: any[]) {
@@ -459,7 +459,7 @@ export async function populateTrends() {
        *                   0
        *               ]);
        */
-      let summary = this.summary[this.item];
+      //let summary = this.summary[this.item];
       let data = this.data[this.item] + String(dump[1].length + 12);
       let date;
       if (dump[2] != 0) {
@@ -469,7 +469,7 @@ export async function populateTrends() {
       //add into cells
       Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("Trends");
-        sheet.getRange(summary).values = dump[0];
+        //sheet.getRange(summary).values = dump[0];
         sheet.getRange(data).values = dump[1];
         if (dump[2] != 0) {
           sheet.getRange(date).values = dump[2];
