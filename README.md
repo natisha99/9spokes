@@ -4,7 +4,8 @@
 
 This is an Addin for Microsoft Excel which uses APIs to find public data sources such as
 
-- Companies Office
+- Companies Office NZ
+- Companies House UK
 - Yahoo Finance
 - Google Trends
 - LinkedIn
@@ -13,7 +14,7 @@ and displays the data in a dashboard that the user can easily modify, use, and a
 
 ## Running the Programme
 
-run the following script in your terminal from the root directory
+Run the following script in your terminal from the root directory
 
 ```bash
 npm stop
@@ -24,15 +25,27 @@ npm start
 
 1. First open the taskpane by clicking the 9spokes logo on the far right hand side under the "Home" tab.
 2. Click "Create workbook from template" and reopen the taskpane once the new workbook has been created.
-3. Search for a company under the "Set-up" tab, and select the company you'd like to view the data for.
+3. Select the source you'd like to use to search for your company under the "Set-up" tab
 4. Click "import".
 5. The data should now be loaded and displayed in the dashboard
-6. To view the raw, more detailed data click the "Go to Data" button on the top right title of the data.
 
+## Prerequisites
+
+Follow [this tutorial from Microsoft](https://docs.microsoft.com/en-us/office/dev/add-ins/tutorials/excel-tutorial) which explains all the prerequisites
+
+- [node js](https://nodejs.org/en/download/)
+- [Yeoman](https://github.com/yeoman/yo) and [Yeoman Generator](https://github.com/OfficeDev/generator-office)
+  Install these with the following command
+
+```bash
+npm install -g yo generator-office
+```
 
 ## Installing
 
-run the following script in your terminal from the root directory
+Clone or Download this repository and run the following script in your terminal from the root
+
+directory of the project
 
 ```bash
 npm install
@@ -41,7 +54,6 @@ npm install
 ## Report a bug or get further
 
 To report a bug or get further help please visit the [9Spokes support page](https://support.9spokes.com/hc/en-us)
-
 
 ## Debugging
 
