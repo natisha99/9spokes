@@ -1,12 +1,12 @@
 export interface Config {
-  house: HouseConfig[];
+  houseNZ: HouseNZConfig[];
   houseUK: HouseUKConfig[];
   linkedin: LinkedinConfig[];
   finance: FinanceConfig[];
   trends: TrendsConfig[];
 }
 
-export interface HouseConfig {
+export interface HouseNZConfig {
   companyName: string;
   companyNumber: number;
 }

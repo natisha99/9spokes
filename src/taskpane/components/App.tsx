@@ -29,26 +29,29 @@ import { Card, ICardTokens, ICardSectionStyles, ICardSectionTokens } from "@uifa
 import { FontWeights } from "@uifabric/styling";
 import { Text, ITextStyles } from "office-ui-fabric-react";
 import {
-  populateHouse,
+  populateHouseNZ,
+  populateHouseUK,
   populateLinkedIn,
   populateFinance,
-  populateTrends, populateUK
+  populateTrends
   /*
       populateFacebook,
       populateXero
     */
 } from "../sheets/population";
-import {searchFinance, searchHouseNZ, searchHouseUK, searchLinkedin} from "../sheets/api";
+import { searchFinance, searchHouseNZ, searchHouseUK, searchLinkedin } from "../sheets/api";
 import {
   loadConfig,
-  addHouseConfig,
+  addHouseNZConfig,
   addFinanceConfig,
   addLinkedinConfig,
-  removeHouseConfig,
+  removeHouseNZConfig,
   removeFinanceConfig,
   removeLinkedinConfig,
   removeTrendsConfig,
-  addTrendsConfig, removeHouseUKConfig, addHouseUKConfig
+  addTrendsConfig,
+  removeHouseUKConfig,
+  addHouseUKConfig
 } from "../sheets/config";
 
 export interface AppProps {
@@ -60,18 +63,18 @@ export interface AppState {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
-  emptyHouseSearch: boolean;
+  emptyHouseNZSearch: boolean;
   emptyHouseUKSearch: boolean;
   emptyFinanceSearch: boolean;
   emptyLinkedinSearch: boolean;
   emptyTrendsSearch: boolean;
   listItems: HeroListItem[];
-  showHouseSearch: boolean;
+  showHouseNZSearch: boolean;
   showHouseUKSearch: boolean;
   showFinanceSearch: boolean;
   showLinkedinSearch: boolean;
   showTrendsSearch: boolean;
-  showHouseRows: boolean;
+  showHouseNZRows: boolean;
   showHouseUKRows: boolean;
   showFinanceRows: boolean;
   showLinkedinRows: boolean;
@@ -81,22 +84,22 @@ export interface AppState {
   showTrendsResults: boolean;
   showFinanceResults: boolean;
   showLinkedinResults: boolean;
-  companiesHouseName: string;
+  companiesHouseNZName: string;
   companiesHouseUKName: string;
   googleTrendsName: string;
   yahooFinanceName: string;
   linkedinName: string;
-  companiesHouseList: any;
+  companiesHouseNZList: any;
   companiesHouseUKList: any;
   yahooFinanceList: any;
   linkedInList: any;
   cNum: number;
-  houseRows: any;
+  houseNZRows: any;
   houseUKRows: any;
   yahooRows: any;
   linkedInRows: any;
   trendsRows: any;
-  showHouseSetUp: boolean;
+  showHouseNZSetUp: boolean;
   showHouseUKSetUp: boolean;
   showFinanceSetUp: boolean;
   showTrendsSetUp: boolean;
@@ -110,18 +113,18 @@ export default class App extends React.Component<AppProps, AppState> {
       isLoading: false,
       isSuccess: false,
       isError: false,
-      emptyHouseSearch: false,
+      emptyHouseNZSearch: false,
       emptyHouseUKSearch: false,
       emptyFinanceSearch: false,
       emptyLinkedinSearch: false,
       emptyTrendsSearch: false,
       listItems: [],
-      showHouseSearch: false,
+      showHouseNZSearch: false,
       showHouseUKSearch: false,
       showFinanceSearch: false,
       showLinkedinSearch: false,
       showTrendsSearch: false,
-      showHouseRows: false,
+      showHouseNZRows: false,
       showHouseUKRows: false,
       showFinanceRows: false,
       showLinkedinRows: false,
@@ -131,22 +134,22 @@ export default class App extends React.Component<AppProps, AppState> {
       showTrendsResults: false,
       showFinanceResults: false,
       showLinkedinResults: false,
-      companiesHouseName: "",
+      companiesHouseNZName: "",
       companiesHouseUKName: "",
       googleTrendsName: "",
       yahooFinanceName: "",
       linkedinName: "",
-      companiesHouseList: [],
+      companiesHouseNZList: [],
       companiesHouseUKList: [],
       yahooFinanceList: [],
       linkedInList: [],
       cNum: null,
-      houseRows: [],
+      houseNZRows: [],
       houseUKRows: [],
       yahooRows: [],
       linkedInRows: [],
       trendsRows: [],
-      showHouseSetUp: false,
+      showHouseNZSetUp: false,
       showHouseUKSetUp: false,
       showFinanceSetUp: false,
       showTrendsSetUp: false,
@@ -193,10 +196,10 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  _showHouseSearch = async bool => {
+  _showHouseNZSearch = async bool => {
     this.setState({
-      showHouseRows: false,
-      showHouseSearch: bool,
+      showHouseNZRows: false,
+      showHouseNZSearch: bool,
       isSuccess: false,
       isError: false
     });
@@ -220,21 +223,21 @@ export default class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  _showHouseRows = async bool => {
+  _showHouseNZRows = async bool => {
     this.setState({
-      showHouseSearch: false,
+      showHouseNZSearch: false,
       isError: false,
       isSuccess: false,
-      showHouseRows: bool,
-      houseRows: []
+      showHouseNZRows: bool,
+      houseNZRows: []
     });
 
     let temp = [];
     let config = await loadConfig();
-    config.house.forEach((item, i) => {
+    config.houseNZ.forEach((item, i) => {
       temp.push([i, item.companyName, item.companyNumber]);
     });
-    this.setState({ houseRows: temp });
+    this.setState({ houseNZRows: temp });
   };
 
   _showHouseUKRows = async bool => {
@@ -305,32 +308,32 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({ trendsRows: temp });
   };
 
-  _showHouseResults = async (bool, val) => {
+  _showHouseNZResults = async (bool, val) => {
     this.setState({
       isLoading: true,
       isError: false,
       isSuccess: false,
-      showHouseSearch: true,
-      showHouseSetUp: false,
+      showHouseNZSearch: true,
+      showHouseNZSetUp: false,
       showHouseResults: bool,
-      companiesHouseName: val
+      companiesHouseNZName: val
     });
     if (val.trim() == "") {
       this.setState({
         isError: true,
         isSuccess: false,
         showHouseResults: false,
-        showHouseSetUp: true,
+        showHouseNZSetUp: true,
         isLoading: false,
-        showHouseSearch: true
+        showHouseNZSearch: true
       });
     } else {
       this.setState({
         isError: false,
         isSuccess: false,
-        companiesHouseList: (await searchHouseNZ(val)).results,
-        showHouseSearch: true,
-        showHouseSetUp: true,
+        companiesHouseNZList: (await searchHouseNZ(val)).results,
+        showHouseNZSearch: true,
+        showHouseNZSetUp: true,
         isLoading: false
       });
     }
@@ -580,18 +583,18 @@ export default class App extends React.Component<AppProps, AppState> {
               </div>
               <br />
 
-              {/* Companies House */}
+              {/* Companies House NZ */}
               <DefaultButton
                 className="apiButton"
                 text="Companies House NZ"
                 iconProps={{ iconName: "ChevronRight" }}
-                onClick={() => this.setState({ showHouseSetUp: true })}
+                onClick={() => this.setState({ showHouseNZSetUp: true })}
               />
               <Dialog
-                hidden={!this.state.showHouseSetUp}
+                hidden={!this.state.showHouseNZSetUp}
                 onDismiss={() =>
                   this.setState({
-                    showHouseSetUp: false,
+                    showHouseNZSetUp: false,
                     isSuccess: false,
                     isError: false
                   })
@@ -600,7 +603,7 @@ export default class App extends React.Component<AppProps, AppState> {
                   onDismissed: () => {
                     if (!this.state.isLoading) {
                       this.setState({
-                        showHouseSetUp: false,
+                        showHouseNZSetUp: false,
                         isSuccess: false,
                         isError: false
                       });
@@ -608,8 +611,8 @@ export default class App extends React.Component<AppProps, AppState> {
                   }
                 }}
               >
-                {!this.state.showHouseSearch && this.state.isSuccess && <this.SuccessNotify />}
-                {!this.state.showHouseSearch && this.state.isError && <this.ErrorNotify />}
+                {!this.state.showHouseNZSearch && this.state.isSuccess && <this.SuccessNotify />}
+                {!this.state.showHouseNZSearch && this.state.isError && <this.ErrorNotify />}
                 <div className={"centerText"}>
                   <Text className={"setUpHeaders"}>Companies House NZ</Text>
                 </div>
@@ -620,7 +623,7 @@ export default class App extends React.Component<AppProps, AppState> {
                       className="configButton"
                       text="Show current set-up"
                       iconProps={{ iconName: "ChevronRight" }}
-                      onClick={this._showHouseRows.bind(null, true)}
+                      onClick={this._showHouseNZRows.bind(null, true)}
                     />
                     <DefaultButton
                       className="configButton"
@@ -628,8 +631,8 @@ export default class App extends React.Component<AppProps, AppState> {
                       iconProps={{ iconName: "ChevronRight" }}
                       onClick={() =>
                         this.setState({
-                          showHouseSearch: true,
-                          emptyHouseSearch: false,
+                          showHouseNZSearch: true,
+                          emptyHouseNZSearch: false,
                           isSuccess: false,
                           isError: false
                         })
@@ -637,26 +640,26 @@ export default class App extends React.Component<AppProps, AppState> {
                     />
                     <DefaultButton
                       className="configButton"
-                      text="Import Companies House"
+                      text="Import Companies House NZ"
                       iconProps={{ iconName: "ChevronRight" }}
                       onClick={async () => {
                         try {
-                          this.setState({ isLoading: true, showHouseSetUp: false });
-                          await populateHouse();
-                          this.setState({ isLoading: false, isSuccess: true, showHouseSetUp: true });
+                          this.setState({ isLoading: true, showHouseNZSetUp: false });
+                          await populateHouseNZ();
+                          this.setState({ isLoading: false, isSuccess: true, showHouseNZSetUp: true });
                         } catch (error) {
                           console.error(error);
-                          this.setState({ isLoading: false, isError: true, showHouseSetUp: true });
+                          this.setState({ isLoading: false, isError: true, showHouseNZSetUp: true });
                         }
                       }}
                     />
                   </Stack>
                 </div>
                 <Dialog
-                  hidden={!this.state.showHouseRows}
+                  hidden={!this.state.showHouseNZRows}
                   onDismiss={() =>
                     this.setState({
-                      showHouseRows: false,
+                      showHouseNZRows: false,
                       isError: false,
                       isSuccess: false
                     })
@@ -667,8 +670,8 @@ export default class App extends React.Component<AppProps, AppState> {
                   </div>
                   <br />
                   <Stack tokens={stackTokens}>
-                    {this.state.showHouseRows &&
-                      this.state.houseRows.map(element => (
+                    {this.state.showHouseNZRows &&
+                      this.state.houseNZRows.map(element => (
                         <Card key={element} tokens={cardTokens}>
                           <Card.Section fill verticalAlign="end"></Card.Section>
                           <Card.Section>
@@ -689,13 +692,13 @@ export default class App extends React.Component<AppProps, AppState> {
                               className="removeButton"
                               onClick={async () => {
                                 try {
-                                  removeHouseConfig(element[0]);
+                                  removeHouseNZConfig(element[0]);
                                   let temp = [];
                                   let config = await loadConfig();
-                                  config.house.forEach((item, i) => {
+                                  config.houseNZ.forEach((item, i) => {
                                     temp.push([i, item.companyName, item.companyNumber]);
                                   });
-                                  this.setState({ houseRows: temp });
+                                  this.setState({ houseNZRows: temp });
                                 } catch (error) {
                                   console.error(error);
                                 }
@@ -718,7 +721,7 @@ export default class App extends React.Component<AppProps, AppState> {
                     <PrimaryButton
                       onClick={() =>
                         this.setState({
-                          showHouseRows: false,
+                          showHouseNZRows: false,
                           isError: false,
                           isSuccess: false
                         })
@@ -729,10 +732,10 @@ export default class App extends React.Component<AppProps, AppState> {
                 </Dialog>
 
                 <Dialog
-                  hidden={!this.state.showHouseSearch}
+                  hidden={!this.state.showHouseNZSearch}
                   onDismiss={() =>
                     this.setState({
-                      showHouseSearch: false,
+                      showHouseNZSearch: false,
                       isError: false,
                       isSuccess: false
                     })
@@ -741,7 +744,7 @@ export default class App extends React.Component<AppProps, AppState> {
                     onDismissed: () => {
                       if (!this.state.isLoading) {
                         this.setState({
-                          companiesHouseList: [],
+                          companiesHouseNZList: [],
                           showHouseResults: false,
                           isError: false,
                           isSuccess: false
@@ -760,27 +763,27 @@ export default class App extends React.Component<AppProps, AppState> {
                     <SearchBox
                       styles={searchBoxStyles}
                       placeholder="Company Name"
-                      onSearch={this._showHouseResults.bind(null, true)}
+                      onSearch={this._showHouseNZResults.bind(null, true)}
                     />
                     <div className={"center"}>
                       <Stack tokens={sectionStackTokens}>
                         {this.state.showHouseResults &&
-                          this.state.companiesHouseList.map(element => (
+                          this.state.companiesHouseNZList.map(element => (
                             <Card
                               key={element[1]}
                               onClick={async () => {
                                 try {
-                                  addHouseConfig({ companyName: element[0], companyNumber: element[1] });
+                                  addHouseNZConfig({ companyName: element[0], companyNumber: element[1] });
                                   this.setState({
                                     isSuccess: true,
-                                    showHouseSearch: true,
+                                    showHouseNZSearch: true,
                                     showHouseResults: false
                                   });
                                 } catch (error) {
                                   console.error(error);
                                   this.setState({
                                     isSuccess: false,
-                                    showHouseSearch: false
+                                    showHouseNZSearch: false
                                   });
                                 }
                               }}
@@ -817,7 +820,7 @@ export default class App extends React.Component<AppProps, AppState> {
                     <PrimaryButton
                       onClick={() =>
                         this.setState({
-                          showHouseSearch: false,
+                          showHouseNZSearch: false,
                           isError: false,
                           isSuccess: false
                         })
@@ -830,7 +833,7 @@ export default class App extends React.Component<AppProps, AppState> {
                   <PrimaryButton
                     onClick={() =>
                       this.setState({
-                        showHouseSetUp: false,
+                        showHouseNZSetUp: false,
                         isError: false,
                         isSuccess: false
                       })
@@ -841,33 +844,33 @@ export default class App extends React.Component<AppProps, AppState> {
               </Dialog>
               <br />
 
-              {/* Companies House UK*/}
+              {/* Companies House UK */}
               <DefaultButton
-                  className="apiButton"
-                  text="Companies House UK"
-                  iconProps={{ iconName: "ChevronRight" }}
-                  onClick={() => this.setState({ showHouseUKSetUp: true })}
+                className="apiButton"
+                text="Companies House UK"
+                iconProps={{ iconName: "ChevronRight" }}
+                onClick={() => this.setState({ showHouseUKSetUp: true })}
               />
               <Dialog
-                  hidden={!this.state.showHouseUKSetUp}
-                  onDismiss={() =>
+                hidden={!this.state.showHouseUKSetUp}
+                onDismiss={() =>
+                  this.setState({
+                    showHouseUKSetUp: false,
+                    isSuccess: false,
+                    isError: false
+                  })
+                }
+                modalProps={{
+                  onDismissed: () => {
+                    if (!this.state.isLoading) {
                       this.setState({
                         showHouseUKSetUp: false,
                         isSuccess: false,
                         isError: false
-                      })
-                  }
-                  modalProps={{
-                    onDismissed: () => {
-                      if (!this.state.isLoading) {
-                        this.setState({
-                          showHouseUKSetUp: false,
-                          isSuccess: false,
-                          isError: false
-                        });
-                      }
+                      });
                     }
-                  }}
+                  }
+                }}
               >
                 {!this.state.showHouseUKSearch && this.state.isSuccess && <this.SuccessNotify />}
                 {!this.state.showHouseUKSearch && this.state.isError && <this.ErrorNotify />}
@@ -878,50 +881,50 @@ export default class App extends React.Component<AppProps, AppState> {
                 <div className={"center"}>
                   <Stack tokens={stackTokens}>
                     <DefaultButton
-                        className="configButton"
-                        text="Show current set-up"
-                        iconProps={{ iconName: "ChevronRight" }}
-                        onClick={this._showHouseUKRows.bind(null, true)}
+                      className="configButton"
+                      text="Show current set-up"
+                      iconProps={{ iconName: "ChevronRight" }}
+                      onClick={this._showHouseUKRows.bind(null, true)}
                     />
                     <DefaultButton
-                        className="configButton"
-                        text="Add another company"
-                        iconProps={{ iconName: "ChevronRight" }}
-                        onClick={() =>
-                            this.setState({
-                              showHouseUKSearch: true,
-                              emptyHouseUKSearch: false,
-                              isSuccess: false,
-                              isError: false
-                            })
+                      className="configButton"
+                      text="Add another company"
+                      iconProps={{ iconName: "ChevronRight" }}
+                      onClick={() =>
+                        this.setState({
+                          showHouseUKSearch: true,
+                          emptyHouseUKSearch: false,
+                          isSuccess: false,
+                          isError: false
+                        })
+                      }
+                    />
+                    <DefaultButton
+                      className="configButton"
+                      text="Import Companies House"
+                      iconProps={{ iconName: "ChevronRight" }}
+                      onClick={async () => {
+                        try {
+                          this.setState({ isLoading: true, showHouseUKSetUp: false });
+                          await populateHouseUK();
+                          this.setState({ isLoading: false, isSuccess: true, showHouseUKSetUp: true });
+                        } catch (error) {
+                          console.error(error);
+                          this.setState({ isLoading: false, isError: true, showHouseUKSetUp: true });
                         }
-                    />
-                    <DefaultButton
-                        className="configButton"
-                        text="Import Companies House"
-                        iconProps={{ iconName: "ChevronRight" }}
-                        onClick={async () => {
-                          try {
-                            this.setState({ isLoading: true, showHouseUKSetUp: false });
-                            await populateUK();
-                            this.setState({ isLoading: false, isSuccess: true, showHouseUKSetUp: true });
-                          } catch (error) {
-                            console.error(error);
-                            this.setState({ isLoading: false, isError: true, showHouseUKSetUp: true });
-                          }
-                        }}
+                      }}
                     />
                   </Stack>
                 </div>
                 <Dialog
-                    hidden={!this.state.showHouseUKRows}
-                    onDismiss={() =>
-                        this.setState({
-                          showHouseUKRows: false,
-                          isError: false,
-                          isSuccess: false
-                        })
-                    }
+                  hidden={!this.state.showHouseUKRows}
+                  onDismiss={() =>
+                    this.setState({
+                      showHouseUKRows: false,
+                      isError: false,
+                      isSuccess: false
+                    })
+                  }
                 >
                   <div className={"centerText"}>
                     <Text className={"setUpHeaders"}>Current set-up</Text>
@@ -929,7 +932,7 @@ export default class App extends React.Component<AppProps, AppState> {
                   <br />
                   <Stack tokens={stackTokens}>
                     {this.state.showHouseUKRows &&
-                    this.state.houseUKRows.map(element => (
+                      this.state.houseUKRows.map(element => (
                         <Card key={element} tokens={cardTokens}>
                           <Card.Section fill verticalAlign="end"></Card.Section>
                           <Card.Section>
@@ -947,69 +950,69 @@ export default class App extends React.Component<AppProps, AppState> {
                           </Card.Section>
                           <Card.Section tokens={agendaCardSectionTokens}>
                             <DefaultButton
-                                className="removeButton"
-                                onClick={async () => {
-                                  try {
-                                    removeHouseUKConfig(element[0]);
-                                    let temp = [];
-                                    let config = await loadConfig();
-                                    config.houseUK.forEach((item, i) => {
-                                      temp.push([i, item.companyName, item.companyNumber]);
-                                    });
-                                    this.setState({ houseUKRows: temp });
-                                  } catch (error) {
-                                    console.error(error);
-                                  }
-                                }}
-                                text="Remove"
+                              className="removeButton"
+                              onClick={async () => {
+                                try {
+                                  removeHouseUKConfig(element[0]);
+                                  let temp = [];
+                                  let config = await loadConfig();
+                                  config.houseUK.forEach((item, i) => {
+                                    temp.push([i, item.companyName, item.companyNumber]);
+                                  });
+                                  this.setState({ houseUKRows: temp });
+                                } catch (error) {
+                                  console.error(error);
+                                }
+                              }}
+                              text="Remove"
                             />
                           </Card.Section>
                           <Card.Item grow={1}>
                             <span />
                           </Card.Item>
                           <Card.Section
-                              horizontal
-                              styles={footerCardSectionStyles}
-                              tokens={footerCardSectionTokens}
+                            horizontal
+                            styles={footerCardSectionStyles}
+                            tokens={footerCardSectionTokens}
                           ></Card.Section>
                         </Card>
-                    ))}
+                      ))}
                   </Stack>
                   <DialogFooter className={"center"}>
                     <PrimaryButton
-                        onClick={() =>
-                            this.setState({
-                              showHouseUKRows: false,
-                              isError: false,
-                              isSuccess: false
-                            })
-                        }
-                        text="Back"
+                      onClick={() =>
+                        this.setState({
+                          showHouseUKRows: false,
+                          isError: false,
+                          isSuccess: false
+                        })
+                      }
+                      text="Back"
                     />
                   </DialogFooter>
                 </Dialog>
 
                 <Dialog
-                    hidden={!this.state.showHouseUKSearch}
-                    onDismiss={() =>
+                  hidden={!this.state.showHouseUKSearch}
+                  onDismiss={() =>
+                    this.setState({
+                      showHouseUKSearch: false,
+                      isError: false,
+                      isSuccess: false
+                    })
+                  }
+                  modalProps={{
+                    onDismissed: () => {
+                      if (!this.state.isLoading) {
                         this.setState({
-                          showHouseUKSearch: false,
+                          companiesHouseUKList: [],
+                          showHouseUKResults: false,
                           isError: false,
                           isSuccess: false
-                        })
-                    }
-                    modalProps={{
-                      onDismissed: () => {
-                        if (!this.state.isLoading) {
-                          this.setState({
-                            companiesHouseUKList: [],
-                            showHouseUKResults: false,
-                            isError: false,
-                            isSuccess: false
-                          });
-                        }
+                        });
                       }
-                    }}
+                    }
+                  }}
                 >
                   {this.state.isSuccess && <this.SuccessNotify />}
                   {this.state.isError && <this.ErrorNotify />}
@@ -1019,33 +1022,33 @@ export default class App extends React.Component<AppProps, AppState> {
                   <br />
                   <Stack tokens={stackTokens}>
                     <SearchBox
-                        styles={searchBoxStyles}
-                        placeholder="Company Name"
-                        onSearch={this._showHouseUKResults.bind(null, true)}
+                      styles={searchBoxStyles}
+                      placeholder="Company Name"
+                      onSearch={this._showHouseUKResults.bind(null, true)}
                     />
                     <div className={"center"}>
                       <Stack tokens={sectionStackTokens}>
                         {this.state.showHouseUKResults &&
-                        this.state.companiesHouseUKList.map(element => (
+                          this.state.companiesHouseUKList.map(element => (
                             <Card
-                                key={element[1]}
-                                onClick={async () => {
-                                  try {
-                                    addHouseUKConfig({ companyName: element[0], companyNumber: element[1] });
-                                    this.setState({
-                                      isSuccess: true,
-                                      showHouseUKSearch: true,
-                                      showHouseUKResults: false
-                                    });
-                                  } catch (error) {
-                                    console.error(error);
-                                    this.setState({
-                                      isSuccess: false,
-                                      showHouseUKSearch: false
-                                    });
-                                  }
-                                }}
-                                tokens={cardTokens}
+                              key={element[1]}
+                              onClick={async () => {
+                                try {
+                                  addHouseUKConfig({ companyName: element[0], companyNumber: element[1] });
+                                  this.setState({
+                                    isSuccess: true,
+                                    showHouseUKSearch: true,
+                                    showHouseUKResults: false
+                                  });
+                                } catch (error) {
+                                  console.error(error);
+                                  this.setState({
+                                    isSuccess: false,
+                                    showHouseUKSearch: false
+                                  });
+                                }
+                              }}
+                              tokens={cardTokens}
                             >
                               <Card.Section fill verticalAlign="end"></Card.Section>
                               <Card.Section>
@@ -1065,38 +1068,38 @@ export default class App extends React.Component<AppProps, AppState> {
                                 <span />
                               </Card.Item>
                               <Card.Section
-                                  horizontal
-                                  styles={footerCardSectionStyles}
-                                  tokens={footerCardSectionTokens}
+                                horizontal
+                                styles={footerCardSectionStyles}
+                                tokens={footerCardSectionTokens}
                               ></Card.Section>
                             </Card>
-                        ))}
+                          ))}
                       </Stack>
                     </div>
                   </Stack>
                   <DialogFooter className={"center"}>
                     <PrimaryButton
-                        onClick={() =>
-                            this.setState({
-                              showHouseUKSearch: false,
-                              isError: false,
-                              isSuccess: false
-                            })
-                        }
-                        text="Back"
+                      onClick={() =>
+                        this.setState({
+                          showHouseUKSearch: false,
+                          isError: false,
+                          isSuccess: false
+                        })
+                      }
+                      text="Back"
                     />
                   </DialogFooter>
                 </Dialog>
                 <DialogFooter className={"center"}>
                   <PrimaryButton
-                      onClick={() =>
-                          this.setState({
-                            showHouseUKSetUp: false,
-                            isError: false,
-                            isSuccess: false
-                          })
-                      }
-                      text="Close"
+                    onClick={() =>
+                      this.setState({
+                        showHouseUKSetUp: false,
+                        isError: false,
+                        isSuccess: false
+                      })
+                    }
+                    text="Close"
                   />
                 </DialogFooter>
               </Dialog>

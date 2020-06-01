@@ -6,10 +6,10 @@
  * @class populateFinance()
  * @class populateTrends()
  */
-import {getHouseDataNZ, getFinanceData, getTrendsData, getLinkedinData, getHouseDataUK} from "./api";
+import { getHouseDataNZ, getFinanceData, getTrendsData, getLinkedinData, getHouseDataUK } from "./api";
 import { loadConfig } from "./config";
 
-export async function populateHouse() {
+export async function populateHouseNZ() {
   let House = {
     //Stores excel index for data
     name: ["B1", "E1", "H1", "K1", "N1", "Q1", "T1", "W1"],
@@ -58,7 +58,7 @@ export async function populateHouse() {
         sheet.getRange(directors).values = dump[3];
         sheet.getRange(share).values = dump[4];
         return context.sync().then(function() {
-          console.log("Imported House");
+          console.log("Imported House NZ");
         });
       });
     }
@@ -73,11 +73,11 @@ export async function populateHouse() {
     sheet.getRanges(House.directors_merged.toString()).clear("Contents");
     sheet.getRanges(House.share.reduce((prev, cur) => [...prev, cur + "10000"], []).toString()).clear("Contents");
     return context.sync().then(function() {
-      console.log("House_NZ Cleared");
+      console.log("House NZ Cleared");
     });
   });
 
-  let config = (await loadConfig()).house;
+  let config = (await loadConfig()).houseNZ;
 
   // Populate new data
   for (const item of config) {
@@ -132,7 +132,7 @@ export async function populateHouse() {
   }
 }
 
-export async function populateUK() {
+export async function populateHouseUK() {
   let House = {
     //Stores excel index for data
     name: ["B1", "E1", "H1", "K1", "N1", "Q1", "T1", "W1"],
@@ -181,7 +181,7 @@ export async function populateUK() {
         sheet.getRange(directors).values = dump[3];
         // sheet.getRange(share).values = dump[4];
         return context.sync().then(function() {
-          console.log("Imported House");
+          console.log("Imported House UK");
         });
       });
     }
@@ -196,7 +196,7 @@ export async function populateUK() {
     sheet.getRanges(House.directors_merged.toString()).clear("Contents");
     // sheet.getRanges(House.share.reduce((prev, cur) => [...prev, cur + "10000"], []).toString()).clear("Contents");
     return context.sync().then(function() {
-      console.log("House_UK Cleared");
+      console.log("House UK Cleared");
     });
   });
 
@@ -210,17 +210,21 @@ export async function populateUK() {
 
     const summary = [
       [data.company_number],
-      [data.registered_office_address.address_line_1+", "+data.registered_office_address.address_line_2
-      +", "+data.registered_office_address.locality+" "+data.registered_office_address.postal_code],
+      [
+        data.registered_office_address.address_line_1 +
+          ", " +
+          data.registered_office_address.address_line_2 +
+          ", " +
+          data.registered_office_address.locality +
+          " " +
+          data.registered_office_address.postal_code
+      ],
       [data.date_of_creation],
       [data.date_of_creation],
       [data.links.self]
     ];
     const name = data.company_name;
-    const accounts = [
-      [data.accounts.next_due],
-      [data.accounts.overdue],
-    ];
+    const accounts = [[data.accounts.next_due], [data.accounts.overdue]];
     let directors = [];
     data.links.officers.forEach(director => {
       directors.push([director.name]);
@@ -244,7 +248,6 @@ export async function populateUK() {
     //stores companies house data
     House.store(sample);
     //#endregion
-
   }
 }
 
