@@ -62,28 +62,6 @@ export async function populateHouseNZ() {
     }
   };
 
-  // TEST
-  Excel.run(async function(context) {
-    const sheet = context.workbook.worksheets.getItem("House_NZ");
-    const template = context.workbook.worksheets.getItem("Templates").getRange("HouseNZTemplate");
-    const width = template.getColumnProperties({ format: { columnWidth: true } });
-    await context.sync();
-    let index = 30;
-
-    for (const value of width.value) {
-      console.log(index);
-      console.log(value.format.columnWidth);
-      sheet.getRangeByIndexes(0, index, 1, 1).format.columnWidth = value.format.columnWidth;
-      index++;
-    }
-    sheet.getRangeByIndexes(0, 28, 1, 1).format.columnWidth = 200;
-    sheet.getRange("AF1").format.columnWidth = 19.0;
-    sheet.getRange("AE2").copyFrom(template, Excel.RangeCopyType.all);
-    return context.sync().then(function() {
-      console.log("TESTING");
-    });
-  });
-
   // Clear old data
   Excel.run(function(context) {
     var sheet = context.workbook.worksheets.getItem("House_NZ");
@@ -276,11 +254,11 @@ export async function populateLinkedIn() {
   let Linkedin = {
     //Stores excel index for data
     company: [
-      ["B2", "C4:C8", "B15"],
-      ["E2", "F4:F8", "E15"],
-      ["H2", "I4:I8", "H15"],
-      ["K2", "L4:F8", "K15"],
-      ["N2", "O4:O8", "N15"],
+      ["B2", "C4:C9", "B15"],
+      ["E2", "F4:F9", "E15"],
+      ["H2", "I4:I9", "H15"],
+      ["K2", "L4:F9", "K15"],
+      ["N2", "O4:O9", "N15"],
 
       ["B37", "C39:C44", "B50"],
       ["E37", "F39:F44", "E50"],
@@ -459,11 +437,7 @@ export async function populateFinance() {
 export async function populateTrends() {
   let Trends = {
     //Stores excel index for data
-<<<<<<< Updated upstream
     data: ["C3:C", "D3:D", "E3:E", "F3:F", "G3:G", "H3:H", "I3:I", "J3:J", "K3:K"],
-=======
-    data: ["C3:C", "D3:D", "E3:E", "F3:F", "G3:G"],
->>>>>>> Stashed changes
     date: "B3:B",
     item: 0,
 
