@@ -438,7 +438,7 @@ export async function populateTrends() {
   let Trends = {
     //Stores excel index for data
     summary: ["C2:C7", "D2:D7", "E2:E7", "F2:F7", "G2:G7"],
-    data: ["C3:C", "D3:D", "E3:E", "F3:F", "G3:G"],
+    data: ["C3:C", "D3:D", "E3:E", "F3:F", "G3:G", "H3:H", "I3:I", "J3:J", "K3:K"],
     date: "B3:B",
     item: 0,
 
