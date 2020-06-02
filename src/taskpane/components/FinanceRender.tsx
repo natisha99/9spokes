@@ -186,7 +186,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
 
     return (
       <div>
-        {/* Companies House NZ */}
+        {/* Yahoo Finance */}
         <DefaultButton
           className="apiButton"
           text="Yahoo Finance"

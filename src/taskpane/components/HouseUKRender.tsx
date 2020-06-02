@@ -172,7 +172,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
 
     return (
       <div>
-        {/* Companies House NZ */}
+        {/* Companies House UK */}
         <DefaultButton
           className="apiButton"
           text="Companies House UK"

@@ -163,7 +163,7 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
 
     return (
       <div>
-        {/* Companies House NZ */}
+        {/* Google Trends */}
         <DefaultButton
           className="apiButton"
           text="Google Trends"

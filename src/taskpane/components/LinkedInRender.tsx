@@ -186,7 +186,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
 
     return (
       <div>
-        {/* Companies House NZ */}
+        {/* LinkedIn */}
         <DefaultButton
           className="apiButton"
           text="LinkedIn"
