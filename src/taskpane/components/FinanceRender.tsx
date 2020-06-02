@@ -1,14 +1,5 @@
 import * as React from "react";
-import {
-  Overlay,
-  Spinner,
-  SpinnerSize,
-  MessageBar,
-  MessageBarType,
-  Dialog,
-  PrimaryButton,
-  DialogFooter
-} from "office-ui-fabric-react";
+import { MessageBar, MessageBarType, Dialog, PrimaryButton, DialogFooter } from "office-ui-fabric-react";
 import { DefaultButton } from "office-ui-fabric-react";
 import { SearchBox, ISearchBoxStyles } from "office-ui-fabric-react/lib/SearchBox";
 import { Stack, IStackTokens } from "office-ui-fabric-react/lib/Stack";
@@ -23,6 +14,7 @@ export interface FinanceState {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
+  noResults: boolean;
   showRefreshButton: boolean;
   isSuccessHome: boolean;
   isErrorHome: boolean;
@@ -34,7 +26,6 @@ export interface FinanceState {
   yahooFinanceList: any;
   yahooRows: any;
   showFinanceSetUp: boolean;
-  noWorkbook: boolean;
 }
 
 export default class FinanceRender extends React.Component<any, FinanceState> {
@@ -44,6 +35,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
       isLoading: false,
       isSuccess: false,
       isError: false,
+      noResults: false,
       showRefreshButton: false,
       isSuccessHome: false,
       isErrorHome: false,
@@ -54,18 +46,9 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
       yahooFinanceName: "",
       yahooFinanceList: [],
       yahooRows: [],
-      showFinanceSetUp: false,
-      noWorkbook: false
+      showFinanceSetUp: false
     };
   }
-
-  LoadingOverlay = () => (
-    <Overlay isDarkThemed={true} hidden={!this.state.isLoading}>
-      <div className="center vertical">
-        <Spinner size={SpinnerSize.large} />
-      </div>
-    </Overlay>
-  );
 
   SuccessNotify = () => (
     <MessageBar
@@ -89,14 +72,14 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
     </MessageBar>
   );
 
-  ErrorNotifyNoWorkbook = () => (
+  ErrorNotifyNoResults = () => (
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ noWorkbook: false })}
+      onDismiss={() => this.setState({ isError: false, noResults: false })}
       dismissButtonAriaLabel="Close"
     >
-      Error: Please create a new workbook
+      No Results Found
     </MessageBar>
   );
 
@@ -105,7 +88,8 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
       showFinanceRows: false,
       showFinanceSearch: bool,
       isSuccess: false,
-      isError: false
+      isError: false,
+      noResults: false
     });
   };
 
@@ -114,6 +98,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
       showFinanceSearch: false,
       isSuccess: false,
       isError: false,
+      noResults: false,
       showFinanceRows: bool,
       yahooRows: []
     });
@@ -127,9 +112,11 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
   };
 
   _showFinanceResults = async (bool, val) => {
+    this.props.isLoading(true);
     this.setState({
       isLoading: true,
       isError: false,
+      noResults: false,
       isSuccess: false,
       emptyFinanceSearch: false,
       showFinanceSetUp: false,
@@ -139,9 +126,11 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
     });
 
     if (val.trim() == "") {
+      this.props.isLoading(false);
       this.setState({
         emptyFinanceSearch: true,
         isError: true,
+        noResults: false,
         isSuccess: false,
         showFinanceSetUp: true,
         showFinanceResults: false,
@@ -154,10 +143,15 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
         isError: false,
         showFinanceSetUp: true,
         isSuccess: false,
+        noResults: false,
         yahooFinanceList: (await searchFinance(val)).results,
         showFinanceSearch: true,
         isLoading: false
       });
+      if (this.state.yahooFinanceList == undefined || this.state.yahooFinanceList.length == 0) {
+        this.setState({ noResults: true });
+      }
+      this.props.isLoading(false);
     }
   };
 
@@ -205,7 +199,8 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
             this.setState({
               showFinanceSetUp: false,
               isSuccess: false,
-              isError: false
+              isError: false,
+              noResults: false
             })
           }
           modalProps={{
@@ -214,7 +209,8 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                 this.setState({
                   showFinanceSetUp: false,
                   isSuccess: false,
-                  isError: false
+                  isError: false,
+                  noResults: false
                 });
               }
             }
@@ -222,7 +218,6 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
         >
           {!this.state.showFinanceSearch && this.state.isSuccess && <this.SuccessNotify />}
           {!this.state.showFinanceSearch && this.state.isError && <this.ErrorNotify />}
-          {this.state.noWorkbook && <this.ErrorNotifyNoWorkbook />}
           <div className={"centerText"}>
             <Text className={"setUpHeaders"}>Yahoo Finance</Text>
           </div>
@@ -244,7 +239,8 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                     showFinanceSearch: true,
                     emptyFinanceSearch: false,
                     isSuccess: false,
-                    isError: false
+                    isError: false,
+                    noResults: false
                   })
                 }
               />
@@ -254,18 +250,28 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                 iconProps={{ iconName: "ChevronRight" }}
                 onClick={async () => {
                   try {
+                    this.props.isLoading(true);
                     this.setState({ isLoading: true, showFinanceSetUp: false });
                     let config = await loadConfig();
 
                     if (config.finance === undefined || config.finance.length == 0) {
-                      this.setState({ isError: true, isSuccess: false, isLoading: false, showFinanceSetUp: true });
+                      this.props.isLoading(false);
+                      this.setState({
+                        isError: true,
+                        noResults: false,
+                        isSuccess: false,
+                        isLoading: false,
+                        showFinanceSetUp: true
+                      });
                     } else {
                       await populateFinance();
+                      this.props.isLoading(false);
                       this.setState({ isLoading: false, isSuccess: true, showFinanceSetUp: true });
                     }
                   } catch (error) {
                     console.error(error);
-                    this.setState({ isLoading: false, noWorkbook: true, showFinanceSetUp: true });
+                    this.props.isLoading(false);
+                    this.setState({ isLoading: false, noResults: false, isError: true, showFinanceSetUp: true });
                   }
                 }}
               />
@@ -277,7 +283,8 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
               this.setState({
                 showFinanceRows: false,
                 isError: false,
-                isSuccess: false
+                isSuccess: false,
+                noResults: false
               })
             }
           >
@@ -334,7 +341,8 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                   this.setState({
                     showFinanceRows: false,
                     isError: false,
-                    isSuccess: false
+                    isSuccess: false,
+                    noResults: false
                   })
                 }
                 text="Back"
@@ -348,7 +356,8 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
               this.setState({
                 showFinanceSearch: false,
                 isError: false,
-                isSuccess: false
+                isSuccess: false,
+                noResults: false
               })
             }
             modalProps={{
@@ -358,7 +367,8 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                     yahooFinanceList: [],
                     showFinanceResults: false,
                     isError: false,
-                    isSuccess: false
+                    isSuccess: false,
+                    noResults: false
                   });
                 }
               }
@@ -366,6 +376,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
           >
             {this.state.isSuccess && <this.SuccessNotify />}
             {this.state.isError && <this.ErrorNotify />}
+            {this.state.noResults && <this.ErrorNotifyNoResults />}
             <div className={"centerText"}>
               <Text className={"setUpHeaders"}>Search within Yahoo Finance</Text>
             </div>
@@ -387,6 +398,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                             addFinanceConfig({ ticker: element, interval: "1d", range: "1y" });
                             this.setState({
                               isSuccess: true,
+                              noResults: false,
                               showFinanceSearch: true,
                               showFinanceResults: false
                             });
@@ -394,6 +406,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                             console.error(error);
                             this.setState({
                               isSuccess: false,
+                              isError: true,
                               showFinanceSearch: false
                             });
                           }
@@ -428,7 +441,8 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                   this.setState({
                     showFinanceSearch: false,
                     isError: false,
-                    isSuccess: false
+                    isSuccess: false,
+                    noResults: false
                   })
                 }
                 text="Back"
@@ -441,14 +455,14 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                 this.setState({
                   showFinanceSetUp: false,
                   isError: false,
-                  isSuccess: false
+                  isSuccess: false,
+                  noResults: false
                 })
               }
               text="Close"
             />
           </DialogFooter>
         </Dialog>
-        {/* <this.LoadingOverlay /> */}
       </div>
     );
   }

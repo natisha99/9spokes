@@ -6,6 +6,7 @@
  * @class App
  */
 
+//#region import
 import * as React from "react";
 import { Overlay, Spinner, SpinnerSize, MessageBar, MessageBarType } from "office-ui-fabric-react";
 import { DefaultButton } from "office-ui-fabric-react";
@@ -33,6 +34,7 @@ export interface AppProps {
   isOfficeInitialized: boolean;
 }
 
+//Exporting current states
 export interface AppState {
   isLoading: boolean;
   showRefreshButton: boolean;
@@ -42,9 +44,12 @@ export interface AppState {
   listItems: HeroListItem[];
 }
 
+//The main code
 export default class App extends React.Component<AppProps, AppState> {
   constructor(props, context) {
+    //the constructor for the task plane
     super(props, context);
+    this.isLoading = this.isLoading.bind(this);
     this.state = {
       isLoading: false,
       showRefreshButton: false,
@@ -81,7 +86,7 @@ export default class App extends React.Component<AppProps, AppState> {
       onDismiss={() => this.setState({ isErrorHome: false })}
       dismissButtonAriaLabel="Close"
     >
-      Error: Please add data to be imported
+      Error
     </MessageBar>
   );
 
@@ -176,13 +181,19 @@ export default class App extends React.Component<AppProps, AppState> {
       );
     }
 
+    /*HTML taskplane
+      this includes 
+        Home, Set-up, and Help tabs
+        All UI elements and components 
+        Function and object storage calls and references
+    */
     return (
       <div className="ms-welcome">
         {this.state.isSuccessHome && <this.SuccessNotifyHome />}
         {this.state.isErrorHome && <this.ErrorNotifyHome />}
         {this.state.noWorkbook && <this.ErrorNotifyNoWorkbook />}
         <Pivot>
-          {/* Home */}
+          {/* Home Tab*/}
           <PivotItem headerText="Home">
             <Header logo="assets/logo-filled.png" title={this.props.title} message="Welcome" />
             <Title message="Create a new worksheet to get started">
@@ -220,14 +231,14 @@ export default class App extends React.Component<AppProps, AppState> {
                     }
                   } catch (error) {
                     console.error(error);
-                    this.setState({ noWorkbook: true, isSuccessHome: false, isLoading: false });
+                    this.setState({ isErrorHome: true, isSuccessHome: false, isLoading: false });
                   }
                 }}
               />
             </Title>
           </PivotItem>
 
-          {/* Set-up */}
+          {/* Set-up Tab*/}
           <PivotItem headerText="Set-up">
             <Title message="Manage Your Data">
               <div className={"centerText"}>
@@ -240,23 +251,23 @@ export default class App extends React.Component<AppProps, AppState> {
               <br />
 
               {/* Companies House UK */}
-              <HouseUKRender />
+              <HouseUKRender isLoading={this.isLoading} />
               <br />
 
               {/* Google Trends */}
-              <TrendsRender />
+              <TrendsRender isLoading={this.isLoading} />
               <br />
 
               {/* Yahoo Finance */}
-              <FinanceRender />
+              <FinanceRender isLoading={this.isLoading} />
               <br />
 
               {/* LinkedIn */}
-              <LinkedInRender />
+              <LinkedInRender isLoading={this.isLoading} />
             </Title>
           </PivotItem>
 
-          {/* Help */}
+          {/* Help Tab*/}
           <PivotItem headerText="Help">
             <HeroList message="Follow the steps below to get started!" items={this.state.listItems}></HeroList>
           </PivotItem>

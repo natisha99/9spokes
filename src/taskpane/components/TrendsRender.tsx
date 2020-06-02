@@ -1,14 +1,5 @@
 import * as React from "react";
-import {
-  Overlay,
-  Spinner,
-  SpinnerSize,
-  MessageBar,
-  MessageBarType,
-  Dialog,
-  PrimaryButton,
-  DialogFooter
-} from "office-ui-fabric-react";
+import { MessageBar, MessageBarType, Dialog, PrimaryButton, DialogFooter } from "office-ui-fabric-react";
 import { DefaultButton } from "office-ui-fabric-react";
 import { SearchBox, ISearchBoxStyles } from "office-ui-fabric-react/lib/SearchBox";
 import { Stack, IStackTokens } from "office-ui-fabric-react/lib/Stack";
@@ -56,14 +47,6 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
     };
   }
 
-  LoadingOverlay = () => (
-    <Overlay isDarkThemed={true} hidden={!this.state.isLoading}>
-      <div className="center vertical">
-        <Spinner size={SpinnerSize.large} />
-      </div>
-    </Overlay>
-  );
-
   SuccessNotify = () => (
     <MessageBar
       messageBarType={MessageBarType.success}
@@ -83,17 +66,6 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
       dismissButtonAriaLabel="Close"
     >
       Error
-    </MessageBar>
-  );
-
-  ErrorNotifyNoWorkbook = () => (
-    <MessageBar
-      messageBarType={MessageBarType.error}
-      isMultiline={false}
-      onDismiss={() => this.setState({ noWorkbook: false })}
-      dismissButtonAriaLabel="Close"
-    >
-      Error: Please create a new workbook
     </MessageBar>
   );
 
@@ -124,6 +96,7 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
   };
 
   _showTrendsResults = async (bool, val) => {
+    this.props.isLoading(true);
     this.setState({
       isLoading: true,
       isError: false,
@@ -134,7 +107,9 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
       showTrendsResults: bool,
       googleTrendsName: val
     });
+
     if (val.trim() == "") {
+      this.props.isLoading(false);
       this.setState({
         emptyTrendsSearch: true,
         isError: true,
@@ -145,7 +120,6 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
         showTrendsSearch: true
       });
     } else {
-      addTrendsConfig({ keyword: val, weeks: 52 });
       this.setState({
         emptyTrendsSearch: false,
         isError: false,
@@ -154,6 +128,8 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
         showTrendsSearch: true,
         isLoading: false
       });
+      addTrendsConfig({ keyword: val, weeks: 52 });
+      this.props.isLoading(false);
     }
   };
 
@@ -218,7 +194,6 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
         >
           {!this.state.showTrendsSearch && this.state.isSuccess && <this.SuccessNotify />}
           {!this.state.showTrendsSearch && this.state.isError && <this.ErrorNotify />}
-          {this.state.noWorkbook && <this.ErrorNotifyNoWorkbook />}
           <div className={"centerText"}>
             <Text className={"setUpHeaders"}>Google Trends</Text>
           </div>
@@ -250,18 +225,22 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
                 iconProps={{ iconName: "ChevronRight" }}
                 onClick={async () => {
                   try {
+                    this.props.isLoading(true);
                     this.setState({ isLoading: true, showTrendsSetUp: false });
                     let config = await loadConfig();
 
                     if (config.trends === undefined || config.trends.length == 0) {
+                      this.props.isLoading(false);
                       this.setState({ isError: true, isSuccess: false, isLoading: false, showTrendsSetUp: true });
                     } else {
                       await populateTrends();
+                      this.props.isLoading(false);
                       this.setState({ isLoading: false, isSuccess: true, showTrendsSetUp: true });
                     }
                   } catch (error) {
                     console.error(error);
-                    this.setState({ isLoading: false, noWorkbook: true, showTrendsSetUp: true });
+                    this.props.isLoading(false);
+                    this.setState({ isLoading: false, isError: true, showTrendsSetUp: true });
                   }
                 }}
               />
@@ -398,7 +377,6 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
             />
           </DialogFooter>
         </Dialog>
-        {/* <this.LoadingOverlay /> */}
       </div>
     );
   }

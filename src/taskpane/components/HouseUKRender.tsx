@@ -1,14 +1,5 @@
 import * as React from "react";
-import {
-  Overlay,
-  Spinner,
-  SpinnerSize,
-  MessageBar,
-  MessageBarType,
-  Dialog,
-  PrimaryButton,
-  DialogFooter
-} from "office-ui-fabric-react";
+import { MessageBar, MessageBarType, Dialog, PrimaryButton, DialogFooter } from "office-ui-fabric-react";
 import { DefaultButton } from "office-ui-fabric-react";
 import { SearchBox, ISearchBoxStyles } from "office-ui-fabric-react/lib/SearchBox";
 import { Stack, IStackTokens } from "office-ui-fabric-react/lib/Stack";
@@ -23,6 +14,7 @@ export interface HouseUKState {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
+  noResults: boolean;
   showRefreshButton: boolean;
   isSuccessHome: boolean;
   isErrorHome: boolean;
@@ -34,7 +26,6 @@ export interface HouseUKState {
   companiesHouseUKList: any;
   houseUKRows: any;
   showHouseUKSetUp: boolean;
-  noWorkbook: boolean;
 }
 
 export default class HouseUKRender extends React.Component<any, HouseUKState> {
@@ -44,6 +35,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
       isLoading: false,
       isSuccess: false,
       isError: false,
+      noResults: false,
       showRefreshButton: false,
       isSuccessHome: false,
       isErrorHome: false,
@@ -54,18 +46,9 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
       companiesHouseUKName: "",
       companiesHouseUKList: [],
       houseUKRows: [],
-      showHouseUKSetUp: false,
-      noWorkbook: false
+      showHouseUKSetUp: false
     };
   }
-
-  LoadingOverlay = () => (
-    <Overlay isDarkThemed={true} hidden={!this.state.isLoading}>
-      <div className="center vertical">
-        <Spinner size={SpinnerSize.large} />
-      </div>
-    </Overlay>
-  );
 
   SuccessNotify = () => (
     <MessageBar
@@ -89,14 +72,14 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
     </MessageBar>
   );
 
-  ErrorNotifyNoWorkbook = () => (
+  ErrorNotifyNoResults = () => (
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ noWorkbook: false })}
+      onDismiss={() => this.setState({ isError: false, noResults: false })}
       dismissButtonAriaLabel="Close"
     >
-      Error: Please create a new workbook
+      No Results Found
     </MessageBar>
   );
 
@@ -104,6 +87,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
     this.setState({
       showHouseUKSearch: false,
       isError: false,
+      noResults: false,
       isSuccess: false,
       showHouseUKRows: bool,
       houseUKRows: []
@@ -118,18 +102,22 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
   };
 
   _showHouseUKResults = async (bool, val) => {
+    this.props.isLoading(true);
     this.setState({
       isLoading: true,
       isError: false,
       isSuccess: false,
+      noResults: false,
       showHouseUKSearch: true,
       showHouseUKSetUp: false,
       showHouseUKResults: bool,
       companiesHouseUKName: val
     });
     if (val.trim() == "") {
+      this.props.isLoading(false);
       this.setState({
         isError: true,
+        noResults: false,
         isSuccess: false,
         showHouseUKResults: false,
         showHouseUKSetUp: true,
@@ -140,11 +128,16 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
       this.setState({
         isError: false,
         isSuccess: false,
+        noResults: false,
         companiesHouseUKList: (await searchHouseUK(val)).results,
         showHouseUKSearch: true,
         showHouseUKSetUp: true,
         isLoading: false
       });
+      if (this.state.companiesHouseUKList == undefined || this.state.companiesHouseUKList.length == 0) {
+        this.setState({ noResults: true });
+      }
+      this.props.isLoading(false);
     }
   };
 
@@ -192,7 +185,8 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
             this.setState({
               showHouseUKSetUp: false,
               isSuccess: false,
-              isError: false
+              isError: false,
+              noResults: false
             })
           }
           modalProps={{
@@ -201,7 +195,8 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                 this.setState({
                   showHouseUKSetUp: false,
                   isSuccess: false,
-                  isError: false
+                  isError: false,
+                  noResults: false
                 });
               }
             }
@@ -209,7 +204,6 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
         >
           {!this.state.showHouseUKSearch && this.state.isSuccess && <this.SuccessNotify />}
           {!this.state.showHouseUKSearch && this.state.isError && <this.ErrorNotify />}
-          {this.state.noWorkbook && <this.ErrorNotifyNoWorkbook />}
           <div className={"centerText"}>
             <Text className={"setUpHeaders"}>Companies House UK</Text>
           </div>
@@ -231,7 +225,8 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                     showHouseUKSearch: true,
                     emptyHouseUKSearch: false,
                     isSuccess: false,
-                    isError: false
+                    isError: false,
+                    noResults: false
                   })
                 }
               />
@@ -241,18 +236,28 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                 iconProps={{ iconName: "ChevronRight" }}
                 onClick={async () => {
                   try {
+                    this.props.isLoading(true);
                     this.setState({ isLoading: true, showHouseUKSetUp: false });
                     let config = await loadConfig();
 
                     if (config.houseUK === undefined || config.houseUK.length == 0) {
-                      this.setState({ isError: true, isSuccess: false, isLoading: false, showHouseUKSetUp: true });
+                      this.props.isLoading(false);
+                      this.setState({
+                        isError: true,
+                        noResults: false,
+                        isSuccess: false,
+                        isLoading: false,
+                        showHouseUKSetUp: true
+                      });
                     } else {
                       await populateHouseUK();
+                      this.props.isLoading(false);
                       this.setState({ isLoading: false, isSuccess: true, showHouseUKSetUp: true });
                     }
                   } catch (error) {
                     console.error(error);
-                    this.setState({ isLoading: false, noWorkbook: true, showHouseUKSetUp: true });
+                    this.props.isLoading(false);
+                    this.setState({ isLoading: false, noResults: false, isError: true, showHouseUKSetUp: true });
                   }
                 }}
               />
@@ -264,7 +269,8 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
               this.setState({
                 showHouseUKRows: false,
                 isError: false,
-                isSuccess: false
+                isSuccess: false,
+                noResults: false
               })
             }
           >
@@ -326,7 +332,8 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                   this.setState({
                     showHouseUKRows: false,
                     isError: false,
-                    isSuccess: false
+                    isSuccess: false,
+                    noResults: false
                   })
                 }
                 text="Back"
@@ -340,7 +347,8 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
               this.setState({
                 showHouseUKSearch: false,
                 isError: false,
-                isSuccess: false
+                isSuccess: false,
+                noResults: false
               })
             }
             modalProps={{
@@ -350,7 +358,8 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                     companiesHouseUKList: [],
                     showHouseUKResults: false,
                     isError: false,
-                    isSuccess: false
+                    isSuccess: false,
+                    noResults: false
                   });
                 }
               }
@@ -358,6 +367,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
           >
             {this.state.isSuccess && <this.SuccessNotify />}
             {this.state.isError && <this.ErrorNotify />}
+            {this.state.noResults && <this.ErrorNotifyNoResults />}
             <div className={"centerText"}>
               <Text className={"setUpHeaders"}>Search within Companies House UK</Text>
             </div>
@@ -379,6 +389,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                             addHouseUKConfig({ companyName: element[0], companyNumber: element[1] });
                             this.setState({
                               isSuccess: true,
+                              noResults: false,
                               showHouseUKSearch: true,
                               showHouseUKResults: false
                             });
@@ -386,6 +397,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                             console.error(error);
                             this.setState({
                               isSuccess: false,
+                              isError: true,
                               showHouseUKSearch: false
                             });
                           }
@@ -425,7 +437,8 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                   this.setState({
                     showHouseUKSearch: false,
                     isError: false,
-                    isSuccess: false
+                    isSuccess: false,
+                    noResults: false
                   })
                 }
                 text="Back"
@@ -438,14 +451,14 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                 this.setState({
                   showHouseUKSetUp: false,
                   isError: false,
-                  isSuccess: false
+                  isSuccess: false,
+                  noResults: false
                 })
               }
               text="Close"
             />
           </DialogFooter>
         </Dialog>
-        {/* <this.LoadingOverlay /> */}
       </div>
     );
   }

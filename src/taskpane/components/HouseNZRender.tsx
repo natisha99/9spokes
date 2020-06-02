@@ -1,14 +1,5 @@
 import * as React from "react";
-import {
-  Overlay,
-  Spinner,
-  SpinnerSize,
-  MessageBar,
-  MessageBarType,
-  Dialog,
-  PrimaryButton,
-  DialogFooter
-} from "office-ui-fabric-react";
+import { MessageBar, MessageBarType, Dialog, PrimaryButton, DialogFooter } from "office-ui-fabric-react";
 import { DefaultButton } from "office-ui-fabric-react";
 import { SearchBox, ISearchBoxStyles } from "office-ui-fabric-react/lib/SearchBox";
 import { Stack, IStackTokens } from "office-ui-fabric-react/lib/Stack";
@@ -23,6 +14,7 @@ export interface HouseNZState {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
+  noResults: boolean;
   showRefreshButton: boolean;
   isSuccessHome: boolean;
   isErrorHome: boolean;
@@ -34,7 +26,6 @@ export interface HouseNZState {
   companiesHouseNZList: any;
   houseNZRows: any;
   showHouseNZSetUp: boolean;
-  noWorkbook: boolean;
 }
 
 export default class HouseNZRender extends React.Component<any, HouseNZState> {
@@ -44,6 +35,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
       isLoading: false,
       isSuccess: false,
       isError: false,
+      noResults: false,
       showRefreshButton: false,
       isSuccessHome: false,
       isErrorHome: false,
@@ -54,18 +46,9 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
       companiesHouseNZName: "",
       companiesHouseNZList: [],
       houseNZRows: [],
-      showHouseNZSetUp: false,
-      noWorkbook: false
+      showHouseNZSetUp: false
     };
   }
-
-  LoadingOverlay = () => (
-    <Overlay isDarkThemed={true} hidden={!this.state.isLoading}>
-      <div className="center vertical">
-        <Spinner size={SpinnerSize.large} />
-      </div>
-    </Overlay>
-  );
 
   SuccessNotify = () => (
     <MessageBar
@@ -89,14 +72,14 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
     </MessageBar>
   );
 
-  ErrorNotifyNoWorkbook = () => (
+  ErrorNotifyNoResults = () => (
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ noWorkbook: false })}
+      onDismiss={() => this.setState({ isError: false, noResults: false })}
       dismissButtonAriaLabel="Close"
     >
-      Error: Please create a new workbook
+      No Results Found
     </MessageBar>
   );
 
@@ -105,7 +88,8 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
       showHouseNZRows: false,
       showHouseNZSearch: bool,
       isSuccess: false,
-      isError: false
+      isError: false,
+      noResults: false
     });
   };
 
@@ -113,6 +97,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
     this.setState({
       showHouseNZSearch: false,
       isError: false,
+      noResults: false,
       isSuccess: false,
       showHouseNZRows: bool,
       houseNZRows: []
@@ -129,8 +114,9 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
   _showHouseNZResults = async (bool, val) => {
     this.props.isLoading(true);
     this.setState({
-      // isLoading: true,
+      isLoading: true,
       isError: false,
+      noResults: false,
       isSuccess: false,
       showHouseNZSearch: true,
       showHouseNZSetUp: false,
@@ -141,22 +127,27 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
       this.props.isLoading(false);
       this.setState({
         isError: true,
+        noResults: false,
         isSuccess: false,
         showHouseResults: false,
         showHouseNZSetUp: true,
-        // isLoading: false,
+        isLoading: false,
         showHouseNZSearch: true
       });
     } else {
-      this.props.isLoading(false);
       this.setState({
         isError: false,
+        noResults: false,
         isSuccess: false,
         companiesHouseNZList: (await searchHouseNZ(val)).results,
         showHouseNZSearch: true,
-        showHouseNZSetUp: true
-        // isLoading: false
+        showHouseNZSetUp: true,
+        isLoading: false
       });
+      if (this.state.companiesHouseNZList == undefined || this.state.companiesHouseNZList.length == 0) {
+        this.setState({ noResults: true });
+      }
+      this.props.isLoading(false);
     }
   };
 
@@ -204,7 +195,8 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
             this.setState({
               showHouseNZSetUp: false,
               isSuccess: false,
-              isError: false
+              isError: false,
+              noResults: false
             })
           }
           modalProps={{
@@ -213,7 +205,8 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                 this.setState({
                   showHouseNZSetUp: false,
                   isSuccess: false,
-                  isError: false
+                  isError: false,
+                  noResults: false
                 });
               }
             }
@@ -221,7 +214,6 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
         >
           {!this.state.showHouseNZSearch && this.state.isSuccess && <this.SuccessNotify />}
           {!this.state.showHouseNZSearch && this.state.isError && <this.ErrorNotify />}
-          {this.state.noWorkbook && <this.ErrorNotifyNoWorkbook />}
           <div className={"centerText"}>
             <Text className={"setUpHeaders"}>Companies House NZ</Text>
           </div>
@@ -243,7 +235,8 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                     showHouseNZSearch: true,
                     emptyHouseNZSearch: false,
                     isSuccess: false,
-                    isError: false
+                    isError: false,
+                    noResults: false
                   })
                 }
               />
@@ -253,18 +246,28 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                 iconProps={{ iconName: "ChevronRight" }}
                 onClick={async () => {
                   try {
+                    this.props.isLoading(true);
                     this.setState({ isLoading: true, showHouseNZSetUp: false });
                     let config = await loadConfig();
 
                     if (config.houseNZ === undefined || config.houseNZ.length == 0) {
-                      this.setState({ isError: true, isSuccess: false, isLoading: false, showHouseNZSetUp: true });
+                      this.props.isLoading(false);
+                      this.setState({
+                        isError: true,
+                        noResults: false,
+                        isSuccess: false,
+                        isLoading: false,
+                        showHouseNZSetUp: true
+                      });
                     } else {
                       await populateHouseNZ();
+                      this.props.isLoading(false);
                       this.setState({ isLoading: false, isSuccess: true, showHouseNZSetUp: true });
                     }
                   } catch (error) {
                     console.error(error);
-                    this.setState({ isLoading: false, noWorkbook: true, showHouseNZSetUp: true });
+                    this.props.isLoading(false);
+                    this.setState({ isLoading: false, noResults: false, isError: true, showHouseNZSetUp: true });
                   }
                 }}
               />
@@ -276,6 +279,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
               this.setState({
                 showHouseNZRows: false,
                 isError: false,
+                noResults: false,
                 isSuccess: false
               })
             }
@@ -338,6 +342,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                   this.setState({
                     showHouseNZRows: false,
                     isError: false,
+                    noResults: false,
                     isSuccess: false
                   })
                 }
@@ -352,7 +357,8 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
               this.setState({
                 showHouseNZSearch: false,
                 isError: false,
-                isSuccess: false
+                isSuccess: false,
+                noResults: false
               })
             }
             modalProps={{
@@ -362,7 +368,8 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                     companiesHouseNZList: [],
                     showHouseResults: false,
                     isError: false,
-                    isSuccess: false
+                    isSuccess: false,
+                    noResults: false
                   });
                 }
               }
@@ -370,6 +377,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
           >
             {this.state.isSuccess && <this.SuccessNotify />}
             {this.state.isError && <this.ErrorNotify />}
+            {this.state.noResults && <this.ErrorNotifyNoResults />}
             <div className={"centerText"}>
               <Text className={"setUpHeaders"}>Search within Companies House NZ</Text>
             </div>
@@ -391,6 +399,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                             addHouseNZConfig({ companyName: element[0], companyNumber: element[1] });
                             this.setState({
                               isSuccess: true,
+                              noResults: false,
                               showHouseNZSearch: true,
                               showHouseResults: false
                             });
@@ -398,6 +407,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                             console.error(error);
                             this.setState({
                               isSuccess: false,
+                              isError: true,
                               showHouseNZSearch: false
                             });
                           }
@@ -437,6 +447,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                   this.setState({
                     showHouseNZSearch: false,
                     isError: false,
+                    noResults: false,
                     isSuccess: false
                   })
                 }
@@ -450,6 +461,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                 this.setState({
                   showHouseNZSetUp: false,
                   isError: false,
+                  noResults: false,
                   isSuccess: false
                 })
               }
@@ -457,7 +469,6 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
             />
           </DialogFooter>
         </Dialog>
-        {/* <this.LoadingOverlay /> */}
       </div>
     );
   }
