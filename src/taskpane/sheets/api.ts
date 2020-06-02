@@ -1,8 +1,8 @@
 import { HouseNZ, HouseSearchNZ } from "../models/HouseNZ";
-import { HouseSearchUK, HouseUK } from "../models/HouseUK";
+import { HouseUK, HouseSearchUK } from "../models/HouseUK";
 import { Finance, FinanceSearch } from "../models/Finance";
-import { Trends } from "../models/Trends";
 import { Linkedin, LinkedinSearch } from "../models/Linkedin";
+import { Trends } from "../models/Trends";
 
 /**
  * Fetch NZ companies matching the search query.
