@@ -43,8 +43,8 @@ export async function populateHouseNZ() {
       let name = this.name[this.item];
       let summary = this.summary[this.item];
       let NZBN = this.NZBN[this.item];
-      let directors = this.directors[this.item] + String(dump[3].length + 23);
-      let share = this.share[this.item] + String(dump[4].length + 35);
+      let directors = this.directors[this.item] + String(dump[3].length + 24);
+      let share = this.share[this.item] + String(dump[4].length + 36);
       this.item++;
 
       //add into cells
@@ -61,6 +61,28 @@ export async function populateHouseNZ() {
       });
     }
   };
+
+  // TEST
+  Excel.run(async function(context) {
+    const sheet = context.workbook.worksheets.getItem("House_NZ");
+    const template = context.workbook.worksheets.getItem("Templates").getRange("HouseNZTemplate");
+    const width = template.getColumnProperties({ format: { columnWidth: true } });
+    await context.sync();
+    let index = 30;
+
+    for (const value of width.value) {
+      console.log(index);
+      console.log(value.format.columnWidth);
+      sheet.getRangeByIndexes(0, index, 1, 1).format.columnWidth = value.format.columnWidth;
+      index++;
+    }
+    sheet.getRangeByIndexes(0, 28, 1, 1).format.columnWidth = 200;
+    sheet.getRange("AF1").format.columnWidth = 19.0;
+    sheet.getRange("AE2").copyFrom(template, Excel.RangeCopyType.all);
+    return context.sync().then(function() {
+      console.log("TESTING");
+    });
+  });
 
   // Clear old data
   Excel.run(function(context) {
@@ -437,8 +459,11 @@ export async function populateFinance() {
 export async function populateTrends() {
   let Trends = {
     //Stores excel index for data
-    summary: ["C2:C7", "D2:D7", "E2:E7", "F2:F7", "G2:G7"],
+<<<<<<< Updated upstream
     data: ["C3:C", "D3:D", "E3:E", "F3:F", "G3:G", "H3:H", "I3:I", "J3:J", "K3:K"],
+=======
+    data: ["C3:C", "D3:D", "E3:E", "F3:F", "G3:G"],
+>>>>>>> Stashed changes
     date: "B3:B",
     item: 0,
 
@@ -447,7 +472,6 @@ export async function populateTrends() {
        *
        * @param {array} dump - A data dump in the form of a 3d array
        * dump = [
-       *         [summary],
        *         [data]
        *         date or none
        *        ]
@@ -459,20 +483,18 @@ export async function populateTrends() {
        *                   0
        *               ]);
        */
-      //let summary = this.summary[this.item];
-      let data = this.data[this.item] + String(dump[1].length + 12);
+      let data = this.data[this.item] + String(dump[0].length + 2);
       let date;
-      if (dump[2] != 0) {
-        date = this.date + String(dump[2].length + 12);
+      if (dump[1] != 0) {
+        date = this.date + String(dump[1].length + 2);
       }
       this.item++;
       //add into cells
       Excel.run(function(context) {
         var sheet = context.workbook.worksheets.getItem("Trends");
-        //sheet.getRange(summary).values = dump[0];
-        sheet.getRange(data).values = dump[1];
-        if (dump[2] != 0) {
-          sheet.getRange(date).values = dump[2];
+        sheet.getRange(data).values = dump[0];
+        if (dump[1] != 0) {
+          sheet.getRange(date).values = dump[0];
         }
         return context.sync().then(function() {
           console.log("Imported Trends");
@@ -484,7 +506,6 @@ export async function populateTrends() {
   // Clear old data
   Excel.run(function(context) {
     var sheet = context.workbook.worksheets.getItem("Trends");
-    sheet.getRanges(Trends.summary.toString()).clear("Contents");
     sheet.getRanges(Trends.data.reduce((prev, cur) => [...prev, cur + "64"], []).toString()).clear("Contents");
     sheet.getRanges(Trends.date + "64").clear("Contents");
     return context.sync().then(function() {
@@ -499,14 +520,13 @@ export async function populateTrends() {
     const data = await getTrendsData(item.keyword, item.weeks);
 
     //#region [rgba(10,50,50,0.5)] sample driver code
-    let summary = [[item.keyword], ["TODO"], ["TODO"], ["TODO"], ["TODO"], ["TODO"]];
     let trends = [];
     let dates = [];
     data.series.forEach(item => {
       trends.push([item[1]]);
       dates.push([item[0]]);
     });
-    let sample = [summary, trends, dates];
+    let sample = [trends, dates];
     //stores Google Trends data
     Trends.store(sample);
     //#endregion
