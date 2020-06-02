@@ -62,6 +62,10 @@ ul {
   height: 45px;
 }
 
+.lineHeight {
+  line-height: 150px;
+}
+
 .removeButton {
   width: auto;
   height: 30px;
