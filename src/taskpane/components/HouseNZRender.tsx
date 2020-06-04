@@ -14,10 +14,9 @@ export interface HouseNZState {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
+  isDuplicate: boolean;
   noResults: boolean;
   showRefreshButton: boolean;
-  isSuccessHome: boolean;
-  isErrorHome: boolean;
   emptyHouseNZSearch: boolean;
   showHouseNZSearch: boolean;
   showHouseNZRows: boolean;
@@ -35,10 +34,9 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
       isLoading: false,
       isSuccess: false,
       isError: false,
+      isDuplicate: false,
       noResults: false,
       showRefreshButton: false,
-      isSuccessHome: false,
-      isErrorHome: false,
       emptyHouseNZSearch: false,
       showHouseNZSearch: false,
       showHouseNZRows: false,
@@ -54,7 +52,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
     <MessageBar
       messageBarType={MessageBarType.success}
       isMultiline={false}
-      onDismiss={() => this.setState({ isSuccess: false, isSuccessHome: false })}
+      onDismiss={() => this.setState({ isSuccess: false })}
       dismissButtonAriaLabel="Close"
     >
       Success
@@ -65,10 +63,21 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ isError: false, isErrorHome: false })}
+      onDismiss={() => this.setState({ isError: false })}
       dismissButtonAriaLabel="Close"
     >
       Error
+    </MessageBar>
+  );
+
+  ErrorNotifyDuplicate = () => (
+    <MessageBar
+      messageBarType={MessageBarType.error}
+      isMultiline={false}
+      onDismiss={() => this.setState({ isDuplicate: false })}
+      dismissButtonAriaLabel="Close"
+    >
+      Item Already Exists
     </MessageBar>
   );
 
@@ -76,7 +85,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ isError: false, noResults: false })}
+      onDismiss={() => this.setState({ noResults: false })}
       dismissButtonAriaLabel="Close"
     >
       No Results Found
@@ -88,6 +97,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
       showHouseNZRows: false,
       showHouseNZSearch: bool,
       isSuccess: false,
+      isDuplicate: false,
       isError: false,
       noResults: false
     });
@@ -97,6 +107,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
     this.setState({
       showHouseNZSearch: false,
       isError: false,
+      isDuplicate: false,
       noResults: false,
       isSuccess: false,
       showHouseNZRows: bool,
@@ -116,9 +127,10 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
     this.setState({
       isLoading: true,
       isError: false,
+      isDuplicate: false,
       noResults: false,
       isSuccess: false,
-      showHouseNZSearch: true,
+      showHouseNZSearch: false,
       showHouseNZSetUp: false,
       showHouseResults: bool,
       companiesHouseNZName: val
@@ -127,6 +139,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
       this.props.isLoading(false);
       this.setState({
         isError: true,
+        isDuplicate: false,
         noResults: false,
         isSuccess: false,
         showHouseResults: false,
@@ -137,6 +150,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
     } else {
       this.setState({
         isError: false,
+        isDuplicate: false,
         noResults: false,
         isSuccess: false,
         companiesHouseNZList: (await searchHouseNZ(val)).results,
@@ -196,6 +210,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
               showHouseNZSetUp: false,
               isSuccess: false,
               isError: false,
+              isDuplicate: false,
               noResults: false
             })
           }
@@ -206,6 +221,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                   showHouseNZSetUp: false,
                   isSuccess: false,
                   isError: false,
+                  isDuplicate: false,
                   noResults: false
                 });
               }
@@ -236,6 +252,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                     emptyHouseNZSearch: false,
                     isSuccess: false,
                     isError: false,
+                    isDuplicate: false,
                     noResults: false
                   })
                 }
@@ -254,6 +271,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                       this.props.isLoading(false);
                       this.setState({
                         isError: true,
+                        isDuplicate: false,
                         noResults: false,
                         isSuccess: false,
                         isLoading: false,
@@ -267,7 +285,13 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                   } catch (error) {
                     console.error(error);
                     this.props.isLoading(false);
-                    this.setState({ isLoading: false, noResults: false, isError: true, showHouseNZSetUp: true });
+                    this.setState({
+                      isLoading: false,
+                      isDuplicate: false,
+                      noResults: false,
+                      isError: true,
+                      showHouseNZSetUp: true
+                    });
                   }
                 }}
               />
@@ -279,6 +303,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
               this.setState({
                 showHouseNZRows: false,
                 isError: false,
+                isDuplicate: false,
                 noResults: false,
                 isSuccess: false
               })
@@ -342,6 +367,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                   this.setState({
                     showHouseNZRows: false,
                     isError: false,
+                    isDuplicate: false,
                     noResults: false,
                     isSuccess: false
                   })
@@ -357,6 +383,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
               this.setState({
                 showHouseNZSearch: false,
                 isError: false,
+                isDuplicate: false,
                 isSuccess: false,
                 noResults: false
               })
@@ -368,6 +395,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                     companiesHouseNZList: [],
                     showHouseResults: false,
                     isError: false,
+                    isDuplicate: false,
                     isSuccess: false,
                     noResults: false
                   });
@@ -378,6 +406,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
             {this.state.isSuccess && <this.SuccessNotify />}
             {this.state.isError && <this.ErrorNotify />}
             {this.state.noResults && <this.ErrorNotifyNoResults />}
+            {this.state.isDuplicate && <this.ErrorNotifyDuplicate />}
             <div className={"centerText"}>
               <Text className={"setUpHeaders"}>Search within Companies House NZ</Text>
             </div>
@@ -396,18 +425,37 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                         key={element[1]}
                         onClick={async () => {
                           try {
-                            addHouseNZConfig({ companyName: element[0], companyNumber: element[1] });
-                            this.setState({
-                              isSuccess: true,
-                              noResults: false,
-                              showHouseNZSearch: true,
-                              showHouseResults: false
+                            let currentConfig = [];
+                            let config = await loadConfig();
+                            config.houseNZ.forEach(item => {
+                              currentConfig.push(item.companyNumber);
                             });
+
+                            if (currentConfig.some(x => x === element[1])) {
+                              this.setState({
+                                isError: false,
+                                isDuplicate: true,
+                                isSuccess: false,
+                                showHouseNZSetUp: true,
+                                showHouseNZSearch: true,
+                                showHouseResults: false
+                              });
+                            } else {
+                              addHouseNZConfig({ companyName: element[0], companyNumber: element[1] });
+                              this.setState({
+                                isSuccess: true,
+                                isDuplicate: false,
+                                noResults: false,
+                                showHouseNZSearch: true,
+                                showHouseResults: false
+                              });
+                            }
                           } catch (error) {
                             console.error(error);
                             this.setState({
                               isSuccess: false,
                               isError: true,
+                              isDuplicate: false,
                               showHouseNZSearch: false
                             });
                           }
@@ -447,6 +495,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                   this.setState({
                     showHouseNZSearch: false,
                     isError: false,
+                    isDuplicate: false,
                     noResults: false,
                     isSuccess: false
                   })
@@ -461,6 +510,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                 this.setState({
                   showHouseNZSetUp: false,
                   isError: false,
+                  isDuplicate: false,
                   noResults: false,
                   isSuccess: false
                 })
