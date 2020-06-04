@@ -14,10 +14,9 @@ export interface FinanceState {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
+  isDuplicate: boolean;
   noResults: boolean;
   showRefreshButton: boolean;
-  isSuccessHome: boolean;
-  isErrorHome: boolean;
   emptyFinanceSearch: boolean;
   showFinanceSearch: boolean;
   showFinanceRows: boolean;
@@ -35,10 +34,9 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
       isLoading: false,
       isSuccess: false,
       isError: false,
+      isDuplicate: false,
       noResults: false,
       showRefreshButton: false,
-      isSuccessHome: false,
-      isErrorHome: false,
       emptyFinanceSearch: false,
       showFinanceSearch: false,
       showFinanceRows: false,
@@ -54,7 +52,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
     <MessageBar
       messageBarType={MessageBarType.success}
       isMultiline={false}
-      onDismiss={() => this.setState({ isSuccess: false, isSuccessHome: false })}
+      onDismiss={() => this.setState({ isSuccess: false })}
       dismissButtonAriaLabel="Close"
     >
       Success
@@ -65,10 +63,21 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ isError: false, isErrorHome: false })}
+      onDismiss={() => this.setState({ isError: false })}
       dismissButtonAriaLabel="Close"
     >
       Error
+    </MessageBar>
+  );
+
+  ErrorNotifyDuplicate = () => (
+    <MessageBar
+      messageBarType={MessageBarType.error}
+      isMultiline={false}
+      onDismiss={() => this.setState({ isDuplicate: false })}
+      dismissButtonAriaLabel="Close"
+    >
+      Item Already Exists
     </MessageBar>
   );
 
@@ -76,7 +85,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ isError: false, noResults: false })}
+      onDismiss={() => this.setState({ noResults: false })}
       dismissButtonAriaLabel="Close"
     >
       No Results Found
@@ -89,6 +98,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
       showFinanceSearch: bool,
       isSuccess: false,
       isError: false,
+      isDuplicate: false,
       noResults: false
     });
   };
@@ -98,6 +108,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
       showFinanceSearch: false,
       isSuccess: false,
       isError: false,
+      isDuplicate: false,
       noResults: false,
       showFinanceRows: bool,
       yahooRows: []
@@ -116,6 +127,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
     this.setState({
       isLoading: true,
       isError: false,
+      isDuplicate: false,
       noResults: false,
       isSuccess: false,
       emptyFinanceSearch: false,
@@ -130,6 +142,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
       this.setState({
         emptyFinanceSearch: true,
         isError: true,
+        isDuplicate: false,
         noResults: false,
         isSuccess: false,
         showFinanceSetUp: true,
@@ -141,6 +154,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
       this.setState({
         emptyFinanceSearch: false,
         isError: false,
+        isDuplicate: false,
         showFinanceSetUp: true,
         isSuccess: false,
         noResults: false,
@@ -200,6 +214,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
               showFinanceSetUp: false,
               isSuccess: false,
               isError: false,
+              isDuplicate: false,
               noResults: false
             })
           }
@@ -210,6 +225,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                   showFinanceSetUp: false,
                   isSuccess: false,
                   isError: false,
+                  isDuplicate: false,
                   noResults: false
                 });
               }
@@ -240,6 +256,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                     emptyFinanceSearch: false,
                     isSuccess: false,
                     isError: false,
+                    isDuplicate: false,
                     noResults: false
                   })
                 }
@@ -258,6 +275,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                       this.props.isLoading(false);
                       this.setState({
                         isError: true,
+                        isDuplicate: false,
                         noResults: false,
                         isSuccess: false,
                         isLoading: false,
@@ -271,7 +289,13 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                   } catch (error) {
                     console.error(error);
                     this.props.isLoading(false);
-                    this.setState({ isLoading: false, noResults: false, isError: true, showFinanceSetUp: true });
+                    this.setState({
+                      isLoading: false,
+                      isDuplicate: false,
+                      noResults: false,
+                      isError: true,
+                      showFinanceSetUp: true
+                    });
                   }
                 }}
               />
@@ -283,6 +307,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
               this.setState({
                 showFinanceRows: false,
                 isError: false,
+                isDuplicate: false,
                 isSuccess: false,
                 noResults: false
               })
@@ -341,6 +366,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                   this.setState({
                     showFinanceRows: false,
                     isError: false,
+                    isDuplicate: false,
                     isSuccess: false,
                     noResults: false
                   })
@@ -356,6 +382,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
               this.setState({
                 showFinanceSearch: false,
                 isError: false,
+                isDuplicate: false,
                 isSuccess: false,
                 noResults: false
               })
@@ -367,6 +394,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                     yahooFinanceList: [],
                     showFinanceResults: false,
                     isError: false,
+                    isDuplicate: false,
                     isSuccess: false,
                     noResults: false
                   });
@@ -377,6 +405,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
             {this.state.isSuccess && <this.SuccessNotify />}
             {this.state.isError && <this.ErrorNotify />}
             {this.state.noResults && <this.ErrorNotifyNoResults />}
+            {this.state.isDuplicate && <this.ErrorNotifyDuplicate />}
             <div className={"centerText"}>
               <Text className={"setUpHeaders"}>Search within Yahoo Finance</Text>
             </div>
@@ -395,18 +424,36 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                         key={element[1]}
                         onClick={async () => {
                           try {
-                            addFinanceConfig({ ticker: element, interval: "1d", range: "1y" });
-                            this.setState({
-                              isSuccess: true,
-                              noResults: false,
-                              showFinanceSearch: true,
-                              showFinanceResults: false
+                            let currentConfig = [];
+                            let config = await loadConfig();
+                            config.finance.forEach(item => {
+                              currentConfig.push(item.ticker);
                             });
+
+                            if (currentConfig.some(x => x === element)) {
+                              this.setState({
+                                isError: false,
+                                isDuplicate: true,
+                                isSuccess: false,
+                                showFinanceSetUp: true,
+                                showFinanceSearch: true,
+                                showFinanceResults: false
+                              });
+                            } else {
+                              addFinanceConfig({ ticker: element, interval: "1d", range: "1y" });
+                              this.setState({
+                                isSuccess: true,
+                                noResults: false,
+                                showFinanceSearch: true,
+                                showFinanceResults: false
+                              });
+                            }
                           } catch (error) {
                             console.error(error);
                             this.setState({
                               isSuccess: false,
                               isError: true,
+                              isDuplicate: false,
                               showFinanceSearch: false
                             });
                           }
@@ -441,6 +488,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                   this.setState({
                     showFinanceSearch: false,
                     isError: false,
+                    isDuplicate: false,
                     isSuccess: false,
                     noResults: false
                   })
@@ -455,6 +503,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                 this.setState({
                   showFinanceSetUp: false,
                   isError: false,
+                  isDuplicate: false,
                   isSuccess: false,
                   noResults: false
                 })

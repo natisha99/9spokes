@@ -14,10 +14,9 @@ export interface LinkedInState {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
+  isDuplicate: boolean;
   noResults: boolean;
   showRefreshButton: boolean;
-  isSuccessHome: boolean;
-  isErrorHome: boolean;
   emptyLinkedinSearch: boolean;
   showLinkedinSearch: boolean;
   showLinkedinRows: boolean;
@@ -35,10 +34,9 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
       isLoading: false,
       isSuccess: false,
       isError: false,
+      isDuplicate: false,
       noResults: false,
       showRefreshButton: false,
-      isSuccessHome: false,
-      isErrorHome: false,
       emptyLinkedinSearch: false,
       showLinkedinSearch: false,
       showLinkedinRows: false,
@@ -54,7 +52,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
     <MessageBar
       messageBarType={MessageBarType.success}
       isMultiline={false}
-      onDismiss={() => this.setState({ isSuccess: false, isSuccessHome: false })}
+      onDismiss={() => this.setState({ isSuccess: false })}
       dismissButtonAriaLabel="Close"
     >
       Success
@@ -65,10 +63,21 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ isError: false, isErrorHome: false })}
+      onDismiss={() => this.setState({ isError: false })}
       dismissButtonAriaLabel="Close"
     >
       Error
+    </MessageBar>
+  );
+
+  ErrorNotifyDuplicate = () => (
+    <MessageBar
+      messageBarType={MessageBarType.error}
+      isMultiline={false}
+      onDismiss={() => this.setState({ isDuplicate: false })}
+      dismissButtonAriaLabel="Close"
+    >
+      Item Already Exists
     </MessageBar>
   );
 
@@ -76,7 +85,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ isError: false, noResults: false })}
+      onDismiss={() => this.setState({ noResults: false })}
       dismissButtonAriaLabel="Close"
     >
       No Results Found
@@ -89,6 +98,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
       showLinkedinSearch: bool,
       isSuccess: false,
       isError: false,
+      isDuplicate: false,
       noResults: false
     });
   };
@@ -98,6 +108,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
       showLinkedinSearch: false,
       isSuccess: false,
       isError: false,
+      isDuplicate: false,
       noResults: false,
       showLinkedinRows: bool,
       linkedInRows: []
@@ -116,6 +127,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
     this.setState({
       isLoading: true,
       isError: false,
+      isDuplicate: false,
       noResults: false,
       isSuccess: false,
       emptyLinkedinSearch: false,
@@ -130,6 +142,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
       this.setState({
         emptyLinkedinSearch: true,
         isError: true,
+        isDuplicate: false,
         noResults: false,
         isSuccess: false,
         showLinkedinResults: false,
@@ -141,6 +154,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
       this.setState({
         emptyLinkedinSearch: false,
         isError: false,
+        isDuplicate: false,
         isSuccess: false,
         noResults: false,
         showLinkedinSetUp: true,
@@ -200,6 +214,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
               showLinkedinSetUp: false,
               isSuccess: false,
               isError: false,
+              isDuplicate: false,
               noResults: false
             })
           }
@@ -210,6 +225,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
                   showLinkedinSetUp: false,
                   isSuccess: false,
                   isError: false,
+                  isDuplicate: false,
                   noResults: false
                 });
               }
@@ -240,6 +256,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
                     emptyLinkedinSearch: false,
                     isSuccess: false,
                     isError: false,
+                    isDuplicate: false,
                     noResults: false
                   })
                 }
@@ -258,6 +275,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
                       this.props.isLoading(false);
                       this.setState({
                         isError: true,
+                        isDuplicate: false,
                         noResults: false,
                         isSuccess: false,
                         isLoading: false,
@@ -271,7 +289,13 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
                   } catch (error) {
                     console.error(error);
                     this.props.isLoading(false);
-                    this.setState({ isLoading: false, noResults: false, isError: true, showLinkedinSetUp: true });
+                    this.setState({
+                      isLoading: false,
+                      isDuplicate: false,
+                      noResults: false,
+                      isError: true,
+                      showLinkedinSetUp: true
+                    });
                   }
                 }}
               />
@@ -283,6 +307,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
               this.setState({
                 showLinkedinRows: false,
                 isError: false,
+                isDuplicate: false,
                 isSuccess: false,
                 noResults: false
               })
@@ -341,6 +366,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
                   this.setState({
                     showLinkedinRows: false,
                     isError: false,
+                    isDuplicate: false,
                     isSuccess: false,
                     noResults: false
                   })
@@ -356,6 +382,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
               this.setState({
                 showLinkedinSearch: false,
                 isError: false,
+                isDuplicate: false,
                 isSuccess: false,
                 noResults: false
               })
@@ -377,6 +404,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
             {this.state.isSuccess && <this.SuccessNotify />}
             {this.state.isError && <this.ErrorNotify />}
             {this.state.noResults && <this.ErrorNotifyNoResults />}
+            {this.state.isDuplicate && <this.ErrorNotifyDuplicate />}
             <div className={"centerText"}>
               <Text className={"setUpHeaders"}>Search within LinkedIn</Text>
             </div>
@@ -395,18 +423,36 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
                         key={element[1]}
                         onClick={async () => {
                           try {
-                            addLinkedinConfig({ profileName: element });
-                            this.setState({
-                              isSuccess: true,
-                              noResults: false,
-                              showLinkedinSearch: true,
-                              showLinkedinResults: false
+                            let currentConfig = [];
+                            let config = await loadConfig();
+                            config.linkedin.forEach(item => {
+                              currentConfig.push(item.profileName);
                             });
+
+                            if (currentConfig.some(x => x === element)) {
+                              this.setState({
+                                isError: false,
+                                isDuplicate: true,
+                                isSuccess: false,
+                                showLinkedinSetUp: true,
+                                showLinkedinSearch: true,
+                                showLinkedinResults: false
+                              });
+                            } else {
+                              addLinkedinConfig({ profileName: element });
+                              this.setState({
+                                isSuccess: true,
+                                noResults: false,
+                                showLinkedinSearch: true,
+                                showLinkedinResults: false
+                              });
+                            }
                           } catch (error) {
                             console.error(error);
                             this.setState({
                               isSuccess: false,
                               isError: true,
+                              isDuplicate: false,
                               showLinkedinSearch: false
                             });
                           }
@@ -441,6 +487,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
                   this.setState({
                     showLinkedinSearch: false,
                     isError: false,
+                    isDuplicate: false,
                     isSuccess: false,
                     noResults: false
                   })
@@ -455,6 +502,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
                 this.setState({
                   showLinkedinSetUp: false,
                   isError: false,
+                  isDuplicate: false,
                   isSuccess: false,
                   noResults: false
                 })

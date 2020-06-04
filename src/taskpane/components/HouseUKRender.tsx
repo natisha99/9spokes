@@ -14,10 +14,9 @@ export interface HouseUKState {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
+  isDuplicate: boolean;
   noResults: boolean;
   showRefreshButton: boolean;
-  isSuccessHome: boolean;
-  isErrorHome: boolean;
   emptyHouseUKSearch: boolean;
   showHouseUKSearch: boolean;
   showHouseUKRows: boolean;
@@ -35,10 +34,9 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
       isLoading: false,
       isSuccess: false,
       isError: false,
+      isDuplicate: false,
       noResults: false,
       showRefreshButton: false,
-      isSuccessHome: false,
-      isErrorHome: false,
       emptyHouseUKSearch: false,
       showHouseUKSearch: false,
       showHouseUKRows: false,
@@ -54,7 +52,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
     <MessageBar
       messageBarType={MessageBarType.success}
       isMultiline={false}
-      onDismiss={() => this.setState({ isSuccess: false, isSuccessHome: false })}
+      onDismiss={() => this.setState({ isSuccess: false })}
       dismissButtonAriaLabel="Close"
     >
       Success
@@ -65,10 +63,21 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ isError: false, isErrorHome: false })}
+      onDismiss={() => this.setState({ isError: false })}
       dismissButtonAriaLabel="Close"
     >
       Error
+    </MessageBar>
+  );
+
+  ErrorNotifyDuplicate = () => (
+    <MessageBar
+      messageBarType={MessageBarType.error}
+      isMultiline={false}
+      onDismiss={() => this.setState({ isDuplicate: false })}
+      dismissButtonAriaLabel="Close"
+    >
+      Item Already Exists
     </MessageBar>
   );
 
@@ -76,7 +85,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ isError: false, noResults: false })}
+      onDismiss={() => this.setState({ noResults: false })}
       dismissButtonAriaLabel="Close"
     >
       No Results Found
@@ -87,6 +96,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
     this.setState({
       showHouseUKSearch: false,
       isError: false,
+      isDuplicate: false,
       noResults: false,
       isSuccess: false,
       showHouseUKRows: bool,
@@ -106,9 +116,10 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
     this.setState({
       isLoading: true,
       isError: false,
+      isDuplicate: false,
       isSuccess: false,
       noResults: false,
-      showHouseUKSearch: true,
+      showHouseUKSearch: false,
       showHouseUKSetUp: false,
       showHouseUKResults: bool,
       companiesHouseUKName: val
@@ -117,6 +128,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
       this.props.isLoading(false);
       this.setState({
         isError: true,
+        isDuplicate: false,
         noResults: false,
         isSuccess: false,
         showHouseUKResults: false,
@@ -127,6 +139,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
     } else {
       this.setState({
         isError: false,
+        isDuplicate: false,
         isSuccess: false,
         noResults: false,
         companiesHouseUKList: (await searchHouseUK(val)).results,
@@ -186,6 +199,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
               showHouseUKSetUp: false,
               isSuccess: false,
               isError: false,
+              isDuplicate: false,
               noResults: false
             })
           }
@@ -196,6 +210,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                   showHouseUKSetUp: false,
                   isSuccess: false,
                   isError: false,
+                  isDuplicate: false,
                   noResults: false
                 });
               }
@@ -226,6 +241,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                     emptyHouseUKSearch: false,
                     isSuccess: false,
                     isError: false,
+                    isDuplicate: false,
                     noResults: false
                   })
                 }
@@ -246,6 +262,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                         isError: true,
                         noResults: false,
                         isSuccess: false,
+                        isDuplicate: false,
                         isLoading: false,
                         showHouseUKSetUp: true
                       });
@@ -257,7 +274,13 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                   } catch (error) {
                     console.error(error);
                     this.props.isLoading(false);
-                    this.setState({ isLoading: false, noResults: false, isError: true, showHouseUKSetUp: true });
+                    this.setState({
+                      isLoading: false,
+                      isDuplicate: false,
+                      noResults: false,
+                      isError: true,
+                      showHouseUKSetUp: true
+                    });
                   }
                 }}
               />
@@ -269,6 +292,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
               this.setState({
                 showHouseUKRows: false,
                 isError: false,
+                isDuplicate: false,
                 isSuccess: false,
                 noResults: false
               })
@@ -332,6 +356,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                   this.setState({
                     showHouseUKRows: false,
                     isError: false,
+                    isDuplicate: false,
                     isSuccess: false,
                     noResults: false
                   })
@@ -347,6 +372,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
               this.setState({
                 showHouseUKSearch: false,
                 isError: false,
+                isDuplicate: false,
                 isSuccess: false,
                 noResults: false
               })
@@ -358,6 +384,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                     companiesHouseUKList: [],
                     showHouseUKResults: false,
                     isError: false,
+                    isDuplicate: false,
                     isSuccess: false,
                     noResults: false
                   });
@@ -368,6 +395,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
             {this.state.isSuccess && <this.SuccessNotify />}
             {this.state.isError && <this.ErrorNotify />}
             {this.state.noResults && <this.ErrorNotifyNoResults />}
+            {this.state.isDuplicate && <this.ErrorNotifyDuplicate />}
             <div className={"centerText"}>
               <Text className={"setUpHeaders"}>Search within Companies House UK</Text>
             </div>
@@ -386,18 +414,36 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                         key={element[1]}
                         onClick={async () => {
                           try {
-                            addHouseUKConfig({ companyName: element[0], companyNumber: element[1] });
-                            this.setState({
-                              isSuccess: true,
-                              noResults: false,
-                              showHouseUKSearch: true,
-                              showHouseUKResults: false
+                            let currentConfig = [];
+                            let config = await loadConfig();
+                            config.houseUK.forEach(item => {
+                              currentConfig.push(item.companyNumber);
                             });
+
+                            if (currentConfig.some(x => x === element[1])) {
+                              this.setState({
+                                isError: false,
+                                isDuplicate: true,
+                                isSuccess: false,
+                                showHouseUKSetUp: true,
+                                showHouseUKSearch: true,
+                                showHouseUKResults: false
+                              });
+                            } else {
+                              addHouseUKConfig({ companyName: element[0], companyNumber: element[1] });
+                              this.setState({
+                                isSuccess: true,
+                                noResults: false,
+                                showHouseUKSearch: true,
+                                showHouseUKResults: false
+                              });
+                            }
                           } catch (error) {
                             console.error(error);
                             this.setState({
                               isSuccess: false,
                               isError: true,
+                              isDuplicate: false,
                               showHouseUKSearch: false
                             });
                           }
@@ -437,6 +483,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                   this.setState({
                     showHouseUKSearch: false,
                     isError: false,
+                    isDuplicate: false,
                     isSuccess: false,
                     noResults: false
                   })
@@ -451,6 +498,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                 this.setState({
                   showHouseUKSetUp: false,
                   isError: false,
+                  isDuplicate: false,
                   isSuccess: false,
                   noResults: false
                 })
