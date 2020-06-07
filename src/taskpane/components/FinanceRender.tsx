@@ -454,7 +454,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                               isSuccess: false,
                               isError: true,
                               isDuplicate: false,
-                              showFinanceSearch: false
+                              showFinanceSearch: true
                             });
                           }
                         }}

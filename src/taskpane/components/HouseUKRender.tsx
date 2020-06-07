@@ -444,7 +444,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                               isSuccess: false,
                               isError: true,
                               isDuplicate: false,
-                              showHouseUKSearch: false
+                              showHouseUKSearch: true
                             });
                           }
                         }}
