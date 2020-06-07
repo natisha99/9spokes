@@ -13,9 +13,8 @@ export interface TrendsState {
   isLoading: boolean;
   isSuccess: boolean;
   isError: boolean;
+  isDuplicate: boolean;
   showRefreshButton: boolean;
-  isSuccessHome: boolean;
-  isErrorHome: boolean;
   emptyTrendsSearch: boolean;
   showTrendsSearch: boolean;
   showTrendsRows: boolean;
@@ -23,7 +22,6 @@ export interface TrendsState {
   googleTrendsName: string;
   trendsRows: any;
   showTrendsSetUp: boolean;
-  noWorkbook: boolean;
 }
 
 export default class TrendsRender extends React.Component<any, TrendsState> {
@@ -33,17 +31,15 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
       isLoading: false,
       isSuccess: false,
       isError: false,
+      isDuplicate: false,
       showRefreshButton: false,
-      isSuccessHome: false,
-      isErrorHome: false,
       emptyTrendsSearch: false,
       showTrendsSearch: false,
       showTrendsRows: false,
       showTrendsResults: false,
       googleTrendsName: "",
       trendsRows: [],
-      showTrendsSetUp: false,
-      noWorkbook: false
+      showTrendsSetUp: false
     };
   }
 
@@ -51,7 +47,7 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
     <MessageBar
       messageBarType={MessageBarType.success}
       isMultiline={false}
-      onDismiss={() => this.setState({ isSuccess: false, isSuccessHome: false })}
+      onDismiss={() => this.setState({ isSuccess: false })}
       dismissButtonAriaLabel="Close"
     >
       Success
@@ -62,10 +58,21 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
     <MessageBar
       messageBarType={MessageBarType.error}
       isMultiline={false}
-      onDismiss={() => this.setState({ isError: false, isErrorHome: false })}
+      onDismiss={() => this.setState({ isError: false })}
       dismissButtonAriaLabel="Close"
     >
       Error
+    </MessageBar>
+  );
+
+  ErrorNotifyDuplicate = () => (
+    <MessageBar
+      messageBarType={MessageBarType.error}
+      isMultiline={false}
+      onDismiss={() => this.setState({ isDuplicate: false })}
+      dismissButtonAriaLabel="Close"
+    >
+      Item Already Exists
     </MessageBar>
   );
 
@@ -114,22 +121,43 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
         emptyTrendsSearch: true,
         isError: true,
         isSuccess: false,
+        isDuplicate: false,
         showTrendsSetUp: true,
         showTrendsResults: false,
         isLoading: false,
         showTrendsSearch: true
       });
     } else {
-      this.setState({
-        emptyTrendsSearch: false,
-        isError: false,
-        isSuccess: true,
-        showTrendsSetUp: true,
-        showTrendsSearch: true,
-        isLoading: false
+      let currentConfig = [];
+      let config = await loadConfig();
+      config.trends.forEach(item => {
+        currentConfig.push(item.keyword.toLowerCase());
       });
-      addTrendsConfig({ keyword: val, weeks: 52 });
-      this.props.isLoading(false);
+
+      if (currentConfig.some(x => x === val.toLowerCase())) {
+        this.setState({
+          emptyTrendsSearch: false,
+          isError: false,
+          isDuplicate: true,
+          isSuccess: false,
+          showTrendsSetUp: true,
+          showTrendsSearch: true,
+          isLoading: false
+        });
+        this.props.isLoading(false);
+      } else {
+        this.setState({
+          emptyTrendsSearch: false,
+          isError: false,
+          isDuplicate: false,
+          isSuccess: true,
+          showTrendsSetUp: true,
+          showTrendsSearch: true,
+          isLoading: false
+        });
+        addTrendsConfig({ keyword: val, weeks: 52 });
+        this.props.isLoading(false);
+      }
     }
   };
 
@@ -215,7 +243,8 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
                     showTrendsSearch: true,
                     emptyTrendsSearch: false,
                     isSuccess: false,
-                    isError: false
+                    isError: false,
+                    isDuplicate: false
                   })
                 }
               />
@@ -231,7 +260,13 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
 
                     if (config.trends === undefined || config.trends.length == 0) {
                       this.props.isLoading(false);
-                      this.setState({ isError: true, isSuccess: false, isLoading: false, showTrendsSetUp: true });
+                      this.setState({
+                        isError: true,
+                        isDuplicate: false,
+                        isSuccess: false,
+                        isLoading: false,
+                        showTrendsSetUp: true
+                      });
                     } else {
                       await populateTrends();
                       this.props.isLoading(false);
@@ -240,7 +275,7 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
                   } catch (error) {
                     console.error(error);
                     this.props.isLoading(false);
-                    this.setState({ isLoading: false, isError: true, showTrendsSetUp: true });
+                    this.setState({ isLoading: false, isDuplicate: false, isError: true, showTrendsSetUp: true });
                   }
                 }}
               />
@@ -252,7 +287,8 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
               this.setState({
                 showTrendsRows: false,
                 isError: false,
-                isSuccess: false
+                isSuccess: false,
+                isDuplicate: false
               })
             }
           >
@@ -309,7 +345,8 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
                   this.setState({
                     showTrendsRows: false,
                     isSuccess: false,
-                    isError: false
+                    isError: false,
+                    isDuplicate: false
                   })
                 }
                 text="Back"
@@ -323,7 +360,8 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
               this.setState({
                 showTrendsSearch: false,
                 isError: false,
-                isSuccess: false
+                isSuccess: false,
+                isDuplicate: false
               })
             }
             modalProps={{
@@ -332,7 +370,8 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
                   this.setState({
                     showTrendsResults: false,
                     isError: false,
-                    isSuccess: false
+                    isSuccess: false,
+                    isDuplicate: false
                   });
                 }
               }
@@ -340,6 +379,7 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
           >
             {this.state.isSuccess && <this.SuccessNotify />}
             {this.state.isError && <this.ErrorNotify />}
+            {this.state.isDuplicate && <this.ErrorNotifyDuplicate />}
             <div className={"centerText"}>
               <Text className={"setUpHeaders"}>Enter a keyword for Google Trends</Text>
             </div>
@@ -357,7 +397,8 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
                   this.setState({
                     showTrendsSearch: false,
                     isError: false,
-                    isSuccess: false
+                    isSuccess: false,
+                    isDuplicate: false
                   })
                 }
                 text="Back"
@@ -370,7 +411,8 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
                 this.setState({
                   showTrendsSetUp: false,
                   isError: false,
-                  isSuccess: false
+                  isSuccess: false,
+                  isDuplicate: false
                 })
               }
               text="Close"
