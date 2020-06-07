@@ -11,16 +11,9 @@ import { loadConfig } from "./config";
 
 export async function populateHouseNZ() {
   let House = {
-    //Stores excel index for data
-    item: 0,
-    name: ["B2", "E2", "H2", "K2", "N2", "Q2", "T2", "W2"],
-    name_merged: ["B2:C2", "E2:F2", "H2:I2", "K2:L2", "N2:O2", "Q2:R2", "T2:U2", "W2:X2"],
-    summary: ["C4:C12", "F4:F12", "I4:I12", "L4:L12", "O4:O12", "R4:R12", "U4:U12", "X4:X12"],
-    NZBN: ["C15:C22", "F15:F22", "I15:I22", "L15:L22", "O15:O22", "R15:R22", "U15:U22", "X15:X22"],
-    directors: ["B25:B", "E25:E", "H25:H", "K25:K", "N25:N", "Q25:Q", "T25:T", "W25:W"],
-    directors_merged: ["B25:C34", "E25:F34", "H25:I34", "K25:L34", "N25:O34", "Q25:R34", "T25:U34", "W25:X34"],
-    share: ["B37:C", "E37:F", "H37:I", "K37:L", "N37:O", "Q37:R", "T37:U", "W37:X"],
-    store: function(dump: any[]) {
+    itemIndex: 0,
+    rowHeightSet: false,
+    store: async function(dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -40,40 +33,45 @@ export async function populateHouseNZ() {
        *               [["Bob"],["10000"], ["Jenny"], ["5000"]]
        *            ]);
        */
-      let name = this.name[this.item];
-      let summary = this.summary[this.item];
-      let NZBN = this.NZBN[this.item];
-      let directors = this.directors[this.item] + String(dump[3].length + 24);
-      let share = this.share[this.item] + String(dump[4].length + 36);
-      this.item++;
 
-      //add into cells
-      Excel.run(function(context) {
-        var sheet = context.workbook.worksheets.getItem("House_NZ");
-        sheet.getRange(name).values = dump[0];
-        sheet.getRange(summary).values = dump[1];
-        sheet.getRange(NZBN).values = dump[2];
-        sheet.getRange(directors).values = dump[3];
-        sheet.getRange(share).values = dump[4];
+      // Generate template and populate data
+      await Excel.run(async function(context) {
+        const sheet = context.workbook.worksheets.getItem("House_NZ");
+        const template = context.workbook.worksheets.getItem("Templates").getRange("HouseNZTemplate");
+        const templateWidth = template.getColumnProperties({ format: { columnWidth: true } });
+        const templateHeight = template.getRowProperties({ format: { rowHeight: true } });
+        await context.sync();
+        let index = House.itemIndex;
+        // Adjusts column widths
+        for (const value of templateWidth.value) {
+          sheet.getRangeByIndexes(0, index, 1, 1).format.columnWidth = value.format.columnWidth;
+          index++;
+        }
+        // Adjust row height, only done for the first insert
+        if (!House.rowHeightSet) {
+          let index = 0;
+          for (const value of templateHeight.value) {
+            sheet.getRangeByIndexes(index, 0, 1, 1).format.rowHeight = value.format.rowHeight;
+            index++;
+          }
+          House.rowHeightSet = true;
+        }
+        sheet.getRangeByIndexes(0, House.itemIndex, 1, 1).copyFrom(template, Excel.RangeCopyType.all);
+        sheet.getRangeByIndexes(0, House.itemIndex + 1, 1, 1).values = dump[0];
+        sheet.getRangeByIndexes(2, House.itemIndex + 2, 9, 1).values = dump[1];
+        sheet.getRangeByIndexes(13, House.itemIndex + 2, 8, 1).values = dump[2];
+        sheet.getRangeByIndexes(23, House.itemIndex + 1, dump[3].length, 1).values = dump[3];
+        sheet.getRangeByIndexes(35, House.itemIndex + 1, dump[4].length, 2).values = dump[4];
         return context.sync().then(function() {
           console.log("Imported House NZ");
         });
       });
+      this.itemIndex += 3;
     }
   };
 
   // Clear old data
-  Excel.run(function(context) {
-    var sheet = context.workbook.worksheets.getItem("House_NZ");
-    sheet.getRanges(House.name_merged.toString()).clear("Contents");
-    sheet.getRanges(House.summary.toString()).clear("Contents");
-    sheet.getRanges(House.NZBN.toString()).clear("Contents");
-    sheet.getRanges(House.directors_merged.toString()).clear("Contents");
-    sheet.getRanges(House.share.reduce((prev, cur) => [...prev, cur + "10000"], []).toString()).clear("Contents");
-    return context.sync().then(function() {
-      console.log("House NZ Cleared");
-    });
-  });
+  clearSheet("House_NZ");
 
   let config = (await loadConfig()).houseNZ;
 
@@ -125,7 +123,7 @@ export async function populateHouseNZ() {
 
     const sample = [name, summary, NZBN_sample, directors, shares];
     //stores companies house data
-    House.store(sample);
+    await House.store(sample);
     //#endregion
   }
 }
@@ -252,48 +250,10 @@ export async function populateHouseUK() {
 
 export async function populateLinkedIn() {
   let Linkedin = {
-    //Stores excel index for data
-    company: [
-      ["B2", "C4:C9", "B15"],
-      ["E2", "F4:F9", "E15"],
-      ["H2", "I4:I9", "H15"],
-      ["K2", "L4:F9", "K15"],
-      ["N2", "O4:O9", "N15"],
+    itemIndex: 0,
+    rowHeightSet: false,
 
-      ["B37", "C39:C44", "B50"],
-      ["E37", "F39:F44", "E50"],
-      ["H37", "I39:I44", "H50"],
-      ["K37", "L39:F44", "K50"],
-      ["N37", "O39:O44", "N50"],
-
-      ["B71", "C73:C78", "B84"],
-      ["E71", "F73:F78", "E84"],
-      ["H71", "I73:I78", "H84"],
-      ["K71", "L73:F78", "K84"],
-      ["N71", "O73:O78", "N84"]
-    ],
-    company_merged: [
-      ["B2:C2", "C4:C12", "B15:C34"],
-      ["E2:F2", "F4:F12", "E15:F34"],
-      ["H2:I2", "I4:I12", "H15:I34"],
-      ["K2:L2", "L4:F12", "K15:L34"],
-      ["N2:O2", "O4:O12", "N15:O34"],
-
-      ["B37:C37", "C39:C47", "B50:C69"],
-      ["E37:F37", "F39:F47", "E50:F69"],
-      ["H37:I37", "I39:C47", "H50:I69"],
-      ["K37:L37", "L39:F47", "K50:L69"],
-      ["N37:O37", "O39:O47", "N50:O69"],
-
-      ["B71:C71", "C73:C81", "B84:C103"],
-      ["E71:F71", "F73:F81", "E84:F103"],
-      ["H71:I71", "I73:C81", "H84:I103"],
-      ["K71:L71", "L73:F81", "K84:L103"],
-      ["N71:O71", "O73:O81", "N84:O103"]
-    ],
-    item: 0,
-
-    store: function(dump: any[]) {
+    store: async function(dump: any[]) {
       /**
        *
        * @param {array} dump - A data dump in the form of a 3d array
@@ -310,35 +270,43 @@ export async function populateLinkedIn() {
        *                   "about info"
        *               ]);
        */
-      let name;
-      let summary;
-      let description;
-      name = this.company[this.item][0];
-      summary = this.company[this.item][1];
-      description = this.company[this.item][2];
-      this.item++;
 
-      //add into cells
-      Excel.run(function(context) {
-        var sheet = context.workbook.worksheets.getItem("Linkedin");
-        sheet.getRange(name).values = dump[0];
-        sheet.getRange(summary).values = dump[1];
-        sheet.getRange(description).values = dump[2];
+      // Generate template and populate data
+      await Excel.run(async function(context) {
+        const sheet = context.workbook.worksheets.getItem("Linkedin");
+        const template = context.workbook.worksheets.getItem("Templates").getRange("LinkedinTemplate");
+        const templateWidth = template.getColumnProperties({ format: { columnWidth: true } });
+        const templateHeight = template.getRowProperties({ format: { rowHeight: true } });
+        await context.sync();
+        let index = Linkedin.itemIndex;
+        // Adjusts column widths
+        for (const value of templateWidth.value) {
+          sheet.getRangeByIndexes(0, index, 1, 1).format.columnWidth = value.format.columnWidth;
+          index++;
+        }
+        // Adjust row height, only done for the first insert
+        if (!Linkedin.rowHeightSet) {
+          let index = 0;
+          for (const value of templateHeight.value) {
+            sheet.getRangeByIndexes(index, 0, 1, 1).format.rowHeight = value.format.rowHeight;
+            index++;
+          }
+          Linkedin.rowHeightSet = true;
+        }
+        sheet.getRangeByIndexes(0, Linkedin.itemIndex, 1, 1).copyFrom(template, Excel.RangeCopyType.all);
+        sheet.getRangeByIndexes(0, Linkedin.itemIndex + 1, 1, 1).values = dump[0];
+        sheet.getRangeByIndexes(2, Linkedin.itemIndex + 2, 6, 1).values = dump[1];
+        sheet.getRangeByIndexes(13, Linkedin.itemIndex + 1, 1, 1).values = dump[2];
         return context.sync().then(function() {
           console.log("Imported LinkedIn");
         });
       });
+      this.itemIndex += 3;
     }
   };
 
   // Clear old data
-  Excel.run(function(context) {
-    var sheet = context.workbook.worksheets.getItem("Linkedin");
-    sheet.getRanges(Linkedin.company_merged.toString()).clear("Contents");
-    return context.sync().then(function() {
-      console.log("Linkedin Cleared");
-    });
-  });
+  clearSheet("Linkedin");
 
   let config = (await loadConfig()).linkedin;
 
@@ -351,7 +319,7 @@ export async function populateLinkedIn() {
       [[data.type], [data.industry], [data.company_size], [data.specialities], [data.website], [data.url]],
       data.overview
     ];
-    Linkedin.store(sample);
+    await Linkedin.store(sample);
     //#endregion
   }
 }
@@ -505,4 +473,16 @@ export async function populateTrends() {
     Trends.store(sample);
     //#endregion
   }
+}
+
+function clearSheet(sheetName: string) {
+  Excel.run(function(context) {
+    var sheetRange = context.workbook.worksheets.getItem(sheetName).getRange();
+    sheetRange.clear("All");
+    sheetRange.format.columnWidth = 64;
+    sheetRange.format.rowHeight = 17;
+    return context.sync().then(function() {
+      console.log(`${sheetName} Cleared`);
+    });
+  });
 }
