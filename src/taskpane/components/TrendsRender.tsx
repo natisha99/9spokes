@@ -103,61 +103,73 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
   };
 
   _showTrendsResults = async (bool, val) => {
-    this.props.isLoading(true);
-    this.setState({
-      isLoading: true,
-      isError: false,
-      isSuccess: false,
-      emptyTrendsSearch: false,
-      showTrendsSearch: false,
-      showTrendsSetUp: false,
-      showTrendsResults: bool,
-      googleTrendsName: val
-    });
-
-    if (val.trim() == "") {
-      this.props.isLoading(false);
+    try {
+      this.props.isLoading(true);
       this.setState({
-        emptyTrendsSearch: true,
-        isError: true,
+        isLoading: true,
+        isError: false,
         isSuccess: false,
+        emptyTrendsSearch: false,
+        showTrendsSearch: false,
+        showTrendsSetUp: false,
+        showTrendsResults: bool,
+        googleTrendsName: val
+      });
+
+      if (val.trim() == "") {
+        this.props.isLoading(false);
+        this.setState({
+          emptyTrendsSearch: true,
+          isError: true,
+          isSuccess: false,
+          isDuplicate: false,
+          showTrendsSetUp: true,
+          showTrendsResults: false,
+          isLoading: false,
+          showTrendsSearch: true
+        });
+      } else {
+        let currentConfig = [];
+        let config = await loadConfig();
+        config.trends.forEach(item => {
+          currentConfig.push(item.keyword.toLowerCase());
+        });
+
+        if (currentConfig.some(x => x === val.toLowerCase())) {
+          this.setState({
+            emptyTrendsSearch: false,
+            isError: false,
+            isDuplicate: true,
+            isSuccess: false,
+            showTrendsSetUp: true,
+            showTrendsSearch: true,
+            isLoading: false
+          });
+          this.props.isLoading(false);
+        } else {
+          this.setState({
+            emptyTrendsSearch: false,
+            isError: false,
+            isDuplicate: false,
+            isSuccess: true,
+            showTrendsSetUp: true,
+            showTrendsSearch: true,
+            isLoading: false
+          });
+          addTrendsConfig({ keyword: val, weeks: 52 });
+          this.props.isLoading(false);
+        }
+      }
+    } catch (error) {
+      this.props.isLoading(false);
+      console.error(error);
+      this.setState({
+        isSuccess: false,
+        isError: true,
         isDuplicate: false,
         showTrendsSetUp: true,
-        showTrendsResults: false,
-        isLoading: false,
         showTrendsSearch: true
       });
-    } else {
-      let currentConfig = [];
-      let config = await loadConfig();
-      config.trends.forEach(item => {
-        currentConfig.push(item.keyword.toLowerCase());
-      });
-
-      if (currentConfig.some(x => x === val.toLowerCase())) {
-        this.setState({
-          emptyTrendsSearch: false,
-          isError: false,
-          isDuplicate: true,
-          isSuccess: false,
-          showTrendsSetUp: true,
-          showTrendsSearch: true,
-          isLoading: false
-        });
-        this.props.isLoading(false);
-      } else {
-        this.setState({
-          emptyTrendsSearch: false,
-          isError: false,
-          isDuplicate: false,
-          isSuccess: true,
-          showTrendsSetUp: true,
-          showTrendsSearch: true,
-          isLoading: false
-        });
-        addTrendsConfig({ keyword: val, weeks: 52 });
-        this.props.isLoading(false);
-      }
     }
   };
 

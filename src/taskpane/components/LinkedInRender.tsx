@@ -453,7 +453,7 @@ export default class LinkedInRender extends React.Component<any, LinkedInState> 
                               isSuccess: false,
                               isError: true,
                               isDuplicate: false,
-                              showLinkedinSearch: false
+                              showLinkedinSearch: true
                             });
                           }
                         }}

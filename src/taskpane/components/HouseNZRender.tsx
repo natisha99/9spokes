@@ -456,7 +456,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                               isSuccess: false,
                               isError: true,
                               isDuplicate: false,
-                              showHouseNZSearch: false
+                              showHouseNZSearch: true
                             });
                           }
                         }}
