@@ -137,12 +137,12 @@ export default class App extends React.Component<AppProps, AppState> {
   };
 
   /**
-   * Creates a new workbook using the template file prototype.xlsx
+   * Creates a new workbook using the template file template.xlsx
    */
   loadTemplate = async () => {
     try {
       Excel.run(async function(context) {
-        var templateFile = await (await fetch("/prototype.xlsx")).blob();
+        var templateFile = await (await fetch("/template.xlsx")).blob();
         var reader = new FileReader();
         reader.onload = function(_event) {
           Excel.run(function(context) {
