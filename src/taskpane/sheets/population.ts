@@ -386,11 +386,13 @@ export async function populateFinance() {
 
     //#region [rgba(20,50,20,0.5)] sample driver code
     let name = data.meta.symbol;
+    let utc_offset = data.meta.gmtoffset;
     let stocks_sample = [];
     data.timestamp.forEach((day, index) => {
-      const date = new Date(day * 1000);
+      const date = new Date((day+utc_offset) * 1000);
       stocks_sample.push([
-        `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+        //`${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
+	    date.toDateString(),
         data.indicators.adjclose[0].adjclose[index]
       ]);
     });
@@ -401,7 +403,7 @@ export async function populateFinance() {
     //#endregion
   }
 }
-
+	
 export async function populateTrends() {
   let Trends = {
     //Stores excel index for data
