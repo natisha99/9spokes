@@ -15,6 +15,8 @@ export interface HouseUK {
   etag: string;
   registered_office_is_in_dispute: string;
   can_file: string;
+  date_retrieved: string;
+  url: string;
 
   accounts: {
     next_due: string;
