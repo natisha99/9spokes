@@ -224,9 +224,9 @@ export default class App extends React.Component<AppProps, AppState> {
                     } else {
                       await populateHouseNZ();
                       await populateHouseUK();
+                      await populateLinkedIn();
                       await populateFinance();
                       await populateTrends();
-                      await populateLinkedIn();
                       this.setState({ isSuccessHome: true, isErrorHome: false, isLoading: false });
                     }
                   } catch (error) {
