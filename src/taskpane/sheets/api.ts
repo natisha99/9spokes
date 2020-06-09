@@ -10,9 +10,15 @@ import { Trends } from "../models/Trends";
  * @return {HouseSearchNZ}
  */
 export async function searchHouseNZ(searchString: string) {
-  const output = await fetch(
-    `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${searchString.replace(/ /g, "+")}`
-  ).then(response => response.json());
+  let output = [];
+  try {
+    output = await fetch(
+      `https://projectapi.co.nz/api/nzcompaniesoffice/search/?keyword=${searchString.replace(/ /g, "+")}`
+    ).then(response => response.json());
+  } catch (error) {
+    console.log(error);
+  }
+
   return { results: output } as HouseSearchNZ;
 }
 
@@ -34,9 +40,15 @@ export async function getHouseDataNZ(companyNumber: number) {
  * @return {HouseSearchUK}
  */
 export async function searchHouseUK(searchString: string) {
-  const output = await fetch(
-    `https://projectapi.co.nz/api/ukcompanieshouse/search/?keyword=${searchString.replace(/ /g, "+")}`
-  ).then(response => response.json());
+  let output = [];
+  try {
+    output = await fetch(
+      `https://projectapi.co.nz/api/ukcompanieshouse/search/?keyword=${searchString.replace(/ /g, "+")}`
+    ).then(response => response.json());
+  } catch (error) {
+    console.log(error);
+  }
+
   return { results: output } as HouseSearchUK;
 }
 
@@ -58,9 +70,15 @@ export async function getHouseDataUK(companyNumber: string) {
  * @returns {FinanceSearch}
  */
 export async function searchFinance(searchString: string) {
-  const output = await fetch(
-    `https://projectapi.co.nz/api/yahoofinances/search/?company_name=${searchString.replace(/ /g, "+")}`
-  ).then(response => response.json());
+  let output = { results: [] };
+  try {
+    output = await fetch(
+      `https://projectapi.co.nz/api/yahoofinances/search/?company_name=${searchString.replace(/ /g, "+")}`
+    ).then(response => response.json());
+  } catch (error) {
+    console.log(error);
+  }
+
   return output as FinanceSearch;
 }
 
@@ -97,9 +115,15 @@ export async function getTrendsData(keyword: string, weeks: number) {
  * @return {LinkedinSearch}
  */
 export async function searchLinkedin(searchString: string) {
-  const output = await fetch(
-    `https://projectapi.co.nz/api/linkedin/search/?keyword=${searchString.replace(/ /g, "+")}`
-  ).then(response => response.json());
+  let output = { results: [] };
+  try {
+    output = await fetch(
+      `https://projectapi.co.nz/api/linkedin/search/?keyword=${searchString.replace(/ /g, "+")}`
+    ).then(response => response.json());
+  } catch (error) {
+    console.log(error);
+  }
+
   return output as LinkedinSearch;
 }
 
