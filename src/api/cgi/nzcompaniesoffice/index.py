@@ -9,52 +9,34 @@ from datetime import datetime, timedelta
 from threading import Thread
 
 def commit(company_number, output, cursor, cnx):
-    """
-        The commit function adds the results to the mysql database cache.
- 
-    """
-    
-    # Two sql quries to remove the result if it has expired and add the new result to the database cache.
+    # Commit to database
     sql1 = "DELETE FROM nzcompaniesoffice WHERE company_number={};".format(company_number)
-    # This table uses a single column primary key company_number.
     sql2 = "INSERT INTO nzcompaniesoffice VALUES({}, '{}', '{}');".format(company_number, output, str(datetime.now()))
     cursor.execute(sql1)
-    cnx.commit()        # Commiting the delete query before executing insert query.
+    cnx.commit()
     cursor.execute(sql2)
     cnx.commit()
     cursor.close()
-    cnx.close()         # Close database connection.
+    cnx.close()
     
 def worker(html, string):
-    """
-        Worker thread locates substring of string location.
-        
-        Intended to be multithreaded but was ultimately deemed unnessasary due to fast execution speed .find() function.
-        O(log n), avg processing time: 4 miliseconds
-    """
     index = html.find(string)
     if index == -1:
         raise Exception('index not found:{}'.format(string))
     return index + len(string)
 
 def site(company_number):
-    """
-        Self created companies office nz api.
-        The official companies office nz api is very limited and provides us with no useful data.
-
-        So this function retrieves the company profile web page and extracts all the relevant data.
-    """
-
-    # Load company profile web page on companies office nz.
+    #url = 'http://10.0.0.10/removed.html'
+    #url = 'https://projectapi.co.nz/demo.html'
     url = 'https://app.companiesoffice.govt.nz/companies/app/ui/pages/companies/{}/detail?backurl=%2Fcompanies%2Fapp%2Fui%2Fpages%2Fcompanies%2F6842293'.format(company_number)
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     webpage = urlopen(req).read()
-    html = webpage.decode('utf-8').replace('\r', '').replace('\n', '')  # Removes all new line characters to reduce memory search footprint.
+    html = webpage.decode('utf-8').replace('\r', '').replace('\n', '')
 
-    # Extracts the maincol from the source
+    # maincol
     maincol = html[worker(html, 'id="maincol"'):]
     
-    # Divides the maincol into Catagories
+    # Catagories
     panel1 = maincol[worker(maincol, 'class="pageContainer"'):]
     panel2 = panel1[worker(panel1, 'class="pageContainer"'):]
     panel3 = panel2[worker(panel2, 'class="pageContainer"'):]
@@ -62,15 +44,16 @@ def site(company_number):
     panel5 = panel4[worker(panel4, 'class="pageContainer"'):]
     panel6 = panel5[worker(panel5, 'class="pageContainer"'):]
     panel7 = panel6[worker(panel6, 'class="pageContainer"'):]
+    panel7 = panel7[worker(panel7, 'class="pageContainer"'):]
 
     panel1 = panel1[:worker(panel1, 'class="pageContainer"')]
     panel2 = panel2[:worker(panel2, 'class="pageContainer"')]
     panel3 = panel3[:worker(panel3, 'class="pageContainer"')]
     panel4 = panel4[:worker(panel4, 'class="pageContainer"')]
     panel5 = panel5[:worker(panel5, 'class="pageContainer"')]
-    panel6 = panel6[:worker(panel6, 'class="pageContainer"')]
+    panel6 = panel6[:worker(panel6, panel7)]
     
-    # Catagory 1: Company Summary
+    # Company Summary
     _name = maincol[:worker(maincol, '<span class="entityIdentifier">')-len('<span class="entityIdentifier">')][::-1]
     _name = _name[:worker(_name, '>')-len('>')][::-1].strip()
 
@@ -113,12 +96,12 @@ def site(company_number):
             'constitution_filed':_constitution_filed,
             'ar_filing_month':_ar_filing_month,
             'ultimate_holding_company':_ultimate_holding_company,
-            'url':url,
-            'date_retrieved':str(datetime.now())
+            'url':url.split('?')[0],
+            'date_retrieved':str(datetime.now().date())
             }
     
 
-    # Catagory 2: Company Directors
+    # Company Directors
 
     directors = []
     while True:
@@ -141,7 +124,7 @@ def site(company_number):
             break
 
     
-    # Catagory 3: Company Shareholdings
+    # Company Shareholdings
 
     panel3 =  panel3[worker(panel3, '<label>Total Number of Shares:</label><span>'):]
     _total_number_of_shares =  int(panel3[:worker(panel3, '</span>')-len('</span>')].strip())
@@ -184,7 +167,7 @@ def site(company_number):
         shareholdings['allocation'].append([_shares, _holders])
     
     
-    # Catagory 4: Company Addresses
+    # Company Addresses
 
     panel4 = panel4[worker(panel4, '<div class="addressLine">'):]
     _registered_office_address = panel4[:worker(panel4, '</div>')-len('</div>')].strip()
@@ -205,23 +188,87 @@ def site(company_number):
         }
     
     
-    # Catagory 5: Company PPSR
+    # Company PPSR
 
     ppsr = {}
 
     
-    # Catagory 6: Company NZBN (additional nzbn information)
+    # Company NZBN (additional nzbn information)
     
     try:
         _industry = panel1[worker(panel1, 'for="businessClassification">Industry Classification(s):</label>'):]
         _industry = _industry[worker(_industry, '<div>'):]
         _industry = ' '.join(_industry[:worker(_industry, '</div>')-len('</div>')].strip().split(' ')[1:])
     except:
-        _industry = None
-    nzbn = {'industry':_industry}
+        _industry = ''
+
+    try:
+        _gst_number = panel6[worker(panel6, 'for="gstNumber">GST Number(s):</label>'):]
+        _gst_number = _gst_number[worker(_gst_number, 'class="nzbnDetails">'):]
+        _gst_number = _gst_number[:worker(_gst_number, '<')-len('<')].strip()
+    except:
+        _gst_number = ''
+
+    try:
+        _website = panel6[worker(panel6, 'for="website">Website(s):</label>'):]
+        if worker(_website, '<a href="') > worker(_website, '</div>'):
+            raise Exception('No data')
+        _website = _website[worker(_website, '<a href="'):]
+        _website = _website[:worker(_website, '"')-len('"')].strip()
+    except:
+        _website = ''
+
+    try:
+        _phone_number = panel6[worker(panel6, 'for="phone">Phone Number(s):</label>'):]
+        _phone_number = _phone_number[worker(_phone_number, '>'):]
+        _phone_number = _phone_number[:worker(_phone_number, '<')-len('<')].strip()
+    except:
+        _phone_number = ''
+
+    try:
+        _email_address = panel6[worker(panel6, 'for="email">Email Address(es):</label>'):]
+        if worker(_email_address, '<a href="') > worker(_email_address, '</div>'):
+            raise Exception('No data')
+        _email_address = _email_address[worker(_email_address, '<a href="'):]
+        _email_address = _email_address[:worker(_email_address, '<')-len('<')].strip().split(':')[1]
+    except:
+        _email_address = ''
+
+    try:
+        _trading_name = panel6[worker(panel6, 'for="tradingName">Trading Name(s):</label>'):]
+        _trading_name = _trading_name[worker(_trading_name, 'class="nzbnDetails">'):]
+        _trading_name = _trading_name[:worker(_trading_name, '<')-len('<')].strip()
+    except:
+        _trading_name = ''
+
+    try:
+        _trading_area = panel6[worker(panel6, 'for="tradingAreas">Trading Area(s):</label>'):]
+        _trading_area = _trading_area[worker(_trading_area, 'class="nzbnDetails">'):]
+        _trading_area = _trading_area[:worker(_trading_area, '<')-len('<')].strip()
+    except:
+        _trading_area = ''
+
+    try:
+        _abn = panel6[worker(panel6, 'for="ABNNumber">Australian Business Number (ABN):</label>'):]
+        _abn = _abn[worker(_abn, 'class="nzbnDetails">'):]
+        _abn = _abn[:worker(_abn, '<')-len('<')].strip()
+    except:
+        _abn = ''
+    
+    
+    nzbn = {
+        'gst_number':_gst_number if len(_gst_number)!=0 else 'Not Listed',
+        'website':_website if len(_website)!=0 else 'Not Listed',
+        'phone_number':_phone_number if len(_phone_number)!=0 else 'Not Listed',
+        'email_address':'Not Listed',
+        'trading_name':_trading_name if len(_trading_name)!=0 else 'Not Listed',
+        'trading_area':_trading_area if len(_trading_area)!=0 else 'Not Listed',
+        'industry':_industry if len(_industry)!=0 else 'Not Listed',
+        'abn':_abn if len(_abn)!=0 else 'Not Listed'
+        }
 
     
-    # Catagory 7: Company Documents
+    # Company Documents
 
     documents = {}
 
@@ -244,56 +291,50 @@ def site(company_number):
     return json.dumps(output)
 
 def main():
-    """
-        Executes apropriate functions to retrieve and return results from companies house.
-    """
-
-    # Retrieve html GET and POST request.
     form = cgi.FieldStorage()
     try:
         try:
-            # Extract company_number from request.
             company_number = int(form['company_number'].value)
+            #company_number=3538758
+            #company_number=9538759
+            #company_number=623457
+            #company_number=676632
         except KeyError:
+            # For testing outside browser and wrong browser request
             return {'error':'missing parameter'}
     except ValueError:
         # Not a number, stop
         return {'error':'Invalid company number: {}'.format(company_number)}
-    
-    # Connects to local database cache
     cnx = mysql.connector.connect(user='api', database='projectapi')
     cursor = cnx.cursor(buffered=True)
-
-    # Load results from database cache.
+    # Load from database
     sql = "SELECT * FROM nzcompaniesoffice WHERE company_number={};".format(company_number)
     cursor.execute(sql)
     try:
-        """
-                If in database cache return the result to the client.    
-        """
         data = list(cursor.fetchall()[0])
         if (datetime.now()-timedelta(days=30)) > data[2]:
             raise IndexError('item in database expired')
         output = data[1]
         cursor.close()
         cnx.close()
-    except IndexError:
-        """
-                If not in database cache or expired get new result from yahoofiances api.    
-        """
-        
-        output = site(company_number)
-
-        # Offload adding to database on different thread to return results without delay.
+    except IndexError:  # Not in database or expired
+        # Load from companiesregister.py
+        try:
+            output = site(company_number)
+        except:
+            output = json.dumps({'error':'removed'})
+        # Add to database
+        # Offload to different thread
         t1 = Thread(target=commit, args=(company_number, output, cursor, cnx,))
         t1.start()
+        #commit(company_number, output, cursor, cnx)
     
-    # Return json results to client.
+    # Return output
     return(output)
     
 if __name__ == "__main__":
-    """
-        If main thread execute program.
-    """
-    print('Content-type:application/json', end='\r\n\r\n')  # Informs the client (recipient/browser) of datatype json.
-    print(main(), end='')                                   # Executes main function and pass to client.
+    #import time
+    #start = time.time()
+    print('Content-type:application/json', end='\r\n\r\n')
+    print(main(), end='')
+    #print('\r\n\r\n{}s'.format(time.time()-start))
