@@ -105,16 +105,19 @@ export default class App extends React.Component<AppProps, AppState> {
     this.setState({
       listItems: [
         {
-          icon: "Home",
-          primaryText: 'Click "create workbook from template" in the Home tab.'
+          primaryText: '1. Click "Create workbook from template" in the Home tab.'
         },
         {
-          icon: "Design",
-          primaryText: "Search for a company in the Set-up tab then select the correct company from the options."
+          primaryText:
+            "2. Select a data source and search for a company in the Set-up tab, then select the appropriate one from the results."
         },
         {
-          icon: "Ribbon",
-          primaryText: "Import the data, this should display the data in the dashboard."
+          primaryText:
+            '3. Click on "Show current set-up" in the Set-up tab to view and/or ammend your current configurations.'
+        },
+        {
+          primaryText:
+            '4. Import the data separately through the Set-up tab, or click "Refresh data" in the Home tab to populate all data at once.'
         }
       ]
     });
@@ -196,7 +199,7 @@ export default class App extends React.Component<AppProps, AppState> {
           {/* Home Tab*/}
           <PivotItem headerText="Home">
             <Header logo="assets/logo-filled.png" title={this.props.title} message="Welcome" />
-            <Title message="Create a new worksheet to get started">
+            <Title message="Create a new workbook to get started">
               <DefaultButton
                 className="homePageButtons"
                 text="Create workbook from template"
