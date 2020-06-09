@@ -92,6 +92,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
     </MessageBar>
   );
 
+  // Called when user clicks "Show current set-up" to display current configs
   _showHouseUKRows = async bool => {
     this.setState({
       showHouseUKSearch: false,
@@ -111,6 +112,7 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
     this.setState({ houseUKRows: temp });
   };
 
+  // Called when the onSearch handler is invoked to display search results
   _showHouseUKResults = async (bool, val) => {
     this.props.isLoading(true);
     this.setState({
@@ -269,13 +271,21 @@ export default class HouseUKRender extends React.Component<any, HouseUKState> {
                     } else {
                       await populateHouseUK();
                       this.props.isLoading(false);
-                      this.setState({ isLoading: false, isSuccess: true, showHouseUKSetUp: true });
+                      this.setState({
+                        isLoading: false,
+                        isError: false,
+                        isDuplicate: false,
+                        noResults: false,
+                        isSuccess: true,
+                        showHouseUKSetUp: true
+                      });
                     }
                   } catch (error) {
                     console.error(error);
                     this.props.isLoading(false);
                     this.setState({
                       isLoading: false,
+                      isSuccess: false,
                       isDuplicate: false,
                       noResults: false,
                       isError: true,

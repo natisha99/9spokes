@@ -103,6 +103,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
     });
   };
 
+  // Called when user clicks "Show current set-up" to display current configs
   _showHouseNZRows = async bool => {
     this.setState({
       showHouseNZSearch: false,
@@ -122,6 +123,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
     this.setState({ houseNZRows: temp });
   };
 
+  // Called when the onSearch handler is invoked to display search results
   _showHouseNZResults = async (bool, val) => {
     this.props.isLoading(true);
     this.setState({
@@ -280,13 +282,21 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
                     } else {
                       await populateHouseNZ();
                       this.props.isLoading(false);
-                      this.setState({ isLoading: false, isSuccess: true, showHouseNZSetUp: true });
+                      this.setState({
+                        isLoading: false,
+                        isError: false,
+                        isDuplicate: false,
+                        noResults: false,
+                        isSuccess: true,
+                        showHouseNZSetUp: true
+                      });
                     }
                   } catch (error) {
                     console.error(error);
                     this.props.isLoading(false);
                     this.setState({
                       isLoading: false,
+                      isSuccess: false,
                       isDuplicate: false,
                       noResults: false,
                       isError: true,
