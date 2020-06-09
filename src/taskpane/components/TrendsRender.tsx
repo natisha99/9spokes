@@ -85,6 +85,7 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
     });
   };
 
+  // Called when user clicks "Show current set-up" to display current configs
   _showTrendsRows = async bool => {
     this.setState({
       showTrendsSearch: false,
@@ -102,6 +103,7 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
     this.setState({ trendsRows: temp });
   };
 
+  // Called when the onSearch handler is invoked to add keyword to config
   _showTrendsResults = async (bool, val) => {
     try {
       this.props.isLoading(true);
@@ -282,12 +284,24 @@ export default class TrendsRender extends React.Component<any, TrendsState> {
                     } else {
                       await populateTrends();
                       this.props.isLoading(false);
-                      this.setState({ isLoading: false, isSuccess: true, showTrendsSetUp: true });
+                      this.setState({
+                        isLoading: false,
+                        isError: false,
+                        isDuplicate: false,
+                        isSuccess: true,
+                        showTrendsSetUp: true
+                      });
                     }
                   } catch (error) {
                     console.error(error);
                     this.props.isLoading(false);
-                    this.setState({ isLoading: false, isDuplicate: false, isError: true, showTrendsSetUp: true });
+                    this.setState({
+                      isLoading: false,
+                      isSuccess: false,
+                      isDuplicate: false,
+                      isError: true,
+                      showTrendsSetUp: true
+                    });
                   }
                 }}
               />

@@ -103,6 +103,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
     });
   };
 
+  // Called when user clicks "Show current set-up" to display current configs
   _showFinanceRows = async bool => {
     this.setState({
       showFinanceSearch: false,
@@ -122,6 +123,7 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
     this.setState({ yahooRows: temp });
   };
 
+  // Called when the onSearch handler is invoked to display search results
   _showFinanceResults = async (bool, val) => {
     this.props.isLoading(true);
     this.setState({
@@ -284,13 +286,21 @@ export default class FinanceRender extends React.Component<any, FinanceState> {
                     } else {
                       await populateFinance();
                       this.props.isLoading(false);
-                      this.setState({ isLoading: false, isSuccess: true, showFinanceSetUp: true });
+                      this.setState({
+                        isLoading: false,
+                        isError: false,
+                        isDuplicate: false,
+                        noResults: false,
+                        isSuccess: true,
+                        showFinanceSetUp: true
+                      });
                     }
                   } catch (error) {
                     console.error(error);
                     this.props.isLoading(false);
                     this.setState({
                       isLoading: false,
+                      isSuccess: false,
                       isDuplicate: false,
                       noResults: false,
                       isError: true,
