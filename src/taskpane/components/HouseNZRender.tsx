@@ -201,7 +201,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
         {/* Companies House NZ */}
         <DefaultButton
           className="apiButton"
-          text="Companies House NZ"
+          text="Companies Office NZ"
           iconProps={{ iconName: "ChevronRight" }}
           onClick={() => this.setState({ showHouseNZSetUp: true })}
         />
@@ -233,7 +233,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
           {!this.state.showHouseNZSearch && this.state.isSuccess && <this.SuccessNotify />}
           {!this.state.showHouseNZSearch && this.state.isError && <this.ErrorNotify />}
           <div className={"centerText"}>
-            <Text className={"setUpHeaders"}>Companies House NZ</Text>
+            <Text className={"setUpHeaders"}>Companies Office NZ</Text>
           </div>
           <br />
           <div className={"center"}>
@@ -261,7 +261,7 @@ export default class HouseNZRender extends React.Component<any, HouseNZState> {
               />
               <DefaultButton
                 className="configButton"
-                text="Import Companies House NZ"
+                text="Import Companies Office"
                 iconProps={{ iconName: "ChevronRight" }}
                 onClick={async () => {
                   try {
