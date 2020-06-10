@@ -249,7 +249,7 @@ export default class App extends React.Component<AppProps, AppState> {
               </div>
               <br />
 
-              {/* Companies House NZ */}
+              {/* Companies Office NZ */}
               <HouseNZRender isLoading={this.isLoading} />
               <br />
 
@@ -257,16 +257,16 @@ export default class App extends React.Component<AppProps, AppState> {
               <HouseUKRender isLoading={this.isLoading} />
               <br />
 
-              {/* Google Trends */}
-              <TrendsRender isLoading={this.isLoading} />
+              {/* LinkedIn */}
+              <LinkedInRender isLoading={this.isLoading} />
               <br />
 
               {/* Yahoo Finance */}
               <FinanceRender isLoading={this.isLoading} />
               <br />
 
-              {/* LinkedIn */}
-              <LinkedInRender isLoading={this.isLoading} />
+              {/* Google Trends */}
+              <TrendsRender isLoading={this.isLoading} />
             </Title>
           </PivotItem>
 
