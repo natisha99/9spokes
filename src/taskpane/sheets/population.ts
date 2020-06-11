@@ -70,7 +70,7 @@ export async function populateHouseNZ() {
 
     //#region [rgba(70,20,20,0.5)] sample code region
     const summary = [
-      [data.INFO.SUMMARY.company_number],
+      [String(data.INFO.SUMMARY.company_number)],
       [String(data.INFO.SUMMARY.nzbn)],
       [data.INFO.SUMMARY.incorporation_date],
       [data.INFO.SUMMARY.company_status],
@@ -194,14 +194,17 @@ export async function populateHouseUK() {
     ];
     const accounts = [[data.accounts.next_due], [data.accounts.overdue]];
     let directors = [];
-    data.links.officers.forEach(director => {
-      directors.push([director.name]);
-    });
+    if (Object.keys(data.links.officers).length !== 0) {
+      data.links.officers.forEach(director => {
+        directors.push([director.name]);
+      });
+    }
     let shareHolders = [];
-    data.links.persons_with_significant_control.forEach(shareHolder => {
-      shareHolders.push([shareHolder.name]);
-    });
-
+    if (Object.keys(data.links.persons_with_significant_control).length !== 0) {
+      data.links.persons_with_significant_control.forEach(shareHolder => {
+        shareHolders.push([shareHolder.name]);
+      });
+    }
     const sample = [name, summary, accounts, directors, shareHolders];
     //stores companies house data
     await House.store(sample);

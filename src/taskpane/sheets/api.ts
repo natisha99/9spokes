@@ -31,6 +31,7 @@ export async function getHouseDataNZ(companyNumber: number) {
   const output = await fetch(
     `https://projectapi.co.nz/api/nzcompaniesoffice/?company_number=${companyNumber}`
   ).then(response => response.json());
+
   return output as HouseNZ;
 }
 
@@ -61,6 +62,7 @@ export async function getHouseDataUK(companyNumber: string) {
   const output = await fetch(
     `https://projectapi.co.nz/api/ukcompanieshouse/?company_number=${companyNumber}`
   ).then(response => response.json());
+
   return output.results as HouseUK;
 }
 
@@ -93,6 +95,7 @@ export async function getFinanceData(ticker: string, interval: string, range: st
   const output = await fetch(
     `https://projectapi.co.nz/api/yahoofinances/?interval=${interval}&range=${range}&ticker_symbol=${ticker}`
   ).then(response => response.json());
+
   return output as Finance;
 }
 
@@ -106,6 +109,7 @@ export async function getTrendsData(keyword: string, weeks: number) {
   const output = await fetch(
     `https://projectapi.co.nz/api/googletrends/?weeks=${weeks}&keyword=${keyword}`
   ).then(response => response.json());
+
   return output as Trends;
 }
 
@@ -136,5 +140,6 @@ export async function getLinkedinData(profileName: string) {
   const output = await fetch(`https://projectapi.co.nz/api/linkedin/?keyword=${profileName}`).then(response =>
     response.json()
   );
+
   return output.results as Linkedin;
 }
