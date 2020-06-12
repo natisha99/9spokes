@@ -19,6 +19,9 @@ def commit(ticker_symbol, results, cursor, cnx):
     cursor.close()
     cnx.close()
 
+def expected(dump):
+    return True
+    
 def site(ticker_symbol):
     stock = yf.Ticker(ticker_symbol)
     sus = stock.sustainability
@@ -30,39 +33,44 @@ def site(ticker_symbol):
             output[c1[i]] = c2[i]
     except:
         output = {'gmo': 'Not Available', 'coal': 'Not Available', 'adult': 'Not Available', 'nuclear': 'Not Available', 'palmOil': 'Not Available', 'tobacco': 'Not Available', 'catholic': 'Not Available', 'gambling': 'Not Available', 'totalEsg': 'Not Available', 'alcoholic': 'Not Available', 'peerCount': 'Not Available', 'peerGroup': 'Not Available', 'smallArms': 'Not Available', 'furLeather': 'Not Available', 'percentile': 'Not Available', 'pesticides': 'Not Available', 'socialScore': 'Not Available', 'animalTesting': 'Not Available', 'esgPerformance': 'Not Available', 'governanceScore': 'Not Available', 'environmentScore': 'Not Available', 'militaryContract': 'Not Available', 'socialPercentile': 'Not Available', 'highestControversy': 'Not Available', 'controversialWeapons': 'Not Available', 'governancePercentile': 'Not Available', 'environmentPercentile': 'Not Available'}
-    return {'results':output}
+    return json.dumps({'results':output})
     
 def main():
     form = cgi.FieldStorage()
     ticker_symbol = str(form['ticker_symbol'].value).upper()
-    #company_name = 'Air New Zealand Limited'
-    #ticker_symbol = 'fb'
-    #ticker_symbol = 'AIR.NZ'
-    # Start sql connector
     cnx = mysql.connector.connect(user='api', database='projectapi')
     cursor = cnx.cursor(buffered=True)
-    # Load from database
     sql = "SELECT * FROM yahoofinancessustainable WHERE ticker='{}';".format(ticker_symbol)
     cursor.execute(sql)
+    
+    cache_results = ''
+    cache_expired = False
+    fetch_results = ''
+    results = ''
     try:
         data = list(cursor.fetchall()[0])
         if (datetime.now()-timedelta(days=30)) > data[2]:
             raise IndexError('item in database expired')
-        results = json.loads(data[1])
+        cache_results = json.loads(data[1])
         cursor.close()
         cnx.close()
-        #print('database')
-    except:  # Not in database or expired
-        results = json.dumps(site(ticker_symbol))
-        # Offload to different thread
-        t1 = Thread(target=commit, args=(ticker_symbol, results, cursor, cnx,))
-        t1.start()
-        #print('google api')
-        # If failed to offload, continue on same thread
-        #commit(company_name, json.dumps(results), cursor, cnx)
+    except:
+        cache_expired = True
+        fetch_results = site(ticker_symbol)
+    finally:
+        if not cache_expired:
+            results = cache_results
+        elif expected(fetch_results):
+            t1 = Thread(target=commit, args=(ticker_symbol, fetch_results, cursor, cnx,))
+            t1.start()
+            results = fetch_results
+        elif cache_expired:
+            results = cache_results
+        else:
+            results = json.dumps({'error':'api access problem'})
 
     return results
 
 if __name__ == '__main__':
     print('Content-type:application/json', end='\r\n\r\n')
-    print(main(), end='')
+    print(main().encode(encoding='UTF-8',errors='ignore').decode(), end='')

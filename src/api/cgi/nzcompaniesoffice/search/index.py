@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 from threading import Thread
 
 def commit(keyword, result, cursor, cnx):
-    # Commit to database
     sql1 = "DELETE FROM nzcompaniesofficesearch WHERE keyword='{}';".format(keyword)
     sql2 = "INSERT INTO nzcompaniesofficesearch VALUES('{}', '{}', '{}');".format(keyword, result, str(datetime.now()))
     cursor.execute(sql1)
@@ -19,6 +18,9 @@ def commit(keyword, result, cursor, cnx):
     cursor.close()
     cnx.close()
 
+def expected(dump):
+    return True
+
 def worker(html, string, end=True):
     index = html.find(string)
     if index == -1:
@@ -27,14 +29,15 @@ def worker(html, string, end=True):
 
 def site(keyword):
     url = 'https://app.companiesoffice.govt.nz/companies/app/ui/pages/companies/search?mode=standard&type=entities&q={}&advancedPanel=true&entityTypes=ALL&entityStatusGroups=ALL'.format(keyword).replace(' ', '+')
-    #url = 'https://projectapi.co.nz/demosearch.html'
-    #url = 'https://app.companiesoffice.govt.nz/companies/app/ui/pages/companies/search?mode=standard&type=entities&q=air&advancedPanel=true&entityTypes=ALL&entityStatusGroups=ALL'
     req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     webpage = urlopen(req).read()
     html = webpage.decode('utf-8').replace('\r', '').replace('\n', '')
 
     # maincol
-    panelcontent = html[worker(html, 'class="panelContent"'):]
+    try:
+        panelcontent = html[worker(html, 'class="panelContent"'):]
+    except: # If site is down
+        return json.dumps([])
 
     results = []
     while True:
@@ -62,42 +65,43 @@ def main():
     try:
         try:
             keyword = str(form['keyword'].value).lower()
-            #keyword = 'test_air'
-            #keyword = 'air new'
         except KeyError:
-            # For testing outside browser and wrong browser request
             return {'error':'missing parameter'}
     except ValueError:
-        # Not a number, stop
         return {'error':'Invalid keyword {}'.format(keyword)}
     cnx = mysql.connector.connect(user='api', database='projectapi')
     cursor = cnx.cursor(buffered=True)
-    # Load from database
+    
     sql = "SELECT * FROM nzcompaniesofficesearch WHERE keyword='{}';".format(keyword)
     cursor.execute(sql)
+    
+    cache_results = ''
+    cache_expired = False
+    fetch_results = ''
+    results = ''
     try:
         data = list(cursor.fetchall()[0])
         if (datetime.now()-timedelta(days=30)) > data[2]:
             raise IndexError('item in database expired')
-        result = data[1]
+        cache_results = data[1]
         cursor.close()
         cnx.close()
-    except IndexError:  # Not in database or expired
-        # Load from companiesregister.py
-        result = site(keyword)
-        # Add to database
-        # Offload to different thread
-        t1 = Thread(target=commit, args=(keyword, result, cursor, cnx,))
-        t1.start()
-        #commit(keyword, result, cursor, cnx)
-    
-    # Return output
-    return(result)
+    except IndexError:
+        cache_expired =  True
+        fetch_results = site(keyword)
+    finally:
+        if not cache_expired:
+            results = cache_results
+        elif expected(fetch_results):
+            t1 = Thread(target=commit, args=(keyword, fetch_results, cursor, cnx,))
+            t1.start()
+            results = fetch_results
+        elif cache_expired:
+            results = cache_results
+        else:
+            results = json.dumps({'error':'api access problem'})
+    return results
     
 if __name__ == "__main__":
-    #import time
-    #start = time.time()
     print('Content-type:application/json', end='\r\n\r\n')
-    print(main(), end='')
-    #print(site('9spokes'))
-    #print('\r\n\r\n{}s'.format(time.time()-start))
+    print(main().encode(encoding='UTF-8',errors='ignore').decode(), end='')

@@ -20,63 +20,76 @@ def commit(company_name, results, cursor, cnx):
     cursor.close()
     cnx.close()
 
+def expected(dump):
+    return True
+    
 def site(company_name):
-    url = 'https://nz.finance.yahoo.com/lookup?s={}'.format(company_name).replace(' ', '%20')
-    #url = 'https://nz.finance.yahoo.com/lookup?s=air%20new%20zealand'
-    req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    webpage = urlopen(req).read()
-    html = webpage.decode('utf-8').replace('\r', '').replace('\n', '')
-
-    results = []
-    html = html[html.find('Symbols similar to'):]
-
-    index = html.find('data-symbol="')
-    while index != -1:
-        html = html[index+13:]
-        end = html.find('"')
+    currencies  = ['nzd', 'usd', 'eur', 'aud', 'sgd']
+    if company_name in currencies:
+        currencies.remove(company_name)
+        return json.dumps({'results':[company_name+'/'+c for c in currencies]})
+    elif len(company_name) == 7 and company_name[:3] in currencies and company_name[4:] in currencies:
+        return json.dumps({'results':[company_name[:3]+'/'+company_name[4:]]})
+    else:
+        url = 'https://nz.finance.yahoo.com/lookup?s={}'.format(company_name).replace(' ', '%20')
+        req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        webpage = urlopen(req).read()
+        html = webpage.decode('utf-8').replace('\r', '').replace('\n', '')
         
-        results.append(html[:end])
+        results = []
+        html = html[html.find('Symbols similar to'):]
         
         index = html.find('data-symbol="')
-
-    output = []
-    for result in results:
-        if result not in output:
-            output.append(result)
-
-    return json.dumps({'results':output})
+        while index != -1:
+            html = html[index+13:]
+            end = html.find('"')
+            
+            results.append(html[:end]) 
+            index = html.find('data-symbol="')
+        
+        output = []
+        for result in results:
+            if result not in output:
+                output.append(result)
+        
+        return json.dumps({'results':output})
     
 def main():
     form = cgi.FieldStorage()
-    company_name = str(form['company_name'].value).lower()
-    
-    #company_name = 'air new zealand'
-    
-    # Start sql connector
+    company_name = str(form['company_name'].value).lower().strip()
     cnx = mysql.connector.connect(user='api', database='projectapi')
     cursor = cnx.cursor(buffered=True)
-    # Load from database
     sql = "SELECT * FROM yahoofinancessearch WHERE company_name='{}';".format(company_name)
     cursor.execute(sql)
+    
+    cache_results = ''
+    cache_expired = False
+    fetch_results = ''
+    results = ''
     try:
         data = list(cursor.fetchall()[0])
         if (datetime.now()-timedelta(days=60)) > data[3]:
             raise IndexError('item in database expired')
-        results = data[2]
+        cache_results = data[2]
         cursor.close()
         cnx.close()
-        #print('database')
-    except:  # Not in database or expired
-        results = site(company_name)
-        # Offload to different thread
-        t1 = Thread(target=commit, args=(company_name, results, cursor, cnx,))
-        t1.start()
-        #print('google api')
-        # If failed to offload, continue on same thread
-        #commit(company_name, json.dumps(results), cursor, cnx)
+    except:
+        cache_expired = True
+        fetch_results = site(company_name)
+    finally:
+        if not cache_expired:
+            results = cache_results
+        elif expected(fetch_results):
+            t1 = Thread(target=commit, args=(company_name, fetch_results, cursor, cnx,))
+            t1.start()
+            results = fetch_results
+        elif cache_expired:
+            results = cache_results
+        else:
+            results = json.dumps({'error':'api access problem'})
 
     return results
 
 if __name__ == '__main__':
     print('Content-type:application/json', end='\r\n\r\n')
-    print(main(), end='')
+    print(main().encode(encoding='UTF-8',errors='ignore').decode(), end='')

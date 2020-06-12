@@ -1,4 +1,5 @@
 #!/usr/bin/pypy3
+#!/usr/bin/python3
 
 import socket
 import mysql.connector
@@ -13,13 +14,15 @@ def commit(keyword, results, cursor, cnx):
         keyword,
         results,
         str(datetime.now()))
-    #print(sql2)
     cursor.execute(sql1, (keyword,))
     cnx.commit()
     cursor.execute(sql2, val2)
     cnx.commit()
     cursor.close()
     cnx.close()
+
+def expected(dump):
+    return True
 
 def site(keyword):
     ClientSocket = socket.socket()
@@ -42,35 +45,41 @@ def site(keyword):
 def main():
     form = cgi.FieldStorage()
     keyword = 'get:'+str(form['keyword'].value)
-    #keyword = 'get:air-canada'
-    #print(keyword)
-    #print(type(keyword))
-    #print('SELECT %s FROM' %keyword)
     
-    # Start sql connector
     cnx = mysql.connector.connect(user='api', database='projectapi')
     cursor = cnx.cursor(buffered=True)
-    # Load from database
+    
     sql = "SELECT * FROM linkedin WHERE keyword=%s;"
     cursor.execute(sql, (keyword,))
+    
+    cache_results = ''
+    cache_expired = False
+    fetch_results = ''
+    results = ''
     try:
         data = list(cursor.fetchall()[0])
-        #print(data)
         if (datetime.now()-timedelta(days=180)) > data[2]:
             raise IndexError('item in database expired')
-        results = data[1]
+        cache_results = data[1]
         cursor.close()
         cnx.close()
-    except:  # Not in database or expired
-        results = site(keyword)
-        # Offload to different thread
-        #t1 = Thread(target=commit, args=(keyword, results, cursor, cnx,))
-        #t1.start()
-        # If failed to offload, continue on same thread
-        commit(keyword, results, cursor, cnx)
+    except:
+        cache_expired = True
+        fetch_results = site(keyword)
+    finally:
+        if not cache_expired:
+            results = cache_results
+        elif expected(fetch_results):
+            t1 = Thread(target=commit, args=(keyword, fetch_results, cursor, cnx,))
+            t1.start()
+            results = fetch_results
+        elif cache_expired:
+            results = cache_results
+        else:
+            results = json.dumps({'error':'api access problem'})
 
     return results
 
 if __name__ == '__main__':
     print('Content-type:application/json', end='\r\n\r\n')
-    print(main().encode('ascii',errors='ignore').decode(), end='')
+    print(main().encode(encoding='UTF-8',errors='ignore').decode(), end='')

@@ -18,6 +18,9 @@ def commit(company_number, output, cursor, cnx):
     cnx.commit()
     cursor.close()
     cnx.close()
+   
+def expected(dump):
+    return True
     
 def worker(html, string):
     index = html.find(string)
@@ -295,46 +298,46 @@ def main():
     try:
         try:
             company_number = int(form['company_number'].value)
-            #company_number=3538758
-            #company_number=9538759
-            #company_number=623457
-            #company_number=676632
         except KeyError:
-            # For testing outside browser and wrong browser request
             return {'error':'missing parameter'}
     except ValueError:
-        # Not a number, stop
         return {'error':'Invalid company number: {}'.format(company_number)}
     cnx = mysql.connector.connect(user='api', database='projectapi')
     cursor = cnx.cursor(buffered=True)
-    # Load from database
+    
     sql = "SELECT * FROM nzcompaniesoffice WHERE company_number={};".format(company_number)
     cursor.execute(sql)
+    
+    cache_results = ''
+    cache_expired = False
+    fetch_results = ''
+    results = ''
     try:
         data = list(cursor.fetchall()[0])
         if (datetime.now()-timedelta(days=30)) > data[2]:
             raise IndexError('item in database expired')
-        output = data[1]
+        cache_results = data[1]
         cursor.close()
         cnx.close()
-    except IndexError:  # Not in database or expired
-        # Load from companiesregister.py
+    except IndexError:
+        cache_expired = True
         try:
-            output = site(company_number)
+            fetch_results = site(company_number)
         except:
-            output = json.dumps({'error':'removed'})
-        # Add to database
-        # Offload to different thread
-        t1 = Thread(target=commit, args=(company_number, output, cursor, cnx,))
-        t1.start()
-        #commit(company_number, output, cursor, cnx)
-    
-    # Return output
-    return(output)
+            fetch_results = json.dumps({'error':'removed'})
+    finally:
+        if not cache_expired:
+            results = cache_results
+        elif expected(fetch_results):
+            t1 = Thread(target=commit, args=(company_number, fetch_results, cursor, cnx,))
+            t1.start()
+            results = fetch_results
+        elif cache_expired:
+            results = cache_results
+        else:
+            results = json.dumps({'error':'api access problem'})
+    return results
     
 if __name__ == "__main__":
-    #import time
-    #start = time.time()
     print('Content-type:application/json', end='\r\n\r\n')
-    print(main(), end='')
-    #print('\r\n\r\n{}s'.format(time.time()-start))
+    print(main().encode(encoding='UTF-8',errors='ignore').decode(), end='')

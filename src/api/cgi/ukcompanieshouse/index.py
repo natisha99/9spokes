@@ -1,4 +1,5 @@
 #!/usr/bin/pypy3
+#!/usr/bin/python3
 
 from http.client import HTTPSConnection
 from base64 import b64encode
@@ -11,7 +12,7 @@ import cgi
 
 class ukcompanieshouse:
     URL = 'api.companieshouse.gov.uk'
-    KEY = ''    # Enter API token here.
+    KEY = 'qIBRmqZAEJFQrpaoYPKs-2b3XkdchKOOy4GufDaS'
     
     def __init__(self):
         basic_auth = b64encode((self.KEY+':').encode(encoding='ascii', errors='ignore')).decode("ascii")
@@ -68,7 +69,6 @@ class ukcompanieshouse:
             return results
     
     def company_profile(self, company_number, recursive=True):
-        #['accounts', 'registered_office_address', 'undeliverable_registered_office_address', 'has_been_liquidated', 'company_number', 'status', 'company_name', 'jurisdiction', 'type', 'date_of_creation', 'last_full_members_list_date', 'sic_codes', 'etag', 'company_status', 'has_insolvency_history', 'has_charges', 'links', 'registered_office_is_in_dispute', 'date_of_cessation', 'can_file']
         res = self.api('/company/{}'.format(company_number))
         results = json.loads(res)
         for r in results:
@@ -100,44 +100,47 @@ def commit(company_number, results, cursor, cnx):
     cursor.close()
     cnx.close()
 
+def expected(dump):
+    return True
+    
 def main():
     form = cgi.FieldStorage()
     company_number = str(form['company_number'].value)
-    #company_number = '00041424'
-    
-    
-    # Start sql connector
+
     cnx = mysql.connector.connect(user='api', database='projectapi')
     cursor = cnx.cursor(buffered=True)
-    # Load from database
+    
     sql = "SELECT * FROM ukcompanieshouse WHERE company_number=%s;"
     cursor.execute(sql, (company_number,))
+    
+    cache_results = ''
+    cache_expired = False
+    fetch_results = ''
+    results = ''
     try:
         data = list(cursor.fetchall()[0])
         if (datetime.now()-timedelta(days=30)) > data[2]:
             raise IndexError('item in database expired')
-        results = data[1]
+        cache_results = data[1]
         cursor.close()
         cnx.close()
-    except:  # Not in database or expired
+    except:
+        cache_expired = True
         company = ukcompanieshouse()
-        results = json.dumps(company.company_profile(company_number))
-        # Offload to different thread
-        t1 = Thread(target=commit, args=(company_number, results, cursor, cnx,))
-        t1.start()
-        # If failed to offload, continue on same thread
-        #commit(keyword, json.dumps(results), cursor, cnx)
-    output = json.loads(results)
-    return json.dumps(output)
+        fetch_results = json.dumps(company.company_profile(company_number))
+    finally:
+        if not cache_expired:
+            results = cache_results
+        elif expected(fetch_results):
+            t1 = Thread(target=commit, args=(company_number, fetch_results, cursor, cnx,))
+            t1.start()
+            results = fetch_results
+        elif cache_expired:
+            results = cache_results
+        else:
+            results = json.dumps({'error':'api access problem'})
+    return results
 
 if __name__ == '__main__':
     print('Content-type:application/json', end='\r\n\r\n')
-    print(main(), end='')
-
-
-#print(api('/search/companies?q={}&items_per_page=20'.format('9spokes')))
-
-#a = ukcompanieshouse()
-#print(a.search('Unilever'))
-#print(a.company_profile('08693015'))
-#print(a.filing_history('08693015'))
+    print(main().encode(encoding='UTF-8',errors='ignore').decode(), end='')

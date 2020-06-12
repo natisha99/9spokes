@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import pandas as pd
-from request import TrendReq
+from pytrends.request import TrendReq
 import cgi
 import json
 import mysql.connector
@@ -21,6 +21,9 @@ def commit(keyword, results, cursor, cnx):
     cursor.close()
     cnx.close()
 
+def expected(dump):
+    return True
+
 def site(keyword):
     pytrend = TrendReq()
     pytrend.build_payload(kw_list=[keyword])
@@ -32,45 +35,56 @@ def site(keyword):
     for i in range(len(data)):
         results.append([str(dates[i]), int(data[i])])
     
-    return {'series':results}
+    return json.dumps({'series':results})
 
 def main():
     form = cgi.FieldStorage()
     keyword = str(form['keyword'].value)
-    #keyword = '9spokes'
     try:
         weeks = int(form['weeks'].value)
     except:
         weeks = 52
     
-    # Start sql connector
+    
     cnx = mysql.connector.connect(user='api', database='projectapi')
     cursor = cnx.cursor(buffered=True)
-    # Load from database
+    
     sql = "SELECT * FROM googletrends WHERE keyword='{}';".format(keyword)
     cursor.execute(sql)
+    
+    cache_results = ''
+    cache_expired = False
+    fetch_results = ''
+    results = ''
     try:
         data = list(cursor.fetchall()[0])
         if (datetime.now()-timedelta(days=7)) > data[3]:
             raise IndexError('item in database expired')
-        results = json.loads(data[2])
+        cache_results = json.loads(data[2])
         cursor.close()
         cnx.close()
-    except:  # Not in database or expired
-        results = site(keyword)
-        # Offload to different thread
-        t1 = Thread(target=commit, args=(keyword, json.dumps(results), cursor, cnx,))
-        t1.start()
-        # If failed to offload, continue on same thread
-        #commit(keyword, json.dumps(results), cursor, cnx)
-
+    except:
+        cache_expired = True
+        fetch_results = site(keyword)
+    finally:
+        if not cache_expired:
+            results = cache_results
+        elif expected(fetch_results):
+            t1 = Thread(target=commit, args=(keyword, fetch_results, cursor, cnx,))
+            t1.start()
+            results = fetch_results
+        else:
+            results = cache_results
+    
+    results = json.loads(results)
     results['series'] = results['series'][:weeks]
     try:
         factor = 100/max([w[1] for w in results['series']])
         results['series'] = [[x[0],int(x[1]*factor)] for x in results['series']]
     except ZeroDivisionError:
         pass
-    return results
+    return json.dumps(results)
+
 if __name__ == '__main__':
     print('Content-type:application/json', end='\r\n\r\n')
-    print(json.dumps(main()), end='')
+    print(main().encode(encoding='UTF-8',errors='ignore').decode(), end='')
