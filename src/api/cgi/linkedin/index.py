@@ -82,4 +82,4 @@ def main():
 
 if __name__ == '__main__':
     print('Content-type:application/json', end='\r\n\r\n')
-    print(main().encode(encoding='UTF-8',errors='ignore').decode(), end='')
+    print(main().encode("utf-8", "ignore").decode(encoding='utf-8', errors='ignore'), end='')
