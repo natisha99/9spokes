@@ -12,7 +12,7 @@ import cgi
 
 class ukcompanieshouse:
     URL = 'api.companieshouse.gov.uk'
-    KEY = 'qIBRmqZAEJFQrpaoYPKs-2b3XkdchKOOy4GufDaS'
+    KEY = ''
     
     def __init__(self):
         basic_auth = b64encode((self.KEY+':').encode(encoding='ascii', errors='ignore')).decode("ascii")

@@ -60,7 +60,7 @@ def main():
         data = list(cursor.fetchall()[0])
         if (datetime.now()-timedelta(days=7)) > data[3]:
             raise IndexError('item in database expired')
-        cache_results = json.loads(data[2])
+        cache_results = data[2]
         cursor.close()
         cnx.close()
     except:

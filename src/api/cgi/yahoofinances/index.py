@@ -69,7 +69,7 @@ def main():
         if not cache_expired:
             results = cache_results
         elif expected(fetch_results):
-            t1 = Thread(target=commit, args=(ticker_symbol, fetch_results, cursor, cnx,))
+            t1 = Thread(target=commit, args=(ticker, fetch_results, cursor, cnx,))
             t1.start()
             results = fetch_results
         elif cache_expired:
@@ -77,7 +77,7 @@ def main():
         else:
             results = json.dumps({'error':'api access problem'})
     
-    output = json.loads(final_results)
+    output = json.loads(results)
     if iinterval == '1d' and rrange == '1y':
         yesterday = datetime.combine(datetime.utcnow().date(), datetime.min.time())-timedelta(hours=24)
         while len(output['chart']['result'][0]['timestamp']) > 250:
