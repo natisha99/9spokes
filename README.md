@@ -37,9 +37,7 @@ Follow [this tutorial from Microsoft](https://docs.microsoft.com/en-us/office/de
 - [Yeoman](https://github.com/yeoman/yo) and [Yeoman Generator](https://github.com/OfficeDev/generator-office)
   Install these with the following command
 
-```bash
-npm install -g yo generator-office
-```
+```npm install -g yo generator-office```
 
 ## Installing
 
@@ -47,9 +45,7 @@ Clone or Download this repository and run the following script in your terminal 
 
 directory of the project
 
-```bash
-npm install
-```
+```npm install```
 
 ## Report a bug or get further
 
